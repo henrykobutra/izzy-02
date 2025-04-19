@@ -49,7 +49,7 @@ export function HowItWorks() {
   }, [isAutoplayEnabled]);
 
   return (
-    <section id="how-it-works" className="py-24 bg-black overflow-hidden">
+    <section id="how-it-works" className="py-24 overflow-hidden">
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tighter text-center mb-6">
           How Our AI Agents Work Together

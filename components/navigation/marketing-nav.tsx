@@ -6,6 +6,7 @@ import {
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 
 export default function MarketingNav() {
@@ -21,29 +22,35 @@ export default function MarketingNav() {
             className="object-contain h-10 w-10"
             priority
           />
-          <span className="text-2xl font-bold tracking-tighter text-white select-none">Izzy AI</span>
+          <span className="text-2xl font-bold tracking-tighter select-none">Izzy AI</span>
         </Link>
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/#how-it-works" className="text-sm font-medium hover:text-primary transition px-4 py-2">
+              <Link href="/#how-it-works" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 How it works
               </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/pricing" className="text-sm font-medium hover:text-primary transition px-4 py-2">
+              <Link href="/pricing" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 Pricing
               </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/about" className="text-sm font-medium hover:text-primary transition px-4 py-2">
+              <Link href="/about" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 About
               </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
         <Link href="/login">
-          <Button variant="default">
+          <Button variant="outline" effect="ringHover" className="cursor-pointer">
             Open Dashboard
           </Button>
         </Link>

@@ -32,7 +32,7 @@ export default function HomePage() {
         </section>
 
         {/* How It Works */}
-        <section id="how-it-works" className="py-20 bg-black">
+        <section id="how-it-works">
           <div className="container mx-auto">
             <HowItWorks />
           </div>
