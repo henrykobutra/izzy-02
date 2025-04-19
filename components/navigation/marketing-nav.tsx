@@ -27,25 +27,19 @@ export default function MarketingNav() {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link href="/#how-it-works">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink href="/#how-it-works" className={navigationMenuTriggerStyle()}>
                 How it works
               </NavigationMenuLink>
-              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/pricing">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink href="/pricing" className={navigationMenuTriggerStyle()}>
                 Pricing
               </NavigationMenuLink>
-              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/about">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink href="/about" className={navigationMenuTriggerStyle()}>
                 About
               </NavigationMenuLink>
-              </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
