@@ -26,25 +26,25 @@ export default function MarketingNav() {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink href="#how-it-works" className="text-sm font-medium hover:text-primary transition px-4 py-2">
+              <NavigationMenuLink href="/#how-it-works" className="text-sm font-medium hover:text-primary transition px-4 py-2">
                 How it works
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="#pricing" className="text-sm font-medium hover:text-primary transition px-4 py-2">
+              <NavigationMenuLink href="/pricing" className="text-sm font-medium hover:text-primary transition px-4 py-2">
                 Pricing
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="#about" className="text-sm font-medium hover:text-primary transition px-4 py-2">
+              <NavigationMenuLink href="/about" className="text-sm font-medium hover:text-primary transition px-4 py-2">
                 About
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
         <Link href="/login">
-          <Button className="rounded-lg bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-primary/50 px-8 py-6 text-base font-semibold cursor-pointer transition">
-            Get Started
+          <Button variant="default">
+            Open Dashboard
           </Button>
         </Link>
       </nav>
