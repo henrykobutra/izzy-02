@@ -9,7 +9,6 @@ import {
   StrategyVisual,
   InterviewVisual,
   FeedbackVisual,
-  IterateVisual,
 } from "./visualizations";
 
 export function HowItWorks() {
@@ -142,7 +141,7 @@ function AnimatedVisualization({
       case 4:
         return <FeedbackVisual />;
       case 5:
-        return <IterateVisual />;
+        return <FeedbackVisual />; // Fallback to FeedbackVisual
       default:
         return <ProfileAnalysisVisual isAutoplayEnabled={isAutoplayEnabled} />;
     }

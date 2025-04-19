@@ -43,14 +43,5 @@ export const steps: Step[] = [
     icon: IconTimeline,
     color: "bg-amber-600",
     lightColor: "bg-amber-500/10",
-  },
-  {
-    id: 5,
-    title: "Iterate & Improve",
-    description:
-      "Refine your performance with each round—apply feedback, practice again, and watch your interview skills soar.",
-    icon: IconRefresh,
-    color: "bg-pink-600",
-    lightColor: "bg-pink-500/10",
-  },
+  }
 ];

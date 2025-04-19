@@ -63,11 +63,6 @@ const data = {
       url: "/dashboard/feedback",
       icon: IconChartBar,
     },
-    {
-      title: "Iterate & Improve",
-      url: "/dashboard/iterate",
-      icon: IconRefresh,
-    },
   ],
   navClouds: [
     {
