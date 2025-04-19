@@ -10,7 +10,7 @@ export default function HomePage() {
       {/* Navigation */}
       <header className="container mx-auto py-6">
         <nav className="flex items-center justify-between">
-          <div className="text-2xl font-bold tracking-tighter">PREPI</div>
+          <div className="text-2xl font-bold tracking-tighter">IZZY</div>
           <div className="hidden md:flex items-center gap-8">
             <Link href="#how-it-works" className="text-sm font-medium hover:text-purple-400 transition">
               HOW IT WORKS
@@ -106,7 +106,7 @@ export default function HomePage() {
               Join thousands of job seekers who have improved their interview performance with our AI-powered platform.
             </p>
             <Button className="rounded-full bg-white text-purple-900 hover:bg-gray-100 px-8 py-6 text-lg">
-              TRY PREPI NOW
+              TRY IZZY NOW
             </Button>
           </div>
         </section>
@@ -124,7 +124,7 @@ export default function HomePage() {
       <footer className="border-t border-gray-800 py-8">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-xl font-bold tracking-tighter mb-4 md:mb-0">PREPI</div>
+            <div className="text-xl font-bold tracking-tighter mb-4 md:mb-0">IZZY</div>
             <div className="flex gap-6 text-sm text-gray-400">
               <Link href="#" className="hover:text-white">
                 Privacy
@@ -138,7 +138,7 @@ export default function HomePage() {
             </div>
           </div>
           <p className="text-center text-gray-600 text-sm mt-6">
-            © {new Date().getFullYear()} PREPI. All rights reserved.
+            {new Date().getFullYear()} IZZY. All rights reserved.
           </p>
         </div>
       </footer>
