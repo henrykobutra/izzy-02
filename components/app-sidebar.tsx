@@ -112,16 +112,6 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: IconSettings,
-    },
-    {
-      title: "FAQ",
-      url: "/dashboard/faq",
-      icon: IconHelp,
-    },
   ],
 }
 
