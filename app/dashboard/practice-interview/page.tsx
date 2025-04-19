@@ -177,7 +177,7 @@ export default function PracticeInterviewPage() {
     }
     
     const position = selectedTab === "generic" 
-      ? genericPositions.find(p => p.id === genericPosition)?.title 
+      ? Object.values(genericPositions).flat().find(p => p.id === genericPosition)?.title 
       : selectedPosition?.title
       
     console.log("Starting interview:", { 
