@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sparkles } from "lucide-react"
-import { IconArrowRight } from "@tabler/icons-react"
 
 export default function CTASection() {
   return (
@@ -20,7 +19,7 @@ export default function CTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto mt-4 justify-center items-center">
-            <Button asChild size="lg" effect="expandIcon" icon={IconArrowRight} iconPlacement="right" className="w-full sm:w-auto">
+            <Button asChild size="lg" effect="expandIcon" className="w-full sm:w-auto">
               <Link href="/login">Get Started</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
