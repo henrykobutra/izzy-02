@@ -27,21 +27,21 @@ export default function MarketingNav() {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link href="/#how-it-works" legacyBehavior passHref>
+              <Link href="/#how-it-works">
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 How it works
               </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/pricing" legacyBehavior passHref>
+              <Link href="/pricing">
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 Pricing
               </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/about" legacyBehavior passHref>
+              <Link href="/about">
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 About
               </NavigationMenuLink>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import AgentVisualizer from "@/components/animations/soundbar";
 import ClientLogos from "@/components/common/client-logos";
 import { HowItWorks } from "@/components/marketing/how-it-works/HowItWorks";
@@ -20,8 +20,8 @@ export default function HomePage() {
             detailed evaluations.
           </p>
           <div className="mt-12">
-            <Button className="rounded-full bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg">
-              START INTERVIEW PREP <ArrowRight className="ml-2 h-5 w-5" />
+            <Button className="text-2xl p-8 cursor-pointer" variant="default" effect="expandIcon" icon={IconArrowRight} iconPlacement="right">
+              Get Started
             </Button>
           </div>
 
@@ -55,7 +55,7 @@ export default function HomePage() {
         </section>
 
         {/* Trusted By */}
-        <section className="py-16 bg-black">
+        <section className="py-16">
           <div className="container mx-auto">
             <p className="text-center text-gray-500 mb-10 text-sm tracking-wider">
               TRUSTED BY GRADUATES FROM

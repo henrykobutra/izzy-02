@@ -100,12 +100,6 @@ export default function AgentVisualizer() {
   return (
     <div className="w-full h-[180px] relative">
       <canvas ref={canvasRef} className="w-full h-full" aria-hidden="true" />
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <button className="bg-white text-black font-medium py-3 px-8 rounded-full hover:bg-gray-100 transition flex items-center gap-2">
-          TALK TO PREPI
-          <Mic className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   )
 }
