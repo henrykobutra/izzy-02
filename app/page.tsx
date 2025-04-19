@@ -2,7 +2,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mic, FileText, Brain } from "lucide-react"
 import AgentVisualizer from "@/components/animations/soundbar"
-import ClientLogos from "@/components/common/client-logos";
+import ClientLogos from "@/components/common/client-logos"
+import HowItWorks from "@/components/marketing/how-it-works-old"
 
 export default function HomePage() {
   return (
@@ -33,41 +34,7 @@ export default function HomePage() {
         {/* How It Works */}
         <section id="how-it-works" className="py-20 bg-black">
           <div className="container mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tighter text-center mb-16">
-              How Our AI Agents Work Together
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-gray-900 p-8 rounded-xl">
-                <div className="h-12 w-12 rounded-full bg-purple-900 flex items-center justify-center mb-6">
-                  <FileText className="h-6 w-6 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Profile Analysis</h3>
-                <p className="text-gray-400">
-                  Our AI analyzes your resume, experience, and skills to understand your professional background.
-                </p>
-              </div>
-
-              <div className="bg-gray-900 p-8 rounded-xl">
-                <div className="h-12 w-12 rounded-full bg-purple-900 flex items-center justify-center mb-6">
-                  <Brain className="h-6 w-6 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Interview Strategy</h3>
-                <p className="text-gray-400">
-                  Based on job requirements and your profile, we create a personalized interview strategy.
-                </p>
-              </div>
-
-              <div className="bg-gray-900 p-8 rounded-xl">
-                <div className="h-12 w-12 rounded-full bg-purple-900 flex items-center justify-center mb-6">
-                  <Mic className="h-6 w-6 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Mock Interviews</h3>
-                <p className="text-gray-400">
-                  Practice with realistic interview simulations and receive immediate feedback.
-                </p>
-              </div>
-            </div>
+            <HowItWorks />
           </div>
         </section>
 
