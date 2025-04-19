@@ -52,8 +52,8 @@ export function NavMain({
               asChild
             >
               <a href="/dashboard/practice-interview" className="flex items-center">
-                <IconCirclePlusFilled className="size-6 mr-2" />
-                <span className="text-base font-bold">Quick Interview</span>
+                
+                <span className="text-base font-bold text-center w-full">Quick Interview</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
