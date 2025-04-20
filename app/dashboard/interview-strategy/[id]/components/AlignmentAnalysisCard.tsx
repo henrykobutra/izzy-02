@@ -130,7 +130,7 @@ export function AlignmentAnalysisCard({ strategy }: AlignmentAnalysisCardProps) 
                       key={i} 
                       className="px-2 py-1 bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-500/20 border-green-200"
                     >
-                      {skill}
+                      {skill.length > 80 ? `${skill.substring(0, 80)}...` : skill}
                     </Badge>
                   ))}
                 </div>

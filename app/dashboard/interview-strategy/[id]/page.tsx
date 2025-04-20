@@ -37,17 +37,19 @@ export default function StrategyViewPage({ params }: PageProps) {
   if (!strategy) return null
   
   return (
-    <div className="flex flex-col max-w-screen-xl mx-auto px-4 pb-20">
-      {/* Hero section with job details and match score */}
-      <StrategyHero 
-        strategy={strategy} 
-        id={id} 
-        deleting={deleting} 
-        onDelete={handleDelete} 
-      />
-      
-      {/* Content tabs */}
-      <StrategyTabs strategy={strategy} />
+    <div className="flex flex-col w-full overflow-x-hidden">
+      <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 pb-20">
+        {/* Hero section with job details and match score */}
+        <StrategyHero 
+          strategy={strategy} 
+          id={id} 
+          deleting={deleting} 
+          onDelete={handleDelete} 
+        />
+        
+        {/* Content tabs */}
+        <StrategyTabs strategy={strategy} />
+      </div>
     </div>
   )
 }

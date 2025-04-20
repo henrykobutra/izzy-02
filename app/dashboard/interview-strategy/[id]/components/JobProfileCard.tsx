@@ -58,7 +58,7 @@ export function JobProfileCard({ strategy }: JobProfileCardProps) {
           <div className="flex flex-wrap gap-2">
             {strategy.job_description_key_points.required_skills.map((skill, i) => (
               <Badge key={i} variant="secondary" className="px-2 py-1">
-                {skill}
+                {skill.length > 80 ? `${skill.substring(0, 80)}...` : skill}
               </Badge>
             ))}
           </div>
@@ -102,7 +102,7 @@ export function JobProfileCard({ strategy }: JobProfileCardProps) {
             id="job-description-content" 
             className="mt-4 animate-in slide-in-from-top-5 duration-300"
           >
-            <div className="p-4 rounded-md bg-muted/50 text-sm whitespace-pre-wrap overflow-auto max-h-96 text-muted-foreground">
+            <div className="p-4 rounded-md bg-muted/50 text-sm whitespace-pre-line overflow-x-auto max-h-96 text-muted-foreground break-words">
               {strategy.job_description}
             </div>
           </CollapsibleContent>
