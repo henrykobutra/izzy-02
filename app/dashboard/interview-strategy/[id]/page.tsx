@@ -50,7 +50,8 @@ import {
   PenSquare,
   Lightbulb,
   Building,
-  Target
+  Target,
+  Circle
 } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -345,17 +346,6 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
                 </AlertDialog>
               </div>
             </div>
-            
-            <div className="flex justify-between gap-2">
-              <Button variant="outline" size="sm" className="w-full gap-1.5">
-                <Share2 className="h-4 w-4" />
-                <span>Share</span>
-              </Button>
-              <Button variant="outline" size="sm" className="w-full gap-1.5">
-                <Download className="h-4 w-4" />
-                <span>Export</span>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
@@ -559,8 +549,8 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
                   <div className="p-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Skills */}
-                      <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-muted-foreground">Skills</h4>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Skills</h4>
                         <div className="flex flex-wrap gap-2">
                           {strategy.key_alignments.skills.map((skill, i) => (
                             <Badge 
@@ -632,7 +622,7 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
                     {strategy.focus_points.map((point, i) => (
                       <div key={i} className="flex items-start gap-4 pb-5 border-b last:border-0 last:pb-0">
                         <div 
-                          className="bg-primary/10 text-primary font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 mt-0.5"
+                          className="bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center shrink-0 mt-0.5"
                           aria-hidden="true"
                         >
                           {i + 1}
@@ -679,31 +669,54 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded border-2 border-primary flex items-center justify-center">
-                        <CheckCircle className="h-3 w-3 text-primary" />
+                    <div className="flex items-start gap-3 p-2 bg-primary/5 rounded-sm">
+                      <div className="mt-0.5 text-primary">
+                        <CheckCircle className="h-4 w-4" />
                       </div>
-                      <span className="text-sm">Review job description</span>
+                      <div>
+                        <span className="text-sm font-medium">Review job description</span>
+                        <div className="text-xs text-muted-foreground mt-0.5">Recommended first step</div>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded border-2 border-muted-foreground flex items-center justify-center">
+                    
+                    <div className="flex items-start gap-3 p-2 rounded-sm">
+                      <div className="mt-0.5 text-muted-foreground">
+                        <Circle className="h-4 w-4" />
                       </div>
-                      <span className="text-sm">Practice interview questions</span>
+                      <div>
+                        <span className="text-sm font-medium">Practice interview questions</span>
+                        <div className="text-xs text-muted-foreground mt-0.5">Suggested preparation</div>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded border-2 border-muted-foreground flex items-center justify-center">
+                    
+                    <div className="flex items-start gap-3 p-2 rounded-sm">
+                      <div className="mt-0.5 text-muted-foreground">
+                        <Circle className="h-4 w-4" />
                       </div>
-                      <span className="text-sm">Research company background</span>
+                      <div>
+                        <span className="text-sm font-medium">Research company background</span>
+                        <div className="text-xs text-muted-foreground mt-0.5">Important for interview</div>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded border-2 border-muted-foreground flex items-center justify-center">
+                    
+                    <div className="flex items-start gap-3 p-2 rounded-sm">
+                      <div className="mt-0.5 text-muted-foreground">
+                        <Circle className="h-4 w-4" />
                       </div>
-                      <span className="text-sm">Prepare questions to ask</span>
+                      <div>
+                        <span className="text-sm font-medium">Prepare questions to ask</span>
+                        <div className="text-xs text-muted-foreground mt-0.5">Shows initiative</div>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded border-2 border-muted-foreground flex items-center justify-center">
+                    
+                    <div className="flex items-start gap-3 p-2 rounded-sm">
+                      <div className="mt-0.5 text-muted-foreground">
+                        <Circle className="h-4 w-4" />
                       </div>
-                      <span className="text-sm">Practice with mock interview</span>
+                      <div>
+                        <span className="text-sm font-medium">Practice with mock interview</span>
+                        <div className="text-xs text-muted-foreground mt-0.5">Builds confidence</div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -810,34 +823,6 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
             
             {/* Sidebar */}
             <div className="space-y-6">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Question Categories</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Technical</span>
-                      <Badge variant="outline">
-                        {Math.floor(strategy.interview_strategy.common_questions.length * 0.4)}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Behavioral</span>
-                      <Badge variant="outline">
-                        {Math.floor(strategy.interview_strategy.common_questions.length * 0.35)}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Experience</span>
-                      <Badge variant="outline">
-                        {Math.floor(strategy.interview_strategy.common_questions.length * 0.25)}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Question Frameworks</CardTitle>
