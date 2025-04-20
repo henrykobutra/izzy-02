@@ -1,13 +1,7 @@
 'use client'
 
+import type { User } from '@/types/user'
 import { createClient } from '@/utils/supabase/client'
-
-export type User = {
-  id: string
-  name: string
-  email: string
-  avatar: string
-}
 
 export const userService = {
   /**

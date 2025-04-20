@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import { useGenerateProfile } from "@/hooks/agents/useGenerateProfile";
+import { useProfiles } from "@/hooks/profile/useProfiles";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic } from "lucide-react"
+import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic, UserSquare2 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -12,17 +14,24 @@ import { Progress } from "@/components/ui/progress"
 export default function ProfileAnalysisPage() {
   const [resumeContent, setResumeContent] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  
-  const handleAnalyzeProfile = () => {
+  const [highlightProfileCard, setHighlightProfileCard] = useState(false)
+  const { generateProfile } = useGenerateProfile();
+  const { profiles, loading: profilesLoading } = useProfiles();
+
+  const handleAnalyzeProfile = async () => {
     if (!resumeContent.trim()) return
     
     setIsAnalyzing(true)
     
-    // Simulate analysis process
-    setTimeout(() => {
+    try {
+      const result = await generateProfile(resumeContent);
+      console.log("Profile analysis result:", result);
+    } catch (err) {
+      console.error("Profile analysis error:", err);
+    } finally {
       setIsAnalyzing(false)
       window.scrollTo({ top: document.getElementById("analysis-results")?.offsetTop || 0, behavior: "smooth" })
-    }, 2000)
+    }
   }
 
   return (
@@ -35,7 +44,7 @@ export default function ProfileAnalysisPage() {
           </p>
         </div>
 
-        <Card>
+        <Card className={`transition-all ${highlightProfileCard ? 'ring-2 ring-primary ring-offset-2 animate-pulse' : ''}`}>
           <CardHeader>
             <CardTitle>Update Your Profile</CardTitle>
             <CardDescription>
@@ -64,6 +73,7 @@ export default function ProfileAnalysisPage() {
                   <Button 
                     onClick={handleAnalyzeProfile}
                     disabled={!resumeContent.trim() || isAnalyzing}
+                    className={(!resumeContent.trim() || isAnalyzing) ? '' : 'cursor-pointer'}
                   >
                     {isAnalyzing ? "Analyzing..." : "Analyze Profile"}
                   </Button>
@@ -98,7 +108,7 @@ export default function ProfileAnalysisPage() {
                     Build your profile through conversation with our AI assistant
                   </p>
                 </div>
-                <Button variant="default" className="gap-2">
+                <Button variant="default" className="gap-2 cursor-pointer">
                   <Mic className="h-4 w-4" />
                   Start Conversation
                 </Button>
@@ -110,13 +120,13 @@ export default function ProfileAnalysisPage() {
             <div className="rounded-lg border bg-slate-50 dark:bg-slate-900/40 p-4">
               <h3 className="text-sm font-medium mb-3">More Profile Options</h3>
               <div className="flex flex-wrap gap-3">
-                <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2">
+                <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
                   <Upload className="h-4 w-4 text-muted-foreground" />
                   <span>Upload Resume</span>
                   <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
                 </div>
                 
-                <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2">
+                <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
                   <Linkedin className="h-4 w-4 text-muted-foreground" />
                   <span>Sync with LinkedIn</span>
                   <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
@@ -129,194 +139,239 @@ export default function ProfileAnalysisPage() {
           </CardContent>
         </Card>
 
-        {/* Mock of previously analyzed profile */}
+        {/* Profile Analysis Results */}
         <div id="analysis-results">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+          {profilesLoading ? (
+            <Card>
+              <CardContent className="py-10">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4" />
+                  <p className="text-sm text-muted-foreground">Loading your profile...</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : !profiles || profiles.length === 0 ? (
+            <Card>
+              <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-primary" />
-                  <CardTitle>Your Profile Analysis</CardTitle>
+                  <UserSquare2 className="h-5 w-5 text-primary" />
+                  <CardTitle>No Profile Found</CardTitle>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Last analyzed: April 15, 2025
+                <CardDescription>
+                  You don&apos;t have a profile yet. Complete the form above to create your profile.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="py-10">
+                <div className="flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="rounded-full bg-muted p-6">
+                    <UserSquare2 className="h-10 w-10 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-medium text-lg">Create Your Profile</h3>
+                    <p className="text-sm text-muted-foreground max-w-md">
+                      To get started, paste your resume or use one of the other options above to create your professional profile.
+                    </p>
+                  </div>
+                  <Button onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setHighlightProfileCard(true);
+                    setTimeout(() => setHighlightProfileCard(false), 1500);
+                  }}
+                  className="cursor-pointer"
+                  >
+                    Get Started
+                  </Button>
                 </div>
-              </div>
-              <CardDescription>
-                AI-powered analysis of your professional profile and qualifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Professional Summary */}
-              <div className="space-y-3">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-primary" />
-                  Professional Summary
-                </h3>
-                <div className="pl-7 space-y-2">
-                  <p className="text-sm">
-                    Experienced Full Stack Developer with 4+ years specializing in modern JavaScript frameworks and cloud technologies. 
-                    Strong background in building scalable web applications with React, Node.js, and TypeScript. 
-                    Demonstrated expertise in API development, database design, and CI/CD implementation.
-                  </p>
-                  <p className="text-sm">
-                    Professional journey includes contributing to a high-traffic e-commerce platform, 
-                    developing a healthcare data management system, and optimizing application performance 
-                    at scale. Experienced in both startup and enterprise environments.
-                  </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-primary" />
+                    <CardTitle>Your Profile Analysis</CardTitle>
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Last analyzed: April 15, 2025
+                  </div>
                 </div>
-              </div>
-              
-              {/* Technical Skills Analysis */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-primary" />
-                  Technical Skills Profile
-                </h3>
-                <div className="pl-7 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm">Frontend Development</h4>
-                      <div className="space-y-2">
-                        {[
-                          { name: "React/Next.js", value: 90 },
-                          { name: "JavaScript/TypeScript", value: 85 },
-                          { name: "HTML/CSS", value: 80 },
-                          { name: "UI/UX Design", value: 65 }
-                        ].map((skill) => (
-                          <div key={skill.name} className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span>{skill.name}</span>
-                              <span className="text-muted-foreground">{skill.value}%</span>
+                <CardDescription>
+                  AI-powered analysis of your professional profile and qualifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/* Professional Summary */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    Professional Summary
+                  </h3>
+                  <div className="pl-7 space-y-2">
+                    <p className="text-sm">
+                      Experienced Full Stack Developer with 4+ years specializing in modern JavaScript frameworks and cloud technologies. 
+                      Strong background in building scalable web applications with React, Node.js, and TypeScript. 
+                      Demonstrated expertise in API development, database design, and CI/CD implementation.
+                    </p>
+                    <p className="text-sm">
+                      Professional journey includes contributing to a high-traffic e-commerce platform, 
+                      developing a healthcare data management system, and optimizing application performance 
+                      at scale. Experienced in both startup and enterprise environments.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Technical Skills Analysis */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                    Technical Skills Profile
+                  </h3>
+                  <div className="pl-7 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-sm">Frontend Development</h4>
+                        <div className="space-y-2">
+                          {[
+                            { name: "React/Next.js", value: 90 },
+                            { name: "JavaScript/TypeScript", value: 85 },
+                            { name: "HTML/CSS", value: 80 },
+                            { name: "UI/UX Design", value: 65 }
+                          ].map((skill) => (
+                            <div key={skill.name} className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span>{skill.name}</span>
+                                <span className="text-muted-foreground">{skill.value}%</span>
+                              </div>
+                              <Progress value={skill.value} className="h-1.5" />
                             </div>
-                            <Progress value={skill.value} className="h-1.5" />
-                          </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-sm">Backend Development</h4>
+                        <div className="space-y-2">
+                          {[
+                            { name: "Node.js", value: 80 },
+                            { name: "REST API Design", value: 85 },
+                            { name: "SQL/NoSQL Databases", value: 75 },
+                            { name: "Authentication/Security", value: 70 }
+                          ].map((skill) => (
+                            <div key={skill.name} className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span>{skill.name}</span>
+                                <span className="text-muted-foreground">{skill.value}%</span>
+                              </div>
+                              <Progress value={skill.value} className="h-1.5" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-2">
+                      <h4 className="font-medium text-sm mb-2">Key Technical Competencies</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          "React", "TypeScript", "Node.js", "Express", "Next.js", "MongoDB", 
+                          "PostgreSQL", "Redux", "REST APIs", "GraphQL", "Jest", "Docker", 
+                          "AWS", "CI/CD", "Git", "Agile", "TailwindCSS", "Responsive Design"
+                        ].map((skill) => (
+                          <Badge key={skill} variant="secondary" className="px-3 py-1">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Experience Analysis */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Award className="h-5 w-5 text-primary" />
+                    Experience Analysis
+                  </h3>
+                  <div className="pl-7 space-y-3">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Experience Level</h4>
+                      <p className="text-sm">Mid-level professional with 4 years of relevant experience</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Industry Experience</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {["E-commerce", "Healthcare", "FinTech"].map((industry) => (
+                          <Badge key={industry} variant="outline" className="px-3 py-1">
+                            {industry}
+                          </Badge>
                         ))}
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-sm">Backend Development</h4>
-                      <div className="space-y-2">
-                        {[
-                          { name: "Node.js", value: 80 },
-                          { name: "REST API Design", value: 85 },
-                          { name: "SQL/NoSQL Databases", value: 75 },
-                          { name: "Authentication/Security", value: 70 }
-                        ].map((skill) => (
-                          <div key={skill.name} className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span>{skill.name}</span>
-                              <span className="text-muted-foreground">{skill.value}%</span>
-                            </div>
-                            <Progress value={skill.value} className="h-1.5" />
-                          </div>
-                        ))}
-                      </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Notable Projects</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        <li>Developed a scalable e-commerce platform serving 100K+ monthly users</li>
+                        <li>Built a real-time healthcare data management system with HIPAA compliance</li>
+                        <li>Implemented authentication system with multi-factor authentication</li>
+                        <li>Led front-end performance optimization reducing load time by 40%</li>
+                      </ul>
                     </div>
-                  </div>
-                  
-                  <div className="pt-2">
-                    <h4 className="font-medium text-sm mb-2">Key Technical Competencies</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        "React", "TypeScript", "Node.js", "Express", "Next.js", "MongoDB", 
-                        "PostgreSQL", "Redux", "REST APIs", "GraphQL", "Jest", "Docker", 
-                        "AWS", "CI/CD", "Git", "Agile", "TailwindCSS", "Responsive Design"
-                      ].map((skill) => (
-                        <Badge key={skill} variant="secondary" className="px-3 py-1">
-                          {skill}
-                        </Badge>
-                      ))}
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Team Collaboration</h4>
+                      <p className="text-sm">
+                        Experience working in Agile teams of 5-10 developers. Collaborated with UX designers, 
+                        product managers, and QA engineers. Participated in code reviews and technical planning.
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Experience Analysis */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Award className="h-5 w-5 text-primary" />
-                  Experience Analysis
-                </h3>
-                <div className="pl-7 space-y-3">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Experience Level</h4>
-                    <p className="text-sm">Mid-level professional with 4 years of relevant experience</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Industry Experience</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {["E-commerce", "Healthcare", "FinTech"].map((industry) => (
-                        <Badge key={industry} variant="outline" className="px-3 py-1">
-                          {industry}
-                        </Badge>
-                      ))}
+                
+                {/* Education & Certifications */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5 text-primary" />
+                    Education & Certifications
+                  </h3>
+                  <div className="pl-7 space-y-3">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Education</h4>
+                      <p className="text-sm">
+                        Bachelor of Science in Computer Science, University of Technology, 2021
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Certifications</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        <li>AWS Certified Developer - Associate</li>
+                        <li>MongoDB Certified Developer</li>
+                        <li>Professional Scrum Developer I</li>
+                      </ul>
                     </div>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Notable Projects</h4>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
-                      <li>Developed a scalable e-commerce platform serving 100K+ monthly users</li>
-                      <li>Built a real-time healthcare data management system with HIPAA compliance</li>
-                      <li>Implemented authentication system with multi-factor authentication</li>
-                      <li>Led front-end performance optimization reducing load time by 40%</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Team Collaboration</h4>
-                    <p className="text-sm">
-                      Experience working in Agile teams of 5-10 developers. Collaborated with UX designers, 
-                      product managers, and QA engineers. Participated in code reviews and technical planning.
-                    </p>
-                  </div>
                 </div>
-              </div>
-              
-              {/* Education & Certifications */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-primary" />
-                  Education & Certifications
-                </h3>
-                <div className="pl-7 space-y-3">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Education</h4>
-                    <p className="text-sm">
-                      Bachelor of Science in Computer Science, University of Technology, 2021
-                    </p>
+                
+                <div className="rounded-lg border bg-card p-4 bg-amber-50 dark:bg-amber-950/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="h-5 w-5 text-amber-500" />
+                    <h3 className="font-semibold text-lg">Next Steps</h3>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Certifications</h4>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
-                      <li>AWS Certified Developer - Associate</li>
-                      <li>MongoDB Certified Developer</li>
-                      <li>Professional Scrum Developer I</li>
-                    </ul>
-                  </div>
+                  <p className="text-sm">
+                    Your profile has been analyzed. To receive tailored interview preparation, please provide information about the position
+                    you&apos;re targeting in the next step.
+                  </p>
+                  <Button variant="outline" className="mt-3">
+                    Set Target Position
+                  </Button>
                 </div>
-              </div>
-              
-              <div className="rounded-lg border bg-card p-4 bg-amber-50 dark:bg-amber-950/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-amber-500" />
-                  <h3 className="font-semibold text-lg">Next Steps</h3>
-                </div>
-                <p className="text-sm">
-                  Your profile has been analyzed. To receive tailored interview preparation, please provide information about the position
-                  you&apos;re targeting in the next step.
-                </p>
-                <Button variant="outline" className="mt-3">
-                  Set Target Position
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { User, userService } from '@/services/user.service'
+import { userService } from '@/services/user.service'
+import type { User } from '@/types/user'
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null)
