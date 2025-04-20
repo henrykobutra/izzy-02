@@ -37,7 +37,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { getStrategyAnalysis } from "@/services/agents/strategy.agent"
-import { saveStrategy } from "@/services/database/strategies/saveStrategy"
+import { saveStrategy, updateStrategy } from "@/services/database/strategies/saveStrategy"
 import { deleteStrategy } from "@/services/database/strategies/deleteStrategy"
 import { userService } from "@/services/user.service"
 import { toast } from "sonner"
@@ -54,6 +54,7 @@ export default function InterviewStrategyPage() {
   const [deletingStrategy, setDeletingStrategy] = useState<string | null>(null);
   const [strategyToDelete, setStrategyToDelete] = useState<string | null>(null);
   const [synchronizingStrategy, setSynchronizingStrategy] = useState<string | null>(null);
+  const [isSynchronizing, setIsSynchronizing] = useState(false);
   const jobCardRef = useRef<HTMLDivElement>(null);
   
   // Define loading states for the job analysis process
@@ -76,6 +77,24 @@ export default function InterviewStrategyPage() {
     { text: "Analyzing company interview patterns..." },
     { text: "Prioritizing your key strengths to highlight..." },
     { text: "Finalizing your interview strategy..." }
+  ];
+  
+  // Define loading states for the synchronization process
+  const synchronizationLoadingStates = [
+    { text: "Initializing synchronization process..." },
+    { text: "Retrieving current profile data..." },
+    { text: "Retrieving existing job description..." },
+    { text: "Preparing strategy analysis..." },
+    { text: "Analyzing job requirements..." },
+    { text: "Extracting key skills and qualifications..." },
+    { text: "Matching with your updated profile..." },
+    { text: "Evaluating experience alignment with current profile..." },
+    { text: "Recalculating match percentage..." },
+    { text: "Updating strategy recommendations..." },
+    { text: "Generating updated interview talking points..." },
+    { text: "Updating strength highlighting strategy..." },
+    { text: "Adapting question response strategies..." },
+    { text: "Finalizing synchronized strategy..." }
   ];
   
   const handleHighlightJobCard = () => {
@@ -196,21 +215,72 @@ export default function InterviewStrategyPage() {
   };
 
   const handleSynchronizeStrategy = async (strategyId: string) => {
-    // This is a placeholder for the future implementation
     setSynchronizingStrategy(strategyId);
+    setIsSynchronizing(true);
     
     try {
-      // This will be implemented later
-      toast.info("Synchronization feature will be implemented soon");
+      // Get current user
+      const userData = await userService.getCurrentUser()
+      if (!userData) {
+        toast.error("You must be logged in to synchronize strategies")
+        return
+      }
       
-      // For now, just set a timeout to simulate an API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get profile data
+      if (!profile) {
+        toast.error("Your profile is required to synchronize strategies")
+        return
+      }
       
+      // Find the strategy to synchronize
+      const strategyToSync = strategies.find(s => s.id === strategyId)
+      if (!strategyToSync) {
+        toast.error("Strategy not found")
+        return
+      }
+      
+      // Generate new strategy using AI agent with existing job description but current profile
+      const jobDescription = strategyToSync.job_description
+      if (!jobDescription) {
+        toast.error("This strategy doesn't have a job description to analyze")
+        return
+      }
+      
+      // Show toast to indicate the process has started
+      toast.info("Synchronizing strategy with your current profile...")
+      
+      // Get new analysis
+      const strategyData = await getStrategyAnalysis(jobDescription, profile)
+      
+      if (!strategyData.is_job_description) {
+        toast.error("The stored job description appears to be invalid. Please delete this strategy and create a new one.")
+        return
+      }
+      
+      // Prepare the strategy object to update
+      const strategyToUpdate: Partial<StrategyAnalysis> = {
+        ...strategyData,
+        profile_id: profile.id,
+        // Keep the original job description and user_id
+        // We're only updating the analysis and linking to the current profile
+      }
+      
+      // Update the strategy in database
+      const updatedStrategy = await updateStrategy(strategyId, strategyToUpdate)
+      
+      if (updatedStrategy) {
+        toast.success("Strategy synchronized successfully with your current profile!")
+        // Refresh strategies list
+        await refetch()
+      } else {
+        toast.error("Failed to synchronize strategy. Please try again.")
+      }
     } catch (error) {
-      console.error("Error synchronizing strategy:", error);
-      toast.error("An error occurred while synchronizing the strategy");
+      console.error("Error synchronizing strategy:", error)
+      toast.error("An error occurred while synchronizing the strategy")
     } finally {
-      setSynchronizingStrategy(null);
+      setSynchronizingStrategy(null)
+      setIsSynchronizing(false)
     }
   };
 
@@ -221,6 +291,14 @@ export default function InterviewStrategyPage() {
         loadingStates={jobAnalysisLoadingStates}
         loading={isAnalyzing}
         duration={1500}
+        loop={false}
+      />
+
+      {/* MultiStepLoader for synchronization */}
+      <MultiStepLoader 
+        loadingStates={synchronizationLoadingStates}
+        loading={isSynchronizing}
+        duration={1200}
         loop={false}
       />
       <div className="px-4 lg:px-6">
