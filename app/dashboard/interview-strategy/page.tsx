@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -15,6 +15,7 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { useProfiles } from "@/hooks/profile/useProfiles"
+import { useStrategies } from "@/hooks/strategies/useStrategies"
 import Link from "next/link"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
@@ -22,7 +23,19 @@ export default function InterviewStrategyPage() {
   const [jobDescription, setJobDescription] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
+  const { strategies, loading: strategiesLoading, hasStrategies } = useStrategies();
   const [isProfileDetailsOpen, setIsProfileDetailsOpen] = useState(false);
+  const [highlightJobCard, setHighlightJobCard] = useState(false);
+  const jobCardRef = useRef<HTMLDivElement>(null);
+  
+  const handleHighlightJobCard = () => {
+    // Scroll to job card
+    jobCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Highlight card temporarily
+    setHighlightJobCard(true);
+    setTimeout(() => setHighlightJobCard(false), 1500);
+  };
   
   // Mock data for saved job descriptions
   const [savedJobs, setSavedJobs] = useState([
@@ -213,7 +226,7 @@ export default function InterviewStrategyPage() {
         </CardContent>
       </Card>
 
-      <Card className="mx-4 lg:mx-6">
+      <Card className={`mx-4 lg:mx-6 transition-all ${highlightJobCard ? 'ring-2 ring-primary ring-offset-2 animate-pulse' : ''}`} ref={jobCardRef}>
         <CardHeader>
           <CardTitle>Add New Job Target</CardTitle>
           <CardDescription>
@@ -258,88 +271,123 @@ export default function InterviewStrategyPage() {
         </CardContent>
       </Card>
 
-      {/* Saved Job Descriptions */}
-      <div id="saved-jobs" className="mx-4 lg:mx-6">
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Saved Jobs Table */}
+      <div id="saved-jobs" className="px-4 lg:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <h2 className="text-xl font-semibold tracking-tight">Your Interview Strategies</h2>
+          <div className="flex items-center gap-2">
+            {hasStrategies && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1.5"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>Filter</span>
+              </Button>
+            )}
+            <Button 
+              onClick={handleHighlightJobCard}
+              size="sm" 
+              className="gap-1.5 cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>New Analysis</span>
+            </Button>
+          </div>
+        </div>
+
+        {strategiesLoading ? (
+          <div className="py-8 flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <h3 className="text-lg font-medium">Loading strategies...</h3>
+            <p className="text-muted-foreground mt-1">Please wait while we retrieve your interview strategies</p>
+          </div>
+        ) : !hasStrategies ? (
+          <Card>
+            <CardHeader>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary" />
-                <CardTitle>Your Target Positions</CardTitle>
+                <Briefcase className="h-5 w-5 text-primary" />
+                <CardTitle>No Interview Strategies Yet</CardTitle>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input 
-                    type="text" 
-                    placeholder="Search jobs..." 
-                    className="pl-8 h-9 rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full sm:w-auto"
-                  />
+              <CardDescription>
+                Create your first strategy to get personalized interview preparation guidance.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="py-6">
+              <div className="flex flex-col items-center justify-center text-center space-y-4">
+                <div className="rounded-full bg-primary/10 p-6">
+                  <FileText className="h-10 w-10 text-primary" />
                 </div>
-                <Button size="sm" variant="outline" className="gap-1">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-lg">Create Your First Strategy</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Analyze job descriptions to get personalized interview preparation strategies tailored to your profile and the position.
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleHighlightJobCard}
+                  className="gap-2 cursor-pointer"
+                >
                   <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add</span>
+                  <span>Create Your First Strategy</span>
                 </Button>
               </div>
-            </div>
-            <CardDescription>
-              Job descriptions you&apos;ve analyzed for interview preparation
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="overflow-auto">
-            <Table className="min-w-[720px]">
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="border rounded-lg overflow-hidden">
+            <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Added</TableHead>
+                  <TableHead className="w-[40%]">Position</TableHead>
                   <TableHead>Match</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {savedJobs.map(job => (
-                  <TableRow key={job.id}>
-                    <TableCell className="font-medium">{job.title}</TableCell>
-                    <TableCell>{job.company}</TableCell>
-                    <TableCell>{job.date}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-sm ${job.match >= 85 ? 'text-green-600 dark:text-green-500' : job.match >= 70 ? 'text-amber-600 dark:text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
-                          {job.match}%
-                        </span>
-                        <Badge 
-                          variant={job.match >= 85 ? 'success' : job.match >= 70 ? 'warning' : 'secondary'} 
-                          className="px-1.5 py-0 text-xs"
-                        >
-                          {job.match >= 85 ? 'High' : job.match >= 70 ? 'Good' : 'Fair'}
-                        </Badge>
+                {strategies.map((strategy) => (
+                  <TableRow key={strategy.id}>
+                    <TableCell className="font-medium">
+                      <div>
+                        <div className="font-medium">{strategy.job_title}</div>
+                        <div className="text-sm text-muted-foreground">{strategy.job_company}</div>
                       </div>
                     </TableCell>
                     <TableCell>
+                      <Badge 
+                        variant={
+                          strategy.match_rate >= 85 ? "success" : 
+                          strategy.match_rate >= 70 ? "default" : 
+                          "secondary"
+                        }
+                        className="gap-1 items-center"
+                      >
+                        {strategy.match_rate}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {strategy.created_at ? new Date(strategy.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      }) : 'N/A'}
+                    </TableCell>
+                    <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground" 
-                          title="View Strategy"
-                        >
-                          <Eye className="h-4 w-4" />
+                        <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Play className="h-4 w-4" />
                         </Button>
                         <Button 
-                          size="icon" 
                           variant="ghost" 
-                          className="h-8 w-8 text-primary/80 hover:text-primary" 
-                          title="Practice Interview"
-                        >
-                          <Play className="h-4 w-4 fill-current" />
-                        </Button>
-                        <Button 
                           size="icon" 
-                          variant="ghost" 
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive" 
-                          title="Remove"
-                          onClick={() => handleRemoveJob(job.id)}
+                          className="h-8 w-8 text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -349,8 +397,8 @@ export default function InterviewStrategyPage() {
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </div>
   )
