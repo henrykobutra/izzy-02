@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -35,6 +35,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+import { useUser } from "@/hooks/use-user"
+import { useUpdateFullName } from '@/hooks/users/useUpdateFullName'
+import { useChangePassword } from '@/hooks/users/useUpdatePassword'
 
 const profileFormSchema = z.object({
   fullName: z
@@ -63,19 +68,23 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>
 type PasswordFormValues = z.infer<typeof passwordFormSchema>
 
 export default function AccountPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  const { setFullName, updateFullName, loading: updatingName, message } = useUpdateFullName()
+  const { 
+    oldPassword, setOldPassword, 
+    newPassword, setNewPassword, 
+    confirmPassword, setConfirmPassword, 
+    updatePassword, 
+    loading: updatingPassword, 
+    message: passwordMessage 
+  } = useChangePassword()
 
-  // Mock user data - in real app, fetch from server
-  const user = {
-    fullName: "John Doe",
-    email: "john.doe@example.com",
-  }
+  const { user, loading: loadingUser } = useUser()
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      fullName: user.fullName,
-      email: user.email,
+      fullName: "",
+      email: "",
     },
   })
 
@@ -88,23 +97,28 @@ export default function AccountPage() {
     },
   })
 
-  function onProfileSubmit(data: ProfileFormValues) {
-    setIsLoading(true)
-    // In a real app, you would update the profile data via an API call here
-    console.log(data)
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+  useEffect(() => {
+    if (!loadingUser && user) {
+      profileForm.reset({ fullName: user.name, email: user.email })
+    }
+  }, [loadingUser, user, profileForm])
+
+  async function onProfileSubmit(data: ProfileFormValues) {
+    setFullName(data.fullName)
+    await updateFullName()
+    // No need to call router.refresh() here as it's already done in the hook
   }
 
-  function onPasswordSubmit(data: PasswordFormValues) {
-    setIsLoading(true)
-    // In a real app, you would update the password via an API call here
-    console.log(data)
-    setTimeout(() => {
-      setIsLoading(false)
-      passwordForm.reset()
-    }, 1000)
+  async function onPasswordSubmit(data: PasswordFormValues) {
+    setOldPassword(data.currentPassword);
+    setNewPassword(data.newPassword);
+    setConfirmPassword(data.confirmPassword);
+    
+    await updatePassword();
+    
+    if (!passwordMessage?.includes('error') && !passwordMessage?.includes('failed') && !passwordMessage?.includes('incorrect')) {
+      passwordForm.reset();
+    }
   }
 
   return (
@@ -121,7 +135,10 @@ export default function AccountPage() {
         <CardContent>
           <Form {...profileForm}>
             <form
-              onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+              onSubmit={(e) => {
+                e.preventDefault()
+                profileForm.handleSubmit(onProfileSubmit)(e)
+              }}
               className="space-y-6"
             >
               <FormField
@@ -131,7 +148,11 @@ export default function AccountPage() {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your name" {...field} />
+                      {loadingUser ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Input placeholder="Your name" {...field} />
+                      )}
                     </FormControl>
                     <FormDescription>
                       This is the name that will be displayed on your profile.
@@ -147,11 +168,23 @@ export default function AccountPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="example@email.com"
-                        {...field}
-                        disabled
-                      />
+                      {loadingUser ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Input
+                              placeholder="example@email.com"
+                              {...field}
+                              disabled
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            Email updates are temporarily unavailable. Please
+                            contact support to change your email address.
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                     </FormControl>
                     <FormDescription>
                       Your email address is used for login and notifications.
@@ -161,9 +194,22 @@ export default function AccountPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save changes"}
+              <Button 
+                type="submit" 
+                disabled={updatingName || loadingUser}
+                onClick={() => {
+                  if (!updatingName && !loadingUser) {
+                    profileForm.handleSubmit(onProfileSubmit)()
+                  }
+                }}
+              >
+                {updatingName ? "Saving..." : "Save changes"}
               </Button>
+              {message && (
+                <p className={`text-sm mt-2 ${message.includes('success') ? 'text-green-500' : 'text-red-500'}`}>
+                  {message}
+                </p>
+              )}
             </form>
           </Form>
         </CardContent>
@@ -179,7 +225,10 @@ export default function AccountPage() {
         <CardContent>
           <Form {...passwordForm}>
             <form
-              onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+              onSubmit={(e) => {
+                e.preventDefault()
+                passwordForm.handleSubmit(onPasswordSubmit)(e)
+              }}
               className="space-y-6"
             >
               <FormField
@@ -193,6 +242,11 @@ export default function AccountPage() {
                         placeholder="••••••••"
                         type="password"
                         {...field}
+                        value={oldPassword}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setOldPassword(e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -210,6 +264,11 @@ export default function AccountPage() {
                         placeholder="••••••••"
                         type="password"
                         {...field}
+                        value={newPassword}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setNewPassword(e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormDescription>
@@ -230,15 +289,34 @@ export default function AccountPage() {
                         placeholder="••••••••"
                         type="password"
                         {...field}
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setConfirmPassword(e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update password"}
+              <Button 
+                type="submit" 
+                disabled={updatingPassword}
+                onClick={() => {
+                  if (!updatingPassword) {
+                    passwordForm.handleSubmit(onPasswordSubmit)()
+                  }
+                }}
+              >
+                {updatingPassword ? "Updating..." : "Update password"}
               </Button>
+              
+              {passwordMessage && (
+                <p className={`text-sm mt-2 ${passwordMessage.includes('success') ? 'text-green-500' : 'text-red-500'}`}>
+                  {passwordMessage}
+                </p>
+              )}
             </form>
           </Form>
         </CardContent>

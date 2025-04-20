@@ -12,6 +12,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,12 +35,14 @@ import { useState, useEffect } from "react"
 
 export function NavUser({
   user,
+  loading = false,
 }: {
-  user: {
+  user?: {
     name: string
     email: string
     avatar: string
   }
+  loading?: boolean
 }) {
   const { isMobile } = useSidebar()
   const { isSigningOut } = useAuth()
@@ -83,17 +86,28 @@ export function NavUser({
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <Avatar className="h-8 w-8 rounded-lg grayscale">
-                  <AvatarImage src={user.avatar} alt={displayName} />
-                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{displayName}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
+                {/* Always render both versions but hide one with CSS to prevent hydration mismatch */}
+                <div className={loading ? "block" : "hidden"}>
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                  <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                  <Skeleton className="ml-auto h-4 w-4" />
                 </div>
-                <IconDotsVertical className="ml-auto size-4" />
+                <div className={loading ? "hidden" : "flex items-center w-full"}>
+                  <Avatar className="h-8 w-8 rounded-lg grayscale">
+                    <AvatarImage src={user?.avatar} alt={displayName} />
+                    <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight ml-2">
+                    <span className="truncate font-medium">{displayName}</span>
+                    <span className="text-muted-foreground truncate text-xs">
+                      {user?.email}
+                    </span>
+                  </div>
+                  <IconDotsVertical className="ml-auto size-4" />
+                </div>
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -104,43 +118,72 @@ export function NavUser({
             >
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user.avatar} alt={displayName} />
-                    <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{displayName}</span>
-                    <span className="text-muted-foreground truncate text-xs">
-                      {user.email}
-                    </span>
+                  <div className={loading ? "flex items-center gap-2 w-full" : "hidden"}>
+                    <Skeleton className="h-8 w-8 rounded-lg" />
+                    <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                  <div className={loading ? "hidden" : "flex items-center w-full"}>
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={user?.avatar} alt={displayName} />
+                      <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight ml-2">
+                      <span className="truncate font-medium">{displayName}</span>
+                      <span className="text-muted-foreground truncate text-xs">
+                        {user?.email}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/account">
-                    <IconUserCircle />
-                    Account
+              <div className={loading ? "block" : "hidden"}>
+                {/* Skeleton menu items */}
+                <DropdownMenuGroup>
+                  <div className="flex items-center gap-2 px-2 py-1.5">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <div className="flex items-center gap-2 px-2 py-1.5">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <DropdownMenuSeparator />
+                  <div className="flex items-center gap-2 px-2 py-1.5">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                </DropdownMenuGroup>
+              </div>
+              <div className={loading ? "hidden" : "block"}>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/account">
+                      <IconUserCircle />
+                      Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings">
+                      <IconSettings />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  asChild
+                  className="cursor-pointer"
+                >
+                  <Link href="/signout" prefetch={false}>
+                    <IconLogout className="h-4 w-4" />
+                    Log out
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings">
-                    <IconSettings />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                asChild
-                className="cursor-pointer"
-              >
-                <Link href="/signout" prefetch={false}>
-                  <IconLogout className="h-4 w-4" />
-                  Log out
-                </Link>
-              </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarMenuItem>
