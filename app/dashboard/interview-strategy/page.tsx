@@ -25,6 +25,7 @@ import {
 import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useStrategies } from "@/hooks/strategies/useStrategies"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   AlertDialog,
@@ -45,6 +46,7 @@ import type { StrategyAnalysis } from "@/types/strategy"
 import { MultiStepLoader } from "@/components/ui/multi-step-loader"
 
 export default function InterviewStrategyPage() {
+  const router = useRouter();
   const [jobDescription, setJobDescription] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
@@ -174,8 +176,8 @@ export default function InterviewStrategyPage() {
         toast.success("Job analyzed successfully! Your interview strategy is ready.")
         // Refresh strategies list
         await refetch()
-        // Scroll to strategies section
-        window.scrollTo({ top: document.getElementById("saved-jobs")?.offsetTop || 0, behavior: "smooth" })
+        // Redirect to the strategy details page
+        router.push(`/dashboard/interview-strategy/${savedStrategy.id}`)
         // Clear the job description input
         setJobDescription("")
       } else {
