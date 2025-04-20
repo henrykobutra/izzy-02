@@ -30,6 +30,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useUser } from "@/hooks/use-user"
 
 const data = {
   user: {
@@ -116,6 +117,22 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, loading } = useUser();
+  
+  // Default user data for fallback when loading or no user
+  const defaultUser = {
+    name: "Guest User",
+    email: "guest@example.com",
+    avatar: "",
+  };
+  
+  // Use actual user data or fallback
+  const userData = user ? {
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+  } : data.user;
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -146,7 +163,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )
