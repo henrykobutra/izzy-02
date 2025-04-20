@@ -5,7 +5,7 @@ import data from "./data.json"
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
       <div className="px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight mb-4">Your Interview Dashboard</h1>
         <p className="text-muted-foreground mb-6">

@@ -185,7 +185,7 @@ export default function PracticeInterviewPage() {
     (selectedTab === "target" && selectedPosition);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
       <div className="px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight mb-4">Practice Interview</h1>
         <p className="text-muted-foreground mb-6">

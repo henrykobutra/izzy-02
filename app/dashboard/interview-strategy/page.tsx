@@ -285,7 +285,7 @@ export default function InterviewStrategyPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 max-w-screen-xl mx-auto">
       {/* MultiStepLoader for job analysis */}
       <MultiStepLoader 
         loadingStates={jobAnalysisLoadingStates}
