@@ -17,27 +17,27 @@ export const getStrategyAnalysis = async (rawJobDescriptionText: string, candida
             job_title: z.string(),
             job_experience_level: z.enum(["junior", "mid", "senior", "principal"]),
             job_description_key_points: z.object({
-                required_skills: z.array(z.string()).max(5),
+                required_skills: z.array(z.string()),
                 experience_level: z.string(),
-                responsibilities: z.array(z.string()).max(5)
+                responsibilities: z.array(z.string())
             }),
             interview_strategy: z.object({
-                preparation_tips: z.array(z.string()).max(5),
-                questions_to_ask: z.array(z.string()).max(5),
+                preparation_tips: z.array(z.string()),
+                questions_to_ask: z.array(z.string()),
                 common_questions: z.array(z.object({
                     question: z.string(),
                     suggested_answer: z.string()
-                })).max(5)
+                }))
             }),
             match_rate: z.number().int().min(0).max(100),
-            strengths: z.array(z.string()).max(5),
-            weaknesses: z.array(z.string()).max(5),
-            focus_points: z.array(z.string()).max(5),
+            strengths: z.array(z.string()),
+            weaknesses: z.array(z.string()),
+            focus_points: z.array(z.string()),
             key_alignments: z.object({
-                skills: z.array(z.string()).max(5),
-                experience: z.array(z.string()).max(5)
+                skills: z.array(z.string()),
+                experience: z.array(z.string())
             }),
-            potential_challenges: z.array(z.string()).max(5),
+            potential_challenges: z.array(z.string()),
             alignment_summary: z.string(),
             is_job_description: z.boolean()
         }),

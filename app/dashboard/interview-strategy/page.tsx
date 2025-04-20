@@ -3,8 +3,9 @@
 import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Play, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp } from "lucide-react"
+import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Play, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
@@ -14,6 +15,13 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useStrategies } from "@/hooks/strategies/useStrategies"
 import Link from "next/link"
@@ -387,21 +395,8 @@ export default function InterviewStrategyPage() {
         </CardContent>
       </Card>
 
-      {/* Saved Jobs Table */}
+      {/* Strategies Table */}
       <div id="saved-jobs" className="px-4 lg:px-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <h2 className="text-xl font-semibold tracking-tight">Your Interview Strategies</h2>
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={handleHighlightJobCard}
-              size="sm" 
-              className="gap-1.5 cursor-pointer"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>New Analysis</span>
-            </Button>
-          </div>
-        </div>
 
         {strategiesLoading ? (
           <div className="py-8 flex flex-col items-center justify-center text-center">
@@ -442,74 +437,139 @@ export default function InterviewStrategyPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40%]">Position</TableHead>
-                  <TableHead>Match</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {strategies.map((strategy) => (
-                  <TableRow key={strategy.id}>
-                    <TableCell className="font-medium">
-                      <div>
-                        <div className="font-medium">{strategy.job_title}</div>
-                        <div className="text-sm text-muted-foreground">{strategy.job_company}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          strategy.match_rate >= 85 ? "success" : 
-                          strategy.match_rate >= 70 ? "default" : 
-                          "secondary"
-                        }
-                        className="gap-1 items-center"
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-medium">Your Interview Strategies</CardTitle>
+                  <CardDescription>Personalized strategies for different job opportunities</CardDescription>
+                </div>
+                <Button 
+                  onClick={handleHighlightJobCard}
+                  size="sm" 
+                  className="gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add New</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <div>
+              <div className="overflow-x-auto">
+                <Table className="border-collapse w-full">
+                  <TableHeader>
+                    <TableRow className="border-b bg-muted/30">
+                      <TableHead className="w-[30%] py-3 font-medium pl-6">Position</TableHead>
+                      <TableHead className="w-[20%] py-3 font-medium">Experience</TableHead>
+                      <TableHead className="w-[30%] py-3 font-medium">Match Rating</TableHead>
+                      <TableHead className="py-3 text-right font-medium pr-6">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {strategies.map((strategy) => (
+                      <TableRow 
+                        key={strategy.id} 
+                        className="hover:bg-muted/30 group/row border-b last:border-0"
                       >
-                        {strategy.match_rate}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {strategy.created_at ? new Date(strategy.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      }) : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Play className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
-                          disabled={deletingStrategy === strategy.id}
-                        >
-                          {deletingStrategy === strategy.id ? (
-                            <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                        <TableCell className="py-4 pl-6">
+                          <div className="space-y-2">
+                            <div className="font-medium text-base">{strategy.job_title}</div>
+                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                              <Briefcase className="h-4 w-4" />
+                              <span>{strategy.job_company}</span>
+                            </div>
+                            <div>
+                              <Badge variant="outline" className="bg-muted/30 text-xs">
+                                {strategy.job_industry}
+                              </Badge>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <div className="space-y-2">
+                            <Badge 
+                              variant="secondary" 
+                              className="capitalize px-2 py-1 text-xs"
+                            >
+                              {strategy.job_experience_level || "Not specified"}
+                            </Badge>
+                            <div className="text-sm text-muted-foreground">
+                              {strategy.job_description_key_points?.required_skills?.length || 0} required skills
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0">
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-medium
+                                ${strategy.match_rate >= 85 ? 'bg-green-500' : 
+                                strategy.match_rate >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
+                              >
+                                {strategy.match_rate}%
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="text-sm font-medium">
+                                {strategy.match_rate >= 85 ? 'Excellent Alignment' : 
+                                  strategy.match_rate >= 70 ? 'Good Alignment' : 'Challenging Interview'}
+                              </div>
+                              <div className="flex gap-3 text-sm">
+                                <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                                  <CheckCircle className="h-4 w-4" />
+                                  <span>{strategy.strengths?.length || 0} strengths</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-muted-foreground">
+                                  <span>{strategy.focus_points?.length || 0} focus points</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4 text-right pr-6">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
+                              <Button variant="outline" size="sm" className="h-9 px-3">
+                                <Eye className="h-4 w-4 mr-1.5" />
+                                <span>View</span>
+                              </Button>
+                            </Link>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Button variant="outline" size="sm" className="h-9 w-9 p-0">
+                                <Play className="h-4 w-4" />
+                                <span className="sr-only">Practice</span>
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-9 w-9 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
+                                disabled={deletingStrategy === strategy.id}
+                              >
+                                {deletingStrategy === strategy.id ? (
+                                  <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                                <span className="sr-only">Delete</span>
+                              </Button>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="py-4 bg-muted/20 border-t flex items-center justify-between px-6">
+                  <div className="text-sm text-muted-foreground">
+                    {strategies.length} {strategies.length === 1 ? 'strategy' : 'strategies'} available
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Last analyzed: {new Date(Math.max(...strategies.map(s => s.created_at ? new Date(s.created_at).getTime() : 0))).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
         )}
       </div>
 
