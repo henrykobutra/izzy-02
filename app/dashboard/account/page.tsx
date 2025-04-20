@@ -344,8 +344,7 @@ export default function AccountPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
+                  Please contact henrykobutra@gmail.com with your account email and your account will be deleted in 24 hours.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -357,7 +356,7 @@ export default function AccountPage() {
                     console.log("Account deleted")
                   }}
                 >
-                  Delete Account
+                  Understood
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
