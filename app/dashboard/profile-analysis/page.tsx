@@ -1,22 +1,30 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useGenerateProfile } from "@/hooks/agents/useGenerateProfile";
 import { useProfiles } from "@/hooks/profile/useProfiles";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic, UserSquare2 } from "lucide-react"
+import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic, UserSquare2, ChevronUp, RefreshCw } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 export default function ProfileAnalysisPage() {
   const [resumeContent, setResumeContent] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [highlightProfileCard, setHighlightProfileCard] = useState(false)
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const { generateProfile } = useGenerateProfile();
-  const { profiles, loading: profilesLoading } = useProfiles();
+  const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
+  
+  // Control collapsible state based on profile existence
+  useEffect(() => {
+    // Open by default when no profile exists, close when profile exists
+    setIsUpdateOpen(!profileExists)
+  }, [profileExists]);
 
   const handleAnalyzeProfile = async () => {
     if (!resumeContent.trim()) return
@@ -45,103 +53,124 @@ export default function ProfileAnalysisPage() {
         </div>
 
         <Card className={`transition-all ${highlightProfileCard ? 'ring-2 ring-primary ring-offset-2 animate-pulse' : ''}`}>
-          <CardHeader>
-            <CardTitle>Update Your Profile</CardTitle>
-            <CardDescription>
-              Paste your resume or connect with LinkedIn to let our AI analyze your profile
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-center mb-4">
-              <h3 className="text-sm font-medium">Choose how to update your profile</h3>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-2">
-              {/* Resume Paste - Takes 2/3 width */}
-              <div className="lg:col-span-7 space-y-4 border rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <FileText className="h-5 w-5 text-primary" />
-                  <h3 className="font-medium">Option 1: Paste Your Resume</h3>
-                </div>
-                <Textarea 
-                  placeholder="Paste your resume text here..." 
-                  className="h-[180px] font-mono text-sm"
-                  value={resumeContent}
-                  onChange={(e) => setResumeContent(e.target.value)}
-                />
-                <div className="flex justify-end">
-                  <Button 
-                    onClick={handleAnalyzeProfile}
-                    disabled={!resumeContent.trim() || isAnalyzing}
-                    className={(!resumeContent.trim() || isAnalyzing) ? '' : 'cursor-pointer'}
-                  >
-                    {isAnalyzing ? "Analyzing..." : "Analyze Profile"}
-                  </Button>
-                </div>
+          <Collapsible open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle>Profile Update</CardTitle>
+                <CardDescription className="mt-1.5">
+                  {profileExists 
+                    ? "Update your existing profile with new information" 
+                    : "Create your profile by pasting your resume or using our AI assistant"}
+                </CardDescription>
               </div>
+              <CollapsibleTrigger asChild>
+                <Button variant={isUpdateOpen ? "ghost" : "outline"} size={isUpdateOpen ? "icon" : "default"} className={isUpdateOpen ? "h-8 w-8" : ""}>
+                  {isUpdateOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="h-4 w-4" />
+                      <span>{profileExists ? "Update Profile" : "Create Profile"}</span>
+                    </div>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+            </CardHeader>
 
-              {/* Mobile Divider */}
-              <div className="flex lg:hidden items-center justify-center my-4">
-                <div className="border-t w-1/3 border-gray-200 dark:border-gray-700"></div>
-                <div className="mx-4 text-xs text-muted-foreground">or</div>
-                <div className="border-t w-1/3 border-gray-200 dark:border-gray-700"></div>
-              </div>
+            <CollapsibleContent>
+              <CardContent className="space-y-6 pt-0">
+                <div className="text-center mb-4">
+                  <h3 className="text-sm font-medium">Choose how to update your profile</h3>
+                </div>
 
-              {/* Desktop Divider - Center Column */}
-              <div className="hidden lg:flex lg:col-span-1 items-center justify-center relative">
-                <div className="flex h-full items-center justify-center">
-                  <div className="border-r border-gray-200 dark:border-gray-700 h-24 absolute"></div>
-                  <div className="bg-white dark:bg-gray-950 z-10 px-3 py-1 text-xs text-muted-foreground border border-gray-200 dark:border-gray-700 rounded-full">
-                    or
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-2">
+                  {/* Resume Paste - Takes 2/3 width */}
+                  <div className="lg:col-span-7 space-y-4 border rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <h3 className="font-medium">Option 1: Paste Your Resume</h3>
+                    </div>
+                    <Textarea 
+                      placeholder="Paste your resume text here..." 
+                      className="h-[180px] font-mono text-sm"
+                      value={resumeContent}
+                      onChange={(e) => setResumeContent(e.target.value)}
+                    />
+                    <div className="flex justify-end">
+                      <Button 
+                        onClick={handleAnalyzeProfile}
+                        disabled={!resumeContent.trim() || isAnalyzing}
+                        className={(!resumeContent.trim() || isAnalyzing) ? '' : 'cursor-pointer'}
+                      >
+                        {isAnalyzing ? "Analyzing..." : "Analyze Profile"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Mobile Divider */}
+                  <div className="flex lg:hidden items-center justify-center my-4">
+                    <div className="border-t w-1/3 border-gray-200 dark:border-gray-700"></div>
+                    <div className="mx-4 text-xs text-muted-foreground">or</div>
+                    <div className="border-t w-1/3 border-gray-200 dark:border-gray-700"></div>
+                  </div>
+
+                  {/* Desktop Divider - Center Column */}
+                  <div className="hidden lg:flex lg:col-span-1 items-center justify-center relative">
+                    <div className="flex h-full items-center justify-center">
+                      <div className="border-r border-gray-200 dark:border-gray-700 h-24 absolute"></div>
+                      <div className="bg-white dark:bg-gray-950 z-10 px-3 py-1 text-xs text-muted-foreground border border-gray-200 dark:border-gray-700 rounded-full">
+                        or
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Talk to Izzy - Takes 1/3 width */}
+                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                    <div className="mb-2">
+                      <div className="flex items-center gap-2 mb-3 justify-center">
+                        <MessageSquare className="h-5 w-5 text-primary" />
+                        <h3 className="font-medium">Option 2: Talk to Izzy</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1 mb-6">
+                        Build your profile through conversation with our AI assistant
+                      </p>
+                    </div>
+                    <Button variant="default" className="gap-2 cursor-pointer">
+                      <Mic className="h-4 w-4" />
+                      Start Conversation
+                    </Button>
                   </div>
                 </div>
-              </div>
 
-              {/* Talk to Izzy - Takes 1/3 width */}
-              <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 flex flex-col items-center justify-center text-center">
-                <div className="mb-2">
-                  <div className="flex items-center gap-2 mb-3 justify-center">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                    <h3 className="font-medium">Option 2: Talk to Izzy</h3>
+                <Separator className="my-6" />
+                
+                <div className="rounded-lg border bg-slate-50 dark:bg-slate-900/40 p-4">
+                  <h3 className="text-sm font-medium mb-3">More Profile Options</h3>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
+                      <Upload className="h-4 w-4 text-muted-foreground" />
+                      <span>Upload Resume</span>
+                      <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
+                    </div>
+                    
+                    <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
+                      <Linkedin className="h-4 w-4 text-muted-foreground" />
+                      <span>Sync with LinkedIn</span>
+                      <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1 mb-6">
-                    Build your profile through conversation with our AI assistant
+                  <p className="text-xs text-muted-foreground mt-2">
+                    We&apos;re working on more ways to update your profile, including document uploads and LinkedIn integration.
                   </p>
                 </div>
-                <Button variant="default" className="gap-2 cursor-pointer">
-                  <Mic className="h-4 w-4" />
-                  Start Conversation
-                </Button>
-              </div>
-            </div>
-
-            <Separator className="my-6" />
-            
-            <div className="rounded-lg border bg-slate-50 dark:bg-slate-900/40 p-4">
-              <h3 className="text-sm font-medium mb-3">More Profile Options</h3>
-              <div className="flex flex-wrap gap-3">
-                <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
-                  <Upload className="h-4 w-4 text-muted-foreground" />
-                  <span>Upload Resume</span>
-                  <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
-                </div>
-                
-                <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
-                  <Linkedin className="h-4 w-4 text-muted-foreground" />
-                  <span>Sync with LinkedIn</span>
-                  <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                We&apos;re working on more ways to update your profile, including document uploads and LinkedIn integration.
-              </p>
-            </div>
-          </CardContent>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
         {/* Profile Analysis Results */}
         <div id="analysis-results">
-          {profilesLoading ? (
+          {profileLoading ? (
             <Card>
               <CardContent className="py-10">
                 <div className="flex flex-col items-center justify-center text-center">
@@ -150,7 +179,7 @@ export default function ProfileAnalysisPage() {
                 </div>
               </CardContent>
             </Card>
-          ) : !profiles || profiles.length === 0 ? (
+          ) : !profileExists ? (
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -175,6 +204,7 @@ export default function ProfileAnalysisPage() {
                   <Button onClick={() => {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                     setHighlightProfileCard(true);
+                    setIsUpdateOpen(true);
                     setTimeout(() => setHighlightProfileCard(false), 1500);
                   }}
                   className="cursor-pointer"
@@ -209,15 +239,8 @@ export default function ProfileAnalysisPage() {
                     Professional Summary
                   </h3>
                   <div className="pl-7 space-y-2">
-                    <p className="text-sm">
-                      Experienced Full Stack Developer with 4+ years specializing in modern JavaScript frameworks and cloud technologies. 
-                      Strong background in building scalable web applications with React, Node.js, and TypeScript. 
-                      Demonstrated expertise in API development, database design, and CI/CD implementation.
-                    </p>
-                    <p className="text-sm">
-                      Professional journey includes contributing to a high-traffic e-commerce platform, 
-                      developing a healthcare data management system, and optimizing application performance 
-                      at scale. Experienced in both startup and enterprise environments.
+                    <p className="text-sm whitespace-pre-line">
+                      {profile?.professional_summary}
                     </p>
                   </div>
                 </div>
@@ -230,61 +253,53 @@ export default function ProfileAnalysisPage() {
                   </h3>
                   <div className="pl-7 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-sm">Frontend Development</h4>
-                        <div className="space-y-2">
-                          {[
-                            { name: "React/Next.js", value: 90 },
-                            { name: "JavaScript/TypeScript", value: 85 },
-                            { name: "HTML/CSS", value: 80 },
-                            { name: "UI/UX Design", value: 65 }
-                          ].map((skill) => (
-                            <div key={skill.name} className="space-y-1">
-                              <div className="flex justify-between text-xs">
-                                <span>{skill.name}</span>
-                                <span className="text-muted-foreground">{skill.value}%</span>
+                      {profile?.skills?.primary_category_name && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">{profile.skills.primary_category_name}</h4>
+                          <div className="space-y-2">
+                            {profile.skills.primary.map((skill) => (
+                              <div key={skill.skill} className="space-y-1">
+                                <div className="flex justify-between text-xs">
+                                  <span>{skill.skill}</span>
+                                  <span className="text-muted-foreground">{skill.rating}%</span>
+                                </div>
+                                <Progress value={skill.rating} className="h-1.5" />
                               </div>
-                              <Progress value={skill.value} className="h-1.5" />
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                       
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-sm">Backend Development</h4>
-                        <div className="space-y-2">
-                          {[
-                            { name: "Node.js", value: 80 },
-                            { name: "REST API Design", value: 85 },
-                            { name: "SQL/NoSQL Databases", value: 75 },
-                            { name: "Authentication/Security", value: 70 }
-                          ].map((skill) => (
-                            <div key={skill.name} className="space-y-1">
-                              <div className="flex justify-between text-xs">
-                                <span>{skill.name}</span>
-                                <span className="text-muted-foreground">{skill.value}%</span>
+                      {profile?.skills?.secondary_category_name && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">{profile.skills.secondary_category_name}</h4>
+                          <div className="space-y-2">
+                            {profile.skills.secondary.map((skill) => (
+                              <div key={skill.skill} className="space-y-1">
+                                <div className="flex justify-between text-xs">
+                                  <span>{skill.skill}</span>
+                                  <span className="text-muted-foreground">{skill.rating}%</span>
+                                </div>
+                                <Progress value={skill.rating} className="h-1.5" />
                               </div>
-                              <Progress value={skill.value} className="h-1.5" />
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     
-                    <div className="pt-2">
-                      <h4 className="font-medium text-sm mb-2">Key Technical Competencies</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          "React", "TypeScript", "Node.js", "Express", "Next.js", "MongoDB", 
-                          "PostgreSQL", "Redux", "REST APIs", "GraphQL", "Jest", "Docker", 
-                          "AWS", "CI/CD", "Git", "Agile", "TailwindCSS", "Responsive Design"
-                        ].map((skill) => (
-                          <Badge key={skill} variant="secondary" className="px-3 py-1">
-                            {skill}
-                          </Badge>
-                        ))}
+                    {profile?.skills?.other && profile.skills.other.length > 0 && (
+                      <div className="pt-2">
+                        <h4 className="font-medium text-sm mb-2">Other Technical Competencies</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {profile.skills.other.map((skill) => (
+                            <Badge key={skill.skill} variant="secondary" className="px-3 py-1">
+                              {skill.skill}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
                 
@@ -297,37 +312,53 @@ export default function ProfileAnalysisPage() {
                   <div className="pl-7 space-y-3">
                     <div className="space-y-2">
                       <h4 className="font-medium">Experience Level</h4>
-                      <p className="text-sm">Mid-level professional with 4 years of relevant experience</p>
+                      <Badge key={profile?.experience_level} className="px-3 py-1 capitalize" variant="outline">
+                        {profile?.experience_level}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">{profile?.experience_level_summary}</p>
                     </div>
                     
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Industry Experience</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {["E-commerce", "Healthcare", "FinTech"].map((industry) => (
-                          <Badge key={industry} variant="outline" className="px-3 py-1">
-                            {industry}
-                          </Badge>
-                        ))}
+                    {profile?.industries && profile.industries.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Industry Experience</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {profile.industries.map((industry) => (
+                            <Badge key={industry} variant="outline" className="px-3 py-1">
+                              {industry}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                     
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Notable Projects</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>Developed a scalable e-commerce platform serving 100K+ monthly users</li>
-                        <li>Built a real-time healthcare data management system with HIPAA compliance</li>
-                        <li>Implemented authentication system with multi-factor authentication</li>
-                        <li>Led front-end performance optimization reducing load time by 40%</li>
-                      </ul>
-                    </div>
+                    {profile?.achievements && profile.achievements.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Notable Achievements</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          {profile.achievements.map((achievement, idx) => (
+                            <li key={idx}>{achievement}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Team Collaboration</h4>
-                      <p className="text-sm">
-                        Experience working in Agile teams of 5-10 developers. Collaborated with UX designers, 
-                        product managers, and QA engineers. Participated in code reviews and technical planning.
-                      </p>
-                    </div>
+                    {profile?.experience && profile.experience.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium">Work Experience</h4>
+                        <div className="space-y-4">
+                          {profile.experience.map((exp, idx) => (
+                            <div key={idx} className="space-y-1 border-l-2 border-muted pl-4">
+                              <div className="flex items-baseline justify-between">
+                                <h5 className="font-medium text-sm">{exp.title}</h5>
+                                <span className="text-xs text-muted-foreground">{exp.years} {exp.years === 1 ? 'year' : 'years'}</span>
+                              </div>
+                              {exp.company && <p className="text-xs">{exp.company}</p>}
+                              <p className="text-sm mt-1">{exp.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -338,21 +369,29 @@ export default function ProfileAnalysisPage() {
                     Education & Certifications
                   </h3>
                   <div className="pl-7 space-y-3">
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Education</h4>
-                      <p className="text-sm">
-                        Bachelor of Science in Computer Science, University of Technology, 2021
-                      </p>
-                    </div>
+                    {profile?.education && profile.education.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Education</h4>
+                        <ul className="space-y-1">
+                          {profile.education.map((edu, idx) => (
+                            <li key={idx} className="text-sm">
+                              {edu}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Certifications</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>AWS Certified Developer - Associate</li>
-                        <li>MongoDB Certified Developer</li>
-                        <li>Professional Scrum Developer I</li>
-                      </ul>
-                    </div>
+                    {profile?.certifications && profile.certifications.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Certifications</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          {profile.certifications.map((cert, idx) => (
+                            <li key={idx}>{cert}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

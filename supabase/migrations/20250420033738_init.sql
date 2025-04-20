@@ -7,6 +7,7 @@ CREATE TABLE profiles (
     user_id UUID NOT NULL,
     professional_summary TEXT NOT NULL,
     experience_level_summary TEXT NOT NULL, -- e.g., "Mid-level with 4 years of relevant experience"
+    experience_level TEXT NOT NULL, -- e.g., "Mid-level with 4 years of relevant experience"
     skills JSONB NOT NULL, -- e.g., {"primary": {"Public Speaking": 90, "Digital Marketing": 85, "SEO": 80, "Branding": 75}, "secondary": {"Analytics": 70, "Content Creation": 65, "Social Media": 60, "Graphic Design": 55}, "other": ["Team Leadership", "Event Planning"]}
     experience JSONB NOT NULL, -- e.g., [{"title": "Marketing Manager", "company": "ABC Corp", "years": 3, "description": "Led campaigns…"}]
     achievements JSONB NOT NULL, -- e.g., ["Increased sales by 20%", "Published 3 research papers"]

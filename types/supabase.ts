@@ -271,9 +271,11 @@ export type Database = {
           created_at: string | null
           education: Json
           experience: Json
+          experience_level: string
           experience_level_summary: string
           id: string
           industries: Json
+          is_resume: boolean
           professional_summary: string
           skills: Json
           updated_at: string | null
@@ -285,9 +287,11 @@ export type Database = {
           created_at?: string | null
           education: Json
           experience: Json
+          experience_level: string
           experience_level_summary: string
           id?: string
           industries: Json
+          is_resume: boolean
           professional_summary: string
           skills: Json
           updated_at?: string | null
@@ -299,9 +303,11 @@ export type Database = {
           created_at?: string | null
           education?: Json
           experience?: Json
+          experience_level?: string
           experience_level_summary?: string
           id?: string
           industries?: Json
+          is_resume?: boolean
           professional_summary?: string
           skills?: Json
           updated_at?: string | null
