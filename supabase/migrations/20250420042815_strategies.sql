@@ -21,6 +21,7 @@ CREATE TABLE interview_strategies (
     key_alignments JSONB NOT NULL, -- e.g., {"skills": ["Python matches job requirement"], "experience": ["3 years matches 3-5 years required"]}
     potential_challenges JSONB NOT NULL, -- e.g., ["Lacks experience with Agile", "May need to learn new tools"]
     alignment_summary TEXT NOT NULL, -- e.g., "User has strong Python skills and 3 years of backend experience, matching the job’s requirements, but lacks Agile experience."
+    is_job_description BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     -- Foreign key to auth.users(id) with cascade delete
