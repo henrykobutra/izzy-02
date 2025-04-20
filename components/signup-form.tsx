@@ -1,11 +1,24 @@
+'use client'
+
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
-import { IconArrowLeft } from "@tabler/icons-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useAuth } from "@/hooks/use-auth"
+import { SignupFormValues, signupSchema } from "@/lib/auth/client-schemas"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 
 export function SignupForm({
   className,
@@ -21,7 +34,7 @@ export function SignupForm({
       </div>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <div className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4">
@@ -32,53 +45,9 @@ export function SignupForm({
                   Sign up for your Izzy account to get started
                 </p>
               </div>
-              <div className="grid gap-3">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Jane Smith"
-                  required
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="password">Password</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="••••••••"
-                  required 
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input 
-                  id="confirmPassword" 
-                  type="password" 
-                  placeholder="••••••••"
-                  required 
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Create Account
-              </Button>
-              <div className="text-center text-sm">
-                Already have an account?{" "}
-                <Link href="/login" className="underline underline-offset-4">
-                  Sign in
-                </Link>
-              </div>
+              <FormContent />
             </div>
-          </form>
+          </div>
           <div className="bg-muted relative hidden md:block">
             <div className="absolute inset-0">
               <Image
@@ -98,5 +67,132 @@ export function SignupForm({
         and <a href="/privacy">Privacy Policy</a>.
       </div>
     </div>
+  )
+}
+
+function FormContent() {
+  const { handleSignup, isSigningUp, authError } = useAuth()
+  
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  })
+
+  async function onSubmit(data: SignupFormValues) {
+    const formData = new FormData()
+    formData.append("name", data.name)
+    formData.append("email", data.email)
+    formData.append("password", data.password)
+    formData.append("confirmPassword", data.confirmPassword)
+    await handleSignup(formData)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {authError && (
+          <div className="text-red-600 text-sm text-center">{authError}</div>
+        )}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Future CEO Material"
+                  disabled={isSigningUp}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="dream.job.hunter@gmail.com"
+                  type="email"
+                  disabled={isSigningUp}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="interview ninja secrets"
+                  type="password"
+                  disabled={isSigningUp}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="one more time, with feeling"
+                  type="password"
+                  disabled={isSigningUp}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isSigningUp}>
+          {isSigningUp ? (
+            <>
+              <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating Account...
+            </>
+          ) : (
+            "Create Account"
+          )}
+        </Button>
+        <div className="text-center text-sm">
+          Already have an account?{" "}
+          <Link 
+            href="/login" 
+            className={cn(
+              "underline underline-offset-4",
+              isSigningUp ? "pointer-events-none opacity-50" : ""
+            )}
+            tabIndex={isSigningUp ? -1 : undefined}
+          >
+            Sign in
+          </Link>
+        </div>
+      </form>
+    </Form>
   )
 }

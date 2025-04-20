@@ -1,11 +1,24 @@
+'use client'
+
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
-import { IconArrowLeft } from "@tabler/icons-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useAuth } from "@/hooks/use-auth"
+import { LoginFormValues, loginSchema } from "@/lib/auth/client-schemas"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 
 export function LoginForm({
   className,
@@ -21,7 +34,7 @@ export function LoginForm({
       </div>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <div className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4">
@@ -32,38 +45,9 @@ export function LoginForm({
                   Login to your Izzy account
                 </p>
               </div>
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/forgot-password"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-              <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline underline-offset-4">
-                  Sign up
-                </Link>
-              </div>
+              <FormContent />
             </div>
-          </form>
+          </div>
           <div className="bg-muted relative hidden md:block">
             <div className="absolute inset-0">
               <Image
@@ -76,7 +60,7 @@ export function LoginForm({
               />
             </div>
             <div className="absolute bottom-2 right-2 text-xs text-white bg-black/30 p-1 rounded z-10">
-              Photo by <a href="https://unsplash.com/@charlesdeluvio?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" className="hover:underline">charlesdeluvio</a> on <a href="https://unsplash.com/photos/person-sitting-in-a-chair-in-front-of-a-man-rRWiVQzLm7k?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" className="hover:underline">Unsplash</a>
+              Photo by <a href="https://unsplash.com/@charlesdeluvio?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noopener noreferrer" className="hover:underline">charlesdeluvio</a> on <a href="https://unsplash.com/photos/person-sitting-in-a-chair-in-front-of-a-man-rRWiVQzLm7k?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noopener noreferrer" className="hover:underline">Unsplash</a>
             </div>
           </div>
         </CardContent>
@@ -86,5 +70,104 @@ export function LoginForm({
         and <a href="/privacy">Privacy Policy</a>.
       </div>
     </div>
+  )
+}
+
+function FormContent() {
+  const { handleLogin, isLoggingIn, authError } = useAuth()
+  
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
+
+  async function onSubmit(data: LoginFormValues) {
+    const formData = new FormData()
+    formData.append("email", data.email)
+    formData.append("password", data.password)
+    await handleLogin(formData)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {authError && (
+          <div className="text-red-600 text-sm text-center">{authError}</div>
+        )}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="career.rockstar@gmail.com" 
+                  disabled={isLoggingIn}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center justify-between">
+                <FormLabel>Password</FormLabel>
+                <Link
+                  href="/forgot-password"
+                  className={cn(
+                    "text-sm underline-offset-2 hover:underline",
+                    isLoggingIn ? "pointer-events-none opacity-50" : ""
+                  )}
+                  tabIndex={isLoggingIn ? -1 : undefined}
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <FormControl>
+                <Input
+                  type="password" 
+                  placeholder="your secret interview weapon"
+                  disabled={isLoggingIn}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isLoggingIn}>
+          {isLoggingIn ? (
+            <>
+              <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            "Login"
+          )}
+        </Button>
+        <div className="text-center text-sm">
+          Don&apos;t have an account?{" "}
+          <Link 
+            href="/signup" 
+            className={cn(
+              "underline underline-offset-4",
+              isLoggingIn ? "pointer-events-none opacity-50" : ""
+            )}
+            tabIndex={isLoggingIn ? -1 : undefined}
+          >
+            Sign up
+          </Link>
+        </div>
+      </form>
+    </Form>
   )
 }
