@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { useGenerateProfile } from "@/hooks/agents/useGenerateProfile";
 import { useProfiles } from "@/hooks/profile/useProfiles";
+import type { ProfileAnalysis } from "@/types/profile";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -17,6 +19,7 @@ export default function ProfileAnalysisPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [highlightProfileCard, setHighlightProfileCard] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<ProfileAnalysis | null>(null)
   const { generateProfile } = useGenerateProfile();
   const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
   
@@ -30,10 +33,15 @@ export default function ProfileAnalysisPage() {
     if (!resumeContent.trim()) return
     
     setIsAnalyzing(true)
+    setAnalysisResult(null)
     
     try {
       const result = await generateProfile(resumeContent);
-      console.log("Profile analysis result:", result);
+
+      setAnalysisResult(result);
+      
+      // Close the update panel after successful analysis
+      setIsUpdateOpen(false);
     } catch (err) {
       console.error("Profile analysis error:", err);
     } finally {
@@ -95,6 +103,7 @@ export default function ProfileAnalysisPage() {
                       className="h-[180px] font-mono text-sm"
                       value={resumeContent}
                       onChange={(e) => setResumeContent(e.target.value)}
+                      disabled={isAnalyzing}
                     />
                     <div className="flex justify-end">
                       <Button 
@@ -135,7 +144,11 @@ export default function ProfileAnalysisPage() {
                         Build your profile through conversation with our AI assistant
                       </p>
                     </div>
-                    <Button variant="default" className="gap-2 cursor-pointer">
+                    <Button 
+                      variant="default" 
+                      className="gap-2 cursor-pointer"
+                      disabled={isAnalyzing}
+                    >
                       <Mic className="h-4 w-4" />
                       Start Conversation
                     </Button>
@@ -147,13 +160,13 @@ export default function ProfileAnalysisPage() {
                 <div className="rounded-lg border bg-slate-50 dark:bg-slate-900/40 p-4">
                   <h3 className="text-sm font-medium mb-3">More Profile Options</h3>
                   <div className="flex flex-wrap gap-3">
-                    <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
+                    <div className={`inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed select-none ${isAnalyzing ? 'opacity-40' : 'opacity-60'}`}>
                       <Upload className="h-4 w-4 text-muted-foreground" />
                       <span>Upload Resume</span>
                       <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
                     </div>
                     
-                    <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed opacity-60 select-none">
+                    <div className={`inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed select-none ${isAnalyzing ? 'opacity-40' : 'opacity-60'}`}>
                       <Linkedin className="h-4 w-4 text-muted-foreground" />
                       <span>Sync with LinkedIn</span>
                       <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
@@ -170,7 +183,153 @@ export default function ProfileAnalysisPage() {
 
         {/* Profile Analysis Results */}
         <div id="analysis-results">
-          {profileLoading ? (
+          {isAnalyzing ? (
+            <Card>
+              <CardContent className="py-10">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4" />
+                  <p className="text-sm text-muted-foreground">Analyzing your profile...</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : analysisResult ? (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-primary" />
+                    <CardTitle>New Profile Analysis</CardTitle>
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <span>Just now</span>
+                  </div>
+                </div>
+                <CardDescription>
+                  AI-powered analysis of your professional profile and qualifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/* Success Message */}
+                <div className="rounded-lg border overflow-hidden mb-6">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/30 p-4 border-b">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <h3 className="font-semibold">Analysis Complete</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your profile has been successfully analyzed and saved to your account.
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-white dark:bg-gray-950">
+                    <div className="flex flex-wrap gap-2">
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 bg-white dark:bg-gray-950 cursor-pointer"
+                        onClick={() => window.location.reload()}
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        View Saved Profile
+                      </Button>
+                      
+                      <Link href="/dashboard/interview-strategy">
+                        <Button 
+                          size="sm"
+                          className="gap-1.5 bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                        >
+                          <BarChart3 className="h-3.5 w-3.5" />
+                          Set Target Position
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/dashboard/practice-interview">
+                        <Button 
+                          size="sm"
+                          className="gap-1.5 bg-purple-500 hover:bg-purple-600 cursor-pointer"
+                        >
+                          <Mic className="h-3.5 w-3.5" />
+                          Practice Interview
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Professional Summary */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    Professional Summary
+                  </h3>
+                  <div className="pl-7 space-y-2">
+                    <p className="text-sm whitespace-pre-line">
+                      {analysisResult?.professional_summary}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Technical Skills Analysis */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                    Technical Skills Profile
+                  </h3>
+                  <div className="pl-7 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {analysisResult?.skills?.primary_category_name && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">{analysisResult.skills.primary_category_name}</h4>
+                          <div className="space-y-2">
+                            {analysisResult.skills.primary.map((skill) => (
+                              <div key={skill.skill} className="space-y-1">
+                                <div className="flex justify-between text-xs">
+                                  <span>{skill.skill}</span>
+                                  <span className="text-muted-foreground">{skill.rating}%</span>
+                                </div>
+                                <Progress value={skill.rating} className="h-1.5" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {analysisResult?.skills?.secondary_category_name && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">{analysisResult.skills.secondary_category_name}</h4>
+                          <div className="space-y-2">
+                            {analysisResult.skills.secondary.map((skill) => (
+                              <div key={skill.skill} className="space-y-1">
+                                <div className="flex justify-between text-xs">
+                                  <span>{skill.skill}</span>
+                                  <span className="text-muted-foreground">{skill.rating}%</span>
+                                </div>
+                                <Progress value={skill.rating} className="h-1.5" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {analysisResult?.skills?.other && analysisResult.skills.other.length > 0 && (
+                      <div className="pt-2">
+                        <h4 className="font-medium text-sm mb-2">Other Technical Competencies</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {analysisResult.skills.other.map((skill) => (
+                            <Badge key={skill.skill} variant="secondary" className="px-3 py-1">
+                              {skill.skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : profileLoading ? (
             <Card>
               <CardContent className="py-10">
                 <div className="flex flex-col items-center justify-center text-center">
@@ -395,18 +554,62 @@ export default function ProfileAnalysisPage() {
                   </div>
                 </div>
                 
-                <div className="rounded-lg border bg-card p-4 bg-amber-50 dark:bg-amber-950/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="h-5 w-5 text-amber-500" />
-                    <h3 className="font-semibold text-lg">Next Steps</h3>
+                <div className="rounded-lg border overflow-hidden">
+                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/30 p-4 border-b">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-amber-500" />
+                      <h3 className="font-semibold text-lg">Continue Your Interview Prep</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your profile analysis is ready. Where would you like to go next?
+                    </p>
                   </div>
-                  <p className="text-sm">
-                    Your profile has been analyzed. To receive tailored interview preparation, please provide information about the position
-                    you&apos;re targeting in the next step.
-                  </p>
-                  <Button variant="outline" className="mt-3">
-                    Set Target Position
-                  </Button>
+                  
+                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Card 1: Set Target Position */}
+                    <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-950">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 p-2.5">
+                          <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Set Target Position</h4>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Receive tailored interview preparation specific to your target job
+                          </p>
+                        </div>
+                      </div>
+                      <Link href="/dashboard/interview-strategy" className="w-full">
+                        <Button 
+                          className="w-full mt-3 bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                        >
+                          Continue
+                        </Button>
+                      </Link>
+                    </div>
+                    
+                    {/* Card 2: Practice Interview */}
+                    <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-950">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 rounded-full bg-purple-100 dark:bg-purple-900/40 p-2.5">
+                          <Mic className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Practice Interview</h4>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Start practicing right away with AI-powered interview simulations
+                          </p>
+                        </div>
+                      </div>
+                      <Link href="/dashboard/practice-interview" className="w-full">
+                        <Button 
+                          className="w-full mt-3 bg-purple-500 hover:bg-purple-600 cursor-pointer"
+                        >
+                          Start Practice
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
