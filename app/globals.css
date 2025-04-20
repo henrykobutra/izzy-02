@@ -136,6 +136,24 @@
   --color-5: hsl(165 50% 65%);
 }
 
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+::-moz-selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.dark ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.dark ::-moz-selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
