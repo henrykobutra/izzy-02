@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Play, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react"
+import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Mic, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
@@ -459,10 +459,10 @@ export default function InterviewStrategyPage() {
                 <Table className="border-collapse w-full">
                   <TableHeader>
                     <TableRow className="border-b bg-muted/30">
-                      <TableHead className="w-[30%] py-3 font-medium pl-6">Position</TableHead>
-                      <TableHead className="w-[20%] py-3 font-medium">Experience</TableHead>
-                      <TableHead className="w-[30%] py-3 font-medium">Match Rating</TableHead>
-                      <TableHead className="py-3 text-right font-medium pr-6">Actions</TableHead>
+                      <TableHead className="w-[30%] py-2 font-medium pl-6">Position</TableHead>
+                      <TableHead className="w-[20%] py-2 font-medium">Experience</TableHead>
+                      <TableHead className="w-[30%] py-2 font-medium">Match Rating</TableHead>
+                      <TableHead className="py-2 text-right font-medium pr-6">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -471,84 +471,69 @@ export default function InterviewStrategyPage() {
                         key={strategy.id} 
                         className="hover:bg-muted/30 group/row border-b last:border-0"
                       >
-                        <TableCell className="py-4 pl-6">
-                          <div className="space-y-2">
-                            <div className="font-medium text-base">{strategy.job_title}</div>
-                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                              <Briefcase className="h-4 w-4" />
+                        <TableCell className="py-3 pl-6">
+                          <div className="space-y-1">
+                            <div className="font-medium">{strategy.job_title}</div>
+                            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                              <Briefcase className="h-3.5 w-3.5" />
                               <span>{strategy.job_company}</span>
                             </div>
-                            <div>
-                              <Badge variant="outline" className="bg-muted/30 text-xs">
-                                {strategy.job_industry}
-                              </Badge>
-                            </div>
                           </div>
                         </TableCell>
-                        <TableCell className="py-4">
-                          <div className="space-y-2">
-                            <Badge 
-                              variant="secondary" 
-                              className="capitalize px-2 py-1 text-xs"
-                            >
-                              {strategy.job_experience_level || "Not specified"}
-                            </Badge>
-                            <div className="text-sm text-muted-foreground">
-                              {strategy.job_description_key_points?.required_skills?.length || 0} required skills
-                            </div>
-                          </div>
+                        <TableCell className="py-3">
+                          <Badge 
+                            variant="secondary" 
+                            className="capitalize px-1.5 py-0.5 text-xs"
+                          >
+                            {strategy.job_experience_level ? 
+                              strategy.job_experience_level.toLowerCase() === "entry" ? "Entry Level" :
+                              strategy.job_experience_level.toLowerCase() === "mid" ? "Mid Level" :
+                              strategy.job_experience_level.toLowerCase() === "senior" ? "Senior Level" :
+                              strategy.job_experience_level.toLowerCase() === "executive" ? "Executive Level" :
+                              strategy.job_experience_level
+                              : "Not specified"}
+                          </Badge>
                         </TableCell>
-                        <TableCell className="py-4">
-                          <div className="flex items-start gap-4">
+                        <TableCell className="py-3">
+                          <div className="flex items-center gap-3">
                             <div className="flex-shrink-0">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-medium
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm
                                 ${strategy.match_rate >= 85 ? 'bg-green-500' : 
                                 strategy.match_rate >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
                               >
                                 {strategy.match_rate}%
                               </div>
                             </div>
-                            <div className="space-y-2">
-                              <div className="text-sm font-medium">
-                                {strategy.match_rate >= 85 ? 'Excellent Alignment' : 
-                                  strategy.match_rate >= 70 ? 'Good Alignment' : 'Challenging Interview'}
-                              </div>
-                              <div className="flex gap-3 text-sm">
-                                <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                                  <CheckCircle className="h-4 w-4" />
-                                  <span>{strategy.strengths?.length || 0} strengths</span>
-                                </div>
-                                <div className="flex items-center gap-1 text-muted-foreground">
-                                  <span>{strategy.focus_points?.length || 0} focus points</span>
-                                </div>
-                              </div>
+                            <div className="text-xs font-medium">
+                              {strategy.match_rate >= 85 ? 'Excellent Alignment' : 
+                                strategy.match_rate >= 70 ? 'Good Alignment' : 'Challenging Interview'}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="py-4 text-right pr-6">
+                        <TableCell className="py-3 text-right pr-6">
                           <div className="flex items-center justify-end gap-2">
                             <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
-                              <Button variant="outline" size="sm" className="h-9 px-3">
-                                <Eye className="h-4 w-4 mr-1.5" />
-                                <span>View</span>
+                              <Button variant="outline" size="sm" className="h-8 px-2.5">
+                                <Eye className="h-3.5 w-3.5 mr-1" />
+                                <span className="text-xs">View</span>
                               </Button>
                             </Link>
-                            <div className="flex flex-col sm:flex-row gap-2">
-                              <Button variant="outline" size="sm" className="h-9 w-9 p-0">
-                                <Play className="h-4 w-4" />
+                            <div className="flex flex-col sm:flex-row gap-1.5">
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                                <Mic className="h-3.5 w-3.5" />
                                 <span className="sr-only">Practice</span>
                               </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm"
-                                className="h-9 w-9 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
                                 onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
                                 disabled={deletingStrategy === strategy.id}
                               >
                                 {deletingStrategy === strategy.id ? (
-                                  <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                  <div className="h-3.5 w-3.5 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
                                 ) : (
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-3.5 w-3.5" />
                                 )}
                                 <span className="sr-only">Delete</span>
                               </Button>
@@ -559,7 +544,7 @@ export default function InterviewStrategyPage() {
                     ))}
                   </TableBody>
                 </Table>
-                <div className="py-4 bg-muted/20 border-t flex items-center justify-between px-6">
+                <div className="py-3 bg-muted/20 border-t flex items-center justify-between px-6">
                   <div className="text-sm text-muted-foreground">
                     {strategies.length} {strategies.length === 1 ? 'strategy' : 'strategies'} available
                   </div>
