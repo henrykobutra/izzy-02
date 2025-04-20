@@ -18,15 +18,56 @@ import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useStrategies } from "@/hooks/strategies/useStrategies"
 import Link from "next/link"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { getStrategyAnalysis } from "@/services/agents/strategy.agent"
+import { saveStrategy } from "@/services/database/strategies/saveStrategy"
+import { deleteStrategy } from "@/services/database/strategies/deleteStrategy"
+import { userService } from "@/services/user.service"
+import { toast } from "sonner"
+import type { StrategyAnalysis } from "@/types/strategy"
+import { MultiStepLoader } from "@/components/ui/multi-step-loader"
 
 export default function InterviewStrategyPage() {
   const [jobDescription, setJobDescription] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
-  const { strategies, loading: strategiesLoading, hasStrategies } = useStrategies();
+  const { strategies, loading: strategiesLoading, hasStrategies, refetch } = useStrategies();
   const [isProfileDetailsOpen, setIsProfileDetailsOpen] = useState(false);
   const [highlightJobCard, setHighlightJobCard] = useState(false);
+  const [deletingStrategy, setDeletingStrategy] = useState<string | null>(null);
+  const [strategyToDelete, setStrategyToDelete] = useState<string | null>(null);
   const jobCardRef = useRef<HTMLDivElement>(null);
+  
+  // Define loading states for the job analysis process
+  const jobAnalysisLoadingStates = [
+    { text: "Initializing job analysis engine..." },
+    { text: "Reading job description..." },
+    { text: "Extracting job title and requirements..." },
+    { text: "Analyzing key technical requirements..." },
+    { text: "Identifying soft skills needed..." },
+    { text: "Retrieving your profile data..." },
+    { text: "Matching your hard skills to requirements..." },
+    { text: "Evaluating your soft skills alignment..." },
+    { text: "Identifying experience alignment..." },
+    { text: "Calculating potential experience gaps..." },
+    { text: "Evaluating company culture indicators..." },
+    { text: "Formulating culture fit talking points..." },
+    { text: "Generating behavioral question predictions..." },
+    { text: "Crafting tailored interview response structures..." },
+    { text: "Preparing technical question strategy..." },
+    { text: "Analyzing company interview patterns..." },
+    { text: "Prioritizing your key strengths to highlight..." },
+    { text: "Finalizing your interview strategy..." }
+  ];
   
   const handleHighlightJobCard = () => {
     // Scroll to job card
@@ -62,24 +103,98 @@ export default function InterviewStrategyPage() {
     }
   ])
   
-  const handleAnalyzeJob = () => {
+  const handleAnalyzeJob = async () => {
     if (!jobDescription.trim()) return
     
     setIsAnalyzing(true)
     
-    // Simulate analysis process
-    setTimeout(() => {
+    try {
+      // Get current user
+      const userData = await userService.getCurrentUser()
+      if (!userData) {
+        toast.error("You must be logged in to analyze jobs")
+        return
+      }
+      
+      // Get profile data
+      if (!profile) {
+        toast.error("Please complete your profile before analyzing jobs")
+        handleHighlightJobCard()
+        return
+      }
+      
+      // Generate strategy using AI agent
+      const strategyData = await getStrategyAnalysis(jobDescription, profile)
+      
+      if (!strategyData.is_job_description) {
+        toast.error("The text you provided doesn't appear to be a job description. Please try again with a valid job description.")
+        return
+      }
+      
+      // Prepare the strategy object to save
+      const strategyToSave: StrategyAnalysis = {
+        ...strategyData,
+        user_id: userData.id,
+        profile_id: profile.id,
+        job_description: jobDescription
+      }
+      
+      // Save strategy to database
+      const savedStrategy = await saveStrategy(strategyToSave)
+      
+      if (savedStrategy) {
+        toast.success("Job analyzed successfully! Your interview strategy is ready.")
+        // Refresh strategies list
+        await refetch()
+        // Scroll to strategies section
+        window.scrollTo({ top: document.getElementById("saved-jobs")?.offsetTop || 0, behavior: "smooth" })
+        // Clear the job description input
+        setJobDescription("")
+      } else {
+        toast.error("Failed to save your strategy. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error analyzing job:", error)
+      toast.error("An error occurred while analyzing the job description")
+    } finally {
       setIsAnalyzing(false)
-      window.scrollTo({ top: document.getElementById("saved-jobs")?.offsetTop || 0, behavior: "smooth" })
-    }, 2000)
+    }
   }
-  
+
   const handleRemoveJob = (id: string) => {
     setSavedJobs(savedJobs.filter(job => job.id !== id))
   }
 
+  const handleDeleteStrategy = async (strategyId: string) => {
+    setDeletingStrategy(strategyId);
+    
+    try {
+      const success = await deleteStrategy(strategyId);
+      
+      if (success) {
+        toast.success("Interview strategy deleted successfully");
+        await refetch();
+      } else {
+        toast.error("Failed to delete interview strategy");
+      }
+    } catch (error) {
+      console.error("Error deleting strategy:", error);
+      toast.error("An error occurred while deleting the interview strategy");
+    } finally {
+      setDeletingStrategy(null);
+      setStrategyToDelete(null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
+      {/* MultiStepLoader for job analysis */}
+      <MultiStepLoader 
+        loadingStates={jobAnalysisLoadingStates}
+        loading={isAnalyzing}
+        duration={1500}
+        loop={false}
+      />
       <div className="px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight mb-4">Interview Strategy</h1>
         <p className="text-muted-foreground mb-6">
@@ -244,6 +359,7 @@ export default function InterviewStrategyPage() {
               className="h-[180px] font-mono text-sm"
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
+              disabled={isAnalyzing}
             />
             <div className="flex justify-end">
               <Button 
@@ -276,16 +392,6 @@ export default function InterviewStrategyPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <h2 className="text-xl font-semibold tracking-tight">Your Interview Strategies</h2>
           <div className="flex items-center gap-2">
-            {hasStrategies && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1.5"
-              >
-                <Search className="h-3.5 w-3.5" />
-                <span>Filter</span>
-              </Button>
-            )}
             <Button 
               onClick={handleHighlightJobCard}
               size="sm" 
@@ -388,8 +494,14 @@ export default function InterviewStrategyPage() {
                           variant="ghost" 
                           size="icon" 
                           className="h-8 w-8 text-destructive"
+                          onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
+                          disabled={deletingStrategy === strategy.id}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {deletingStrategy === strategy.id ? (
+                            <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </TableCell>
@@ -400,6 +512,28 @@ export default function InterviewStrategyPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!strategyToDelete} onOpenChange={(open) => !open && setStrategyToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Interview Strategy</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this interview strategy? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => strategyToDelete && handleDeleteStrategy(strategyToDelete)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={!!deletingStrategy}
+            >
+              {deletingStrategy ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

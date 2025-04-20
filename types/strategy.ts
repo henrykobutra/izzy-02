@@ -1,7 +1,9 @@
 export type StrategyAnalysis = {
     id?: string;
     user_id?: string;
+    profile_id?: string;
     created_at?: string;
+    job_description?: string;
     job_description_summary: string;
     job_company: string;
     job_industry: string;

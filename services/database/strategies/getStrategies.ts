@@ -8,7 +8,7 @@ export const getStrategies = async (userId: string) => {
     
     try {
         const { data, error } = await supabase
-            .from('strategies')
+            .from('interview_strategies')
             .select('*')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
@@ -29,7 +29,7 @@ export const getStrategyById = async (id: string) => {
     
     try {
         const { data, error } = await supabase
-            .from('strategies')
+            .from('interview_strategies')
             .select('*')
             .eq('id', id)
             .single()

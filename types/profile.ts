@@ -1,4 +1,6 @@
 export type ProfileAnalysis = {
+    id?: string;
+    user_id?: string;
     professional_summary: string;
     experience_level_summary: string;
     skills: {
