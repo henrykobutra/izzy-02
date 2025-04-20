@@ -109,279 +109,282 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="interview" className="w-full">
+      <Tabs defaultValue="interview" className="w-[520px] space-y-4">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="interview">Interview Settings</TabsTrigger>
           <TabsTrigger value="preferences">Other Preferences</TabsTrigger>
         </TabsList>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <TabsContent value="interview" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Interview Configuration</CardTitle>
-                  <CardDescription>
-                    Adjust how your interviews are conducted
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="interviewToughness"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Interview Toughness Level</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select toughness level" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="dynamic">Dynamic (Recommended)</SelectItem>
-                            <SelectItem value="easy">Easy</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="hard">Hard</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Dynamic adjusts based on your performance during the interview
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="seniorityLevel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Seniority Level Override</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select seniority level" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="dynamic">Dynamic (Based on resume)</SelectItem>
-                            <SelectItem value="junior">Junior</SelectItem>
-                            <SelectItem value="mid-level">Mid-level</SelectItem>
-                            <SelectItem value="senior">Senior</SelectItem>
-                            <SelectItem value="staff">Staff/Principal</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Override if our system incorrectly identified your experience level
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="targetIndustry"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Target Industry</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select target industry" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="dynamic">Dynamic (Based on resume)</SelectItem>
-                            <SelectItem value="tech">Technology</SelectItem>
-                            <SelectItem value="finance">Finance</SelectItem>
-                            <SelectItem value="healthcare">Healthcare</SelectItem>
-                            <SelectItem value="education">Education</SelectItem>
-                            <SelectItem value="retail">Retail</SelectItem>
-                            <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Select the industry you're targeting for interviews
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="targetPosition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Target Position</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select target position" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="dynamic">Dynamic (Based on resume)</SelectItem>
-                            <SelectItem value="software-engineer">Software Engineer</SelectItem>
-                            <SelectItem value="frontend-developer">Frontend Developer</SelectItem>
-                            <SelectItem value="backend-developer">Backend Developer</SelectItem>
-                            <SelectItem value="full-stack-developer">Full Stack Developer</SelectItem>
-                            <SelectItem value="devops-engineer">DevOps Engineer</SelectItem>
-                            <SelectItem value="data-scientist">Data Scientist</SelectItem>
-                            <SelectItem value="machine-learning-engineer">Machine Learning Engineer</SelectItem>
-                            <SelectItem value="product-manager">Product Manager</SelectItem>
-                            <SelectItem value="designer">UX/UI Designer</SelectItem>
-                            <SelectItem value="other">Other (Specify)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Select the position you're interviewing for
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {showCustomField && (
+        <div className="w-[520px] mx-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <TabsContent value="interview" className="space-y-6">
+                <Card className="w-[520px]">
+                  <CardHeader>
+                    <CardTitle>Interview Configuration</CardTitle>
+                    <CardDescription>
+                      Adjust how your interviews are conducted
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
                     <FormField
                       control={form.control}
-                      name="customPosition"
+                      name="interviewToughness"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Specify Position</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your target position" {...field} />
-                          </FormControl>
+                          <FormLabel>Interview Toughness Level</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select toughness level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="dynamic">Dynamic (Recommended)</SelectItem>
+                              <SelectItem value="easy">Easy</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="hard">Hard</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Dynamic adjusts based on your performance during the interview
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  )}
 
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="preferences" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Additional Preferences</CardTitle>
-                  <CardDescription>
-                    Customize other aspects of your experience
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="feedbackDetail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Feedback Detail Level</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select feedback detail" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="concise">Concise</SelectItem>
-                            <SelectItem value="standard">Standard</SelectItem>
-                            <SelectItem value="detailed">Detailed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Choose how detailed you want your feedback to be
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="languagePreference"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Language Preference</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          disabled
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="english">English</SelectItem>
-                            <SelectItem value="spanish">Spanish</SelectItem>
-                            <SelectItem value="french">French</SelectItem>
-                            <SelectItem value="german">German</SelectItem>
-                            <SelectItem value="chinese">Chinese</SelectItem>
-                            <SelectItem value="japanese">Japanese</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Additional languages coming soon. Currently, interviews are only available in English.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="receiveNotifications"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">
-                            Notifications
-                          </FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="seniorityLevel"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seniority Level Override</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select seniority level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="dynamic">Dynamic (Based on resume)</SelectItem>
+                              <SelectItem value="junior">Junior</SelectItem>
+                              <SelectItem value="mid-level">Mid-level</SelectItem>
+                              <SelectItem value="senior">Senior</SelectItem>
+                              <SelectItem value="staff">Staff/Principal</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormDescription>
-                            Receive email notifications about new features and feedback
+                            Override if our system incorrectly identified your experience level
                           </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-            <div className="flex justify-end">
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save settings"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+                    <FormField
+                      control={form.control}
+                      name="targetIndustry"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target Industry</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select target industry" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="dynamic">Dynamic (Based on resume)</SelectItem>
+                              <SelectItem value="tech">Technology</SelectItem>
+                              <SelectItem value="finance">Finance</SelectItem>
+                              <SelectItem value="healthcare">Healthcare</SelectItem>
+                              <SelectItem value="education">Education</SelectItem>
+                              <SelectItem value="retail">Retail</SelectItem>
+                              <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Select the industry you're targeting for interviews
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="targetPosition"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target Position</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select target position" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="dynamic">Dynamic (Based on resume)</SelectItem>
+                              <SelectItem value="software-engineer">Software Engineer</SelectItem>
+                              <SelectItem value="frontend-developer">Frontend Developer</SelectItem>
+                              <SelectItem value="backend-developer">Backend Developer</SelectItem>
+                              <SelectItem value="full-stack-developer">Full Stack Developer</SelectItem>
+                              <SelectItem value="devops-engineer">DevOps Engineer</SelectItem>
+                              <SelectItem value="data-scientist">Data Scientist</SelectItem>
+                              <SelectItem value="machine-learning-engineer">Machine Learning Engineer</SelectItem>
+                              <SelectItem value="product-manager">Product Manager</SelectItem>
+                              <SelectItem value="designer">UX/UI Designer</SelectItem>
+                              <SelectItem value="other">Other (Specify)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Select the position you're interviewing for
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {showCustomField && (
+                      <FormField
+                        control={form.control}
+                        name="customPosition"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Specify Position</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your target position" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="preferences" className="space-y-6">
+                <Card className="w-[520px]">
+                  <CardHeader>
+                    <CardTitle>Additional Preferences</CardTitle>
+                    <CardDescription>
+                      Customize other aspects of your experience
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="feedbackDetail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Feedback Detail Level</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select feedback detail" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="concise">Concise</SelectItem>
+                              <SelectItem value="standard">Standard</SelectItem>
+                              <SelectItem value="detailed">Detailed</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Feedback detail customization is currently not supported.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="languagePreference"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Language Preference</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select language" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="english">English</SelectItem>
+                              <SelectItem value="spanish">Spanish</SelectItem>
+                              <SelectItem value="french">French</SelectItem>
+                              <SelectItem value="german">German</SelectItem>
+                              <SelectItem value="chinese">Chinese</SelectItem>
+                              <SelectItem value="japanese">Japanese</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Additional languages coming soon. Currently, interviews are only available in English.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="receiveNotifications"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                              Notifications
+                            </FormLabel>
+                            <FormDescription>
+                              Receive email notifications about new features and feedback
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save settings"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </Tabs>
     </div>
   )
