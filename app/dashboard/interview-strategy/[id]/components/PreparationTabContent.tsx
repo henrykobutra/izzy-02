@@ -5,7 +5,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card"
-import { CheckCircle, Circle, CheckedCircle, Mic, FileText, BookOpen } from "lucide-react"
+import { CheckCircle, Circle, Mic, FileText, BookOpen } from "lucide-react"
 import type { StrategyAnalysis } from "@/types/strategy"
 
 interface PreparationTabContentProps {

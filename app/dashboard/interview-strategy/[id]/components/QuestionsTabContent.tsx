@@ -48,7 +48,7 @@ export function QuestionsTabContent({ strategy }: QuestionsTabContentProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-xl">Expected Interview Questions</CardTitle>
             <CardDescription>
-              Questions you're likely to be asked with suggested answers
+              Questions you&apos;re likely to be asked with suggested answers
             </CardDescription>
           </CardHeader>
           <CardContent>

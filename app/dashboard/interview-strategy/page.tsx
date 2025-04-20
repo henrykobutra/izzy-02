@@ -3,9 +3,8 @@
 import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Mic, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RefreshCw, AlertTriangle } from "lucide-react"
+import { FileText, CheckCircle, Plus, Briefcase, Eye, Mic, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, RefreshCw, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
@@ -15,13 +14,6 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
 import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useStrategies } from "@/hooks/strategies/useStrategies"
 import Link from "next/link"
@@ -108,31 +100,6 @@ export default function InterviewStrategyPage() {
     setTimeout(() => setHighlightJobCard(false), 1500);
   };
   
-  // Mock data for saved job descriptions
-  const [savedJobs, setSavedJobs] = useState([
-    {
-      id: "job-1",
-      title: "Senior Frontend Engineer",
-      company: "TechCorp Inc.",
-      date: "April 15, 2025",
-      match: 85
-    },
-    {
-      id: "job-2",
-      title: "Full Stack Developer",
-      company: "InnovateSoft",
-      date: "April 10, 2025",
-      match: 92
-    },
-    {
-      id: "job-3",
-      title: "React Developer",
-      company: "WebSolutions Ltd.",
-      date: "April 5, 2025",
-      match: 78
-    }
-  ])
-  
   const handleAnalyzeJob = async () => {
     if (!jobDescription.trim()) return
     
@@ -189,10 +156,6 @@ export default function InterviewStrategyPage() {
     } finally {
       setIsAnalyzing(false)
     }
-  }
-
-  const handleRemoveJob = (id: string) => {
-    setSavedJobs(savedJobs.filter(job => job.id !== id))
   }
 
   const handleDeleteStrategy = async (strategyId: string) => {
