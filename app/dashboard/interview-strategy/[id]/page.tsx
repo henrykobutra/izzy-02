@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useStrategy } from "./hooks/useStrategy"
 import { useDeleteStrategy } from "./hooks/useDeleteStrategy"
 import { StrategyLoader } from "./components/StrategyLoader"
@@ -7,15 +8,16 @@ import { StrategyError } from "./components/StrategyError"
 import { StrategyHero } from "./components/StrategyHero"
 import { StrategyTabs } from "./components/StrategyTabs"
 
+// Updated type definition for Next.js 15.3.1 params
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function StrategyViewPage({ params }: PageProps) {
-  // Access the id from params safely
-  const id = params?.id as string
+  // Unwrap params Promise with React.use()
+  const { id } = React.use(params)
   
   // Use custom hooks for data fetching and deletion
   const { strategy, loading, error } = useStrategy(id)
