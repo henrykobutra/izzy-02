@@ -194,6 +194,7 @@ export type Database = {
           focus_points: Json
           id: string
           interview_strategy: Json
+          is_job_description: boolean
           job_company: string
           job_description: string
           job_description_key_points: Json
@@ -204,7 +205,7 @@ export type Database = {
           key_alignments: Json
           match_rate: number
           potential_challenges: Json
-          profile_id: string
+          profile_id: string | null
           strengths: Json
           updated_at: string | null
           user_id: string
@@ -216,6 +217,7 @@ export type Database = {
           focus_points: Json
           id?: string
           interview_strategy: Json
+          is_job_description: boolean
           job_company: string
           job_description: string
           job_description_key_points: Json
@@ -226,7 +228,7 @@ export type Database = {
           key_alignments: Json
           match_rate: number
           potential_challenges: Json
-          profile_id: string
+          profile_id?: string | null
           strengths: Json
           updated_at?: string | null
           user_id: string
@@ -238,6 +240,7 @@ export type Database = {
           focus_points?: Json
           id?: string
           interview_strategy?: Json
+          is_job_description?: boolean
           job_company?: string
           job_description?: string
           job_description_key_points?: Json
@@ -248,7 +251,7 @@ export type Database = {
           key_alignments?: Json
           match_rate?: number
           potential_challenges?: Json
-          profile_id?: string
+          profile_id?: string | null
           strengths?: Json
           updated_at?: string | null
           user_id?: string
@@ -256,7 +259,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_profile_id"
+            foreignKeyName: "interview_strategies_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Mic, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react"
+import { FileText, CheckCircle, Plus, Search, Briefcase, Eye, Mic, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RefreshCw, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
@@ -53,6 +53,7 @@ export default function InterviewStrategyPage() {
   const [highlightJobCard, setHighlightJobCard] = useState(false);
   const [deletingStrategy, setDeletingStrategy] = useState<string | null>(null);
   const [strategyToDelete, setStrategyToDelete] = useState<string | null>(null);
+  const [synchronizingStrategy, setSynchronizingStrategy] = useState<string | null>(null);
   const jobCardRef = useRef<HTMLDivElement>(null);
   
   // Define loading states for the job analysis process
@@ -191,6 +192,25 @@ export default function InterviewStrategyPage() {
     } finally {
       setDeletingStrategy(null);
       setStrategyToDelete(null);
+    }
+  };
+
+  const handleSynchronizeStrategy = async (strategyId: string) => {
+    // This is a placeholder for the future implementation
+    setSynchronizingStrategy(strategyId);
+    
+    try {
+      // This will be implemented later
+      toast.info("Synchronization feature will be implemented soon");
+      
+      // For now, just set a timeout to simulate an API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+    } catch (error) {
+      console.error("Error synchronizing strategy:", error);
+      toast.error("An error occurred while synchronizing the strategy");
+    } finally {
+      setSynchronizingStrategy(null);
     }
   };
 
@@ -466,87 +486,177 @@ export default function InterviewStrategyPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {strategies.map((strategy) => (
+                    {strategies.map((strategy) => {
+                      const isOutOfSync = strategy.profile_id === null;
+                      
+                      return (
                       <TableRow 
                         key={strategy.id} 
-                        className="hover:bg-muted/30 group/row border-b last:border-0"
+                        className={`hover:bg-muted/30 group/row border-b last:border-0 ${isOutOfSync ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}
                       >
                         <TableCell className="py-3 pl-6">
                           <div className="space-y-1">
-                            <div className="font-medium">{strategy.job_title}</div>
+                            <div className="font-medium">
+                              {isOutOfSync && (
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                  <span className="text-amber-600 text-sm">Strategy out of sync</span>
+                                </div>
+                              )}
+                              {strategy.job_title}
+                            </div>
                             <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                               <Briefcase className="h-3.5 w-3.5" />
                               <span>{strategy.job_company}</span>
                             </div>
+                            {isOutOfSync && (
+                              <div className="mt-1 text-xs text-muted-foreground italic">
+                                Profile has been updated since strategy creation
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="py-3">
-                          <Badge 
-                            variant="secondary" 
-                            className="capitalize px-1.5 py-0.5 text-xs"
-                          >
-                            {strategy.job_experience_level ? 
-                              strategy.job_experience_level.toLowerCase() === "entry" ? "Entry Level" :
-                              strategy.job_experience_level.toLowerCase() === "mid" ? "Mid Level" :
-                              strategy.job_experience_level.toLowerCase() === "senior" ? "Senior Level" :
-                              strategy.job_experience_level.toLowerCase() === "executive" ? "Executive Level" :
-                              strategy.job_experience_level
-                              : "Not specified"}
-                          </Badge>
+                          {isOutOfSync ? (
+                            <Badge 
+                              variant="outline" 
+                              className="text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 px-1.5 py-0.5 text-xs"
+                            >
+                              Needs update
+                            </Badge>
+                          ) : (
+                            <Badge 
+                              variant="secondary" 
+                              className="capitalize px-1.5 py-0.5 text-xs"
+                            >
+                              {strategy.job_experience_level ? 
+                                strategy.job_experience_level.toLowerCase() === "entry" ? "Entry Level" :
+                                strategy.job_experience_level.toLowerCase() === "mid" ? "Mid Level" :
+                                strategy.job_experience_level.toLowerCase() === "senior" ? "Senior Level" :
+                                strategy.job_experience_level.toLowerCase() === "executive" ? "Executive Level" :
+                                strategy.job_experience_level
+                                : "Not specified"}
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell className="py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm
-                                ${strategy.match_rate >= 85 ? 'bg-green-500' : 
-                                strategy.match_rate >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
-                              >
-                                {strategy.match_rate}%
+                          {isOutOfSync ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-600 border border-amber-200 dark:border-amber-800">
+                                <AlertTriangle className="h-5 w-5" />
+                              </div>
+                              <div className="text-xs font-medium text-amber-600">
+                                Match score unavailable
                               </div>
                             </div>
-                            <div className="text-xs font-medium">
-                              {strategy.match_rate >= 85 ? 'Excellent Alignment' : 
-                                strategy.match_rate >= 70 ? 'Good Alignment' : 'Challenging Interview'}
+                          ) : (
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm
+                                  ${strategy.match_rate >= 85 ? 'bg-green-500' : 
+                                  strategy.match_rate >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
+                                >
+                                  {strategy.match_rate}%
+                                </div>
+                              </div>
+                              <div className="text-xs font-medium">
+                                {strategy.match_rate >= 85 ? 'Excellent Alignment' : 
+                                  strategy.match_rate >= 70 ? 'Good Alignment' : 'Challenging Interview'}
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </TableCell>
                         <TableCell className="py-3 text-right pr-6">
                           <div className="flex items-center justify-end gap-2">
-                            <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
-                              <Button variant="outline" size="sm" className="h-8 px-2.5">
-                                <Eye className="h-3.5 w-3.5 mr-1" />
-                                <span className="text-xs">View</span>
-                              </Button>
-                            </Link>
-                            <div className="flex flex-col sm:flex-row gap-1.5">
-                              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                                <Mic className="h-3.5 w-3.5" />
-                                <span className="sr-only">Practice</span>
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
-                                onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
-                                disabled={deletingStrategy === strategy.id}
-                              >
-                                {deletingStrategy === strategy.id ? (
-                                  <div className="h-3.5 w-3.5 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                )}
-                                <span className="sr-only">Delete</span>
-                              </Button>
-                            </div>
+                            {isOutOfSync ? (
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 px-2.5 border-amber-200 dark:border-amber-800 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                                  onClick={() => strategy.id && handleSynchronizeStrategy(strategy.id)}
+                                  disabled={synchronizingStrategy === strategy.id}
+                                >
+                                  {synchronizingStrategy === strategy.id ? (
+                                    <div className="h-3.5 w-3.5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mr-1" />
+                                  ) : (
+                                    <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                                  )}
+                                  <span className="text-xs">Synchronize</span>
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="h-8 px-2.5 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                  onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
+                                  disabled={deletingStrategy === strategy.id}
+                                >
+                                  {deletingStrategy === strategy.id ? (
+                                    <div className="h-3.5 w-3.5 border-2 border-destructive border-t-transparent rounded-full animate-spin mr-1" />
+                                  ) : (
+                                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                                  )}
+                                  <span className="text-xs">Delete</span>
+                                </Button>
+                              </div>
+                            ) : (
+                              <>
+                                <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
+                                  <Button variant="outline" size="sm" className="h-8 px-2.5">
+                                    <Eye className="h-3.5 w-3.5 mr-1" />
+                                    <span className="text-xs">View</span>
+                                  </Button>
+                                </Link>
+                                <div className="flex flex-col sm:flex-row gap-1.5">
+                                  <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                                    <Mic className="h-3.5 w-3.5" />
+                                    <span className="sr-only">Practice</span>
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                    onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
+                                    disabled={deletingStrategy === strategy.id}
+                                  >
+                                    {deletingStrategy === strategy.id ? (
+                                      <div className="h-3.5 w-3.5 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    )}
+                                    <span className="sr-only">Delete</span>
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )})}
                   </TableBody>
                 </Table>
-                <div className="py-3 bg-muted/20 border-t flex items-center justify-between px-6">
-                  <div className="text-sm text-muted-foreground">
-                    {strategies.length} {strategies.length === 1 ? 'strategy' : 'strategies'} available
+                <div className="py-3 bg-muted/20 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-6">
+                  <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <span>{strategies.length} {strategies.length === 1 ? 'strategy' : 'strategies'} available</span>
+                    
+                    {/* Sync status summary */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span className="text-xs">
+                          {strategies.filter(s => s.profile_id !== null).length} synced
+                        </span>
+                      </div>
+                      
+                      {strategies.some(s => s.profile_id === null) && (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                          <span className="text-xs text-amber-600">
+                            {strategies.filter(s => s.profile_id === null).length} out of sync
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="text-xs text-muted-foreground">
                     Last analyzed: {new Date(Math.max(...strategies.map(s => s.created_at ? new Date(s.created_at).getTime() : 0))).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}
