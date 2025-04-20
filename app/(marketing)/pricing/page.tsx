@@ -77,7 +77,7 @@ export default function PricingPage() {
             </CardContent>
             <CardFooter>
               <Link href="/login" className="w-full">
-                <Button className="w-full cursor-pointer" effect="expandLeft">
+                <Button className="w-full cursor-pointer">
                   Get Started
                 </Button>
               </Link>

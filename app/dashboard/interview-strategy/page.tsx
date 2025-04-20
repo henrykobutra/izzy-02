@@ -56,7 +56,7 @@ export default function InterviewStrategyPage() {
     }, 2000)
   }
   
-  const handleRemoveJob = (id) => {
+  const handleRemoveJob = (id: string) => {
     setSavedJobs(savedJobs.filter(job => job.id !== id))
   }
 

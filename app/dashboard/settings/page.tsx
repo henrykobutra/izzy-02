@@ -65,13 +65,13 @@ const settingsFormSchema = z.object({
   receiveNotifications: z.boolean().default(false),
 })
 
-type SettingsFormValues = z.infer<typeof settingsFormSchema>
+export type SettingsFormValues = z.infer<typeof settingsFormSchema>
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   // Mock settings data - in real app, fetch from server
-  const defaultValues: Partial<SettingsFormValues> = {
+  const defaultValues: SettingsFormValues = {
     interviewToughness: "dynamic",
     seniorityLevel: "dynamic",
     targetIndustry: "dynamic",
@@ -79,9 +79,10 @@ export default function SettingsPage() {
     feedbackDetail: "standard",
     languagePreference: "english",
     receiveNotifications: false,
+    customPosition: undefined,
   }
 
-  const form = useForm<SettingsFormValues>({
+  const form = useForm({
     resolver: zodResolver(settingsFormSchema),
     defaultValues,
   })
