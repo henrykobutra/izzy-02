@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
@@ -96,7 +95,7 @@ export function SiteHeader() {
                   <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 
-                {breadcrumbs.map((breadcrumb, index) => (
+                {breadcrumbs.map((breadcrumb) => (
                   <React.Fragment key={breadcrumb.path}>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>

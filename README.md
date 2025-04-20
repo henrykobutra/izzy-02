@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Izzy - AI-Powered Interview Prep Platform
+
+Izzy is an intelligent interview preparation platform that helps job seekers practice and improve their interview skills through AI-driven mock interviews, personalized feedback, and targeted preparation strategies.
+
+## Features
+
+- **AI Mock Interviews**: Practice with realistic interview simulations tailored to specific job positions and interview types
+- **Personalized Profile Analysis**: Get insights on your professional profile strengths and areas for improvement
+- **Interview Strategy**: Receive customized preparation plans based on job descriptions and your profile
+- **Comprehensive Feedback**: Review detailed performance metrics and improvement suggestions after each practice session
+- **Progress Tracking**: Monitor your improvement over time with visual analytics
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TailwindCSS 4
+- **UI Components**: shadcn/ui component library
+- **Authentication**: Supabase Auth
+- **Data Visualization**: Recharts
+- **AI Integration**: OpenAI SDK
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18.17.0 or later
+- pnpm package manager
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone the repository
+git clone https://github.com/yourusername/izzy.git
+
+# Navigate to the project directory
+cd izzy
+
+# Install dependencies
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file in the root directory:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+OPENAI_API_KEY=your_openai_api_key
+```
 
-## Learn More
+### Development
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Start the development server
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Visit `http://localhost:3000` to view the application.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Build
 
-## Deploy on Vercel
+```bash
+# Build for production
+pnpm build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Start production server
+pnpm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+- `/app`: Next.js pages and layouts (App Router)
+- `/components`: Reusable UI components
+- `/lib`: Utility functions and authentication
+- `/utils`: Helper functions including Supabase client setup
+- `/public`: Static assets
+
+## License
+
+[MIT](LICENSE)

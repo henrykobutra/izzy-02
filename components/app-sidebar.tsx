@@ -5,9 +5,7 @@ import Image from "next/image"
 import {
   IconChartBar,
   IconDashboard,
-  IconDatabase,
   IconFileDescription,
-  IconFolder,
   IconListDetails,
   IconMessage,
 } from "@tabler/icons-react"
@@ -21,7 +19,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useUser } from "@/hooks/use-user"
@@ -60,7 +57,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, loading } = useUser();
+  const { user } = useUser();
   
   // Default user data for fallback when loading or no user
   const defaultUser = {

@@ -55,7 +55,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-start">
                   <Check className="mr-2 h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span>Detailed feedback & evaluation</span>
+                  <span>Detailed feedback &amp; evaluation</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="mr-2 h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
@@ -104,11 +104,11 @@ export default function PricingPage() {
                     Interested in sponsoring?
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    If you're interested in supporting this educational project or implementing it for your organization, 
-                    I'd be happy to discuss potential partnerships and customizations.
+                    If you&apos;re interested in supporting this educational project or implementing it for your organization, 
+                    I&apos;d be happy to discuss potential partnerships and customizations.
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    As a student project, Izzy AI demonstrates what's possible with modern AI, but with your support, 
+                    As a student project, Izzy AI demonstrates what&apos;s possible with modern AI, but with your support, 
                     it could evolve into a sustainable tool with enhanced features and ongoing maintenance.
                   </p>
                 </div>
@@ -184,7 +184,7 @@ export default function PricingPage() {
             <div className="space-y-2">
               <h3 className="text-xl font-medium">Why offer sponsorship options?</h3>
               <p className="text-muted-foreground">
-                While Izzy AI is primarily an educational project, there's potential for it to grow with the right support. 
+                While Izzy AI is primarily an educational project, there&apos;s potential for it to grow with the right support. 
                 Sponsorship could help extend its lifespan, add new features, and ensure ongoing maintenance.
               </p>
             </div>
@@ -192,7 +192,7 @@ export default function PricingPage() {
               <h3 className="text-xl font-medium">How can I contact the developer?</h3>
               <p className="text-muted-foreground">
                 You can reach out to Henry Kobutra via GitHub or LinkedIn using the links provided above. 
-                He's open to discussing potential partnerships, customizations, or improvements to the project.
+                He&apos;s open to discussing potential partnerships, customizations, or improvements to the project.
               </p>
             </div>
           </div>

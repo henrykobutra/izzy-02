@@ -1,6 +1,6 @@
 "use client";
 
-import { IconFilter, IconCalendar, IconBrain, IconMessageCircle, IconCode, IconPuzzle } from "@tabler/icons-react";
+import { IconCalendar, IconBrain, IconMessageCircle, IconCode, IconPuzzle } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";

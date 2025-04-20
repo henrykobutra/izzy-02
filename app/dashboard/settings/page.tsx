@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -32,7 +31,6 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const settingsFormSchema = z.object({
@@ -215,7 +213,7 @@ export default function SettingsPage() {
                             </SelectContent>
                           </Select>
                           <FormDescription>
-                            Select the industry you're targeting for interviews
+                            Select the industry you&apos;re targeting for interviews
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -252,7 +250,7 @@ export default function SettingsPage() {
                             </SelectContent>
                           </Select>
                           <FormDescription>
-                            Select the position you're interviewing for
+                            Select the position you&apos;re interviewing for
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

@@ -17,10 +17,13 @@ export default function PrivacyPage() {
               <section>
                 <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
                 <p>
-                  This Privacy Policy explains how Izzy AI ("we," "our," or "us") collects, uses, and protects information as part of our educational preview. Izzy AI is a student project developed for the Spring 2025 Deep Learning course at Houston Community College System (HCCS).
+                  This Privacy Policy explains how Izzy AI (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) collects, uses, and protects information as part of our educational preview. Izzy AI is a student project developed for the Spring 2025 Deep Learning course at Houston Community College System (HCCS).
+                </p>
+                <p className="mt-4 text-muted-foreground">
+                  Effective Date: April 18, 2025. Izzy AI (&quot;Izzy,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services (the &quot;Services&quot;). Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.
                 </p>
                 <p className="mt-4">
-                  As an educational project, I prioritize transparency and ethical handling of user data. This project is developed and maintained solely by Henry Kobutra as coursework for Prof. Patricia McManus's Deep Learning class at HCCS.
+                  As an educational project, I prioritize transparency and ethical handling of user data. This project is developed and maintained solely by Henry Kobutra as coursework for Prof. Patricia McManus&apos;s Deep Learning class at HCCS.
                 </p>
               </section>
 
@@ -70,6 +73,9 @@ export default function PrivacyPage() {
                   <li>Feature usage patterns</li>
                   <li>Time spent on platform</li>
                 </ul>
+                <p>
+                  We may collect information about you in a variety of ways. The information we may collect via the Services depends on the content and materials you use, and includes basic user data provided through the sign-up process (e.g., name, email) and any information you voluntarily provide during interviews, such as your resume details or answers to questions. We don&apos;t store audio or video recordings, only the transcribed text and associated feedback.
+                </p>
               </section>
 
               <section>

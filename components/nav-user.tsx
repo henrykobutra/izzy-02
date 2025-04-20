@@ -1,10 +1,8 @@
 "use client"
 
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
   IconSettings,
   IconUserCircle,
 } from "@tabler/icons-react"
@@ -44,7 +42,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const { handleSignOut, isSigningOut } = useAuth()
+  const { isSigningOut } = useAuth()
   const [displayName, setDisplayName] = useState<string>("User")
   const [initials, setInitials] = useState<string>("UN")
   

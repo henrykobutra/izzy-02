@@ -123,7 +123,7 @@ export default function ProfileAnalysisPage() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                We're working on more ways to update your profile, including document uploads and LinkedIn integration.
+                We&apos;re working on more ways to update your profile, including document uploads and LinkedIn integration.
               </p>
             </div>
           </CardContent>
@@ -309,7 +309,7 @@ export default function ProfileAnalysisPage() {
                 </div>
                 <p className="text-sm">
                   Your profile has been analyzed. To receive tailored interview preparation, please provide information about the position
-                  you're targeting in the next step.
+                  you&apos;re targeting in the next step.
                 </p>
                 <Button variant="outline" className="mt-3">
                   Set Target Position

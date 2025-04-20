@@ -108,7 +108,7 @@ export default function InterviewStrategyPage() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              We're working on more ways to add job descriptions, including direct links to job posts.
+              We&apos;re working on more ways to add job descriptions, including direct links to job posts.
             </p>
           </div>
         </CardContent>
@@ -139,7 +139,7 @@ export default function InterviewStrategyPage() {
               </div>
             </div>
             <CardDescription>
-              Job descriptions you've analyzed for interview preparation
+              Job descriptions you&apos;ve analyzed for interview preparation
             </CardDescription>
           </CardHeader>
           <CardContent className="overflow-auto">

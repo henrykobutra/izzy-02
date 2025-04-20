@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/data-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -49,16 +49,8 @@ import {
   CommandList,
   CommandSeparator
 } from "@/components/ui/command"
-import { cn } from "@/lib/utils"
 
 import data from "../data.json"
-
-type GenericPosition = {
-  id: string
-  title: string
-  icon: React.ReactNode
-  count: number
-}
 
 type Position = {
   id: string

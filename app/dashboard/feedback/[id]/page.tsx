@@ -22,15 +22,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import feedbackData from "../data.json";
 
+// Define the type for a feedback item
+interface FeedbackItem {
+  id: number;
+  interviewTitle: string;
+  type: string;
+  date: string;
+  overallScore: number;
+  strengths: string[];
+  improvements: string[];
+  metrics: {
+    [key: string]: number | undefined;
+  };
+}
+
 export default function FeedbackDetail() {
   const { id } = useParams();
-  const [feedback, setFeedback] = useState<any>(null);
+  const [feedback, setFeedback] = useState<FeedbackItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Find the feedback entry with the matching ID
     const feedbackEntry = feedbackData.find(item => item.id.toString() === id);
-    setFeedback(feedbackEntry);
+    setFeedback(feedbackEntry || null); // Explicitly set null if undefined
     setLoading(false);
   }, [id]);
 
@@ -155,7 +169,7 @@ export default function FeedbackDetail() {
                   <div>
                     <h3 className="font-medium mb-3">Performance Metrics</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(feedback.metrics).map(([key, value]: [string, any], i: number) => (
+                      {Object.entries(feedback.metrics).map(([key, value]: [string, number | undefined], i: number) => (
                         <div key={i} className="flex flex-col gap-1.5">
                           <div className="flex justify-between items-center">
                             <span className="text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>

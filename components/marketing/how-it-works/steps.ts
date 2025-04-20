@@ -3,7 +3,6 @@ import {
   IconTarget,
   IconMessage,
   IconTimeline,
-  IconRefresh,
 } from "@tabler/icons-react";
 import type { Step } from "./types";
 

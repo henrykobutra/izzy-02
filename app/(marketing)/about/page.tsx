@@ -45,7 +45,7 @@ export default function AboutPage() {
           Our Mission
         </h1>
         <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
-          At Izzy AI, we're building intelligent interview preparation tools to help job seekers develop their skills, build confidence, and succeed in their career journeys.
+          At Izzy AI, we&apos;re building intelligent interview preparation tools to help job seekers develop their skills, build confidence, and succeed in their career journeys.
         </p>
       </section>
 
@@ -63,10 +63,10 @@ export default function AboutPage() {
                 Izzy AI began as a finals project for the Deep Learning class at Houston Community College System (HCCS), Spring 2025 term. It represents an opportunity to apply theoretical deep learning concepts to a practical application that can help real people.
               </p>
               <p className="text-lg mb-6">
-                As a student in Prof. McManus's deep learning course, I identified interview preparation as a critical skill that many job seekers struggle with. This project allowed me to create an accessible, personalized solution using the latest advances in AI while demonstrating my understanding of course concepts.
+                As a student in Prof. McManus&apos;s deep learning course, I identified interview preparation as a critical skill that many job seekers struggle with. This project allowed me to create an accessible, personalized solution using the latest advances in AI while demonstrating my understanding of course concepts.
               </p>
               <p className="text-lg">
-                Izzy AI represents an Educational Preview of what's possible when deep learning meets career readiness. While I cannot guarantee continued maintenance beyond the course requirements, this project showcases the potential of AI to democratize access to quality interview preparation.
+                Izzy AI represents an Educational Preview of what&apos;s possible when deep learning meets career readiness. While I cannot guarantee continued maintenance beyond the course requirements, this project showcases the potential of AI to democratize access to quality interview preparation.
               </p>
             </div>
           </div>
