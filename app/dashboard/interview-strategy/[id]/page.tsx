@@ -119,9 +119,9 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
   }
   
   const getMatchRateGradient = (rate: number) => {
-    if (rate >= 85) return "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900"
-    if (rate >= 70) return "from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900"
-    return "from-red-50 to-red-100 dark:from-red-950 dark:to-red-900"
+    if (rate >= 85) return "from-green-50 to-green-100 dark:from-green-800/30 dark:to-green-700/40"
+    if (rate >= 70) return "from-amber-50 to-amber-100 dark:from-amber-800/30 dark:to-amber-700/40"
+    return "from-red-50 to-red-100 dark:from-red-800/30 dark:to-red-700/40"
   }
   
   const getMatchRateColor = (rate: number) => {
@@ -131,9 +131,9 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
   }
   
   const getMatchRateBg = (rate: number) => {
-    if (rate >= 85) return "bg-green-500"
-    if (rate >= 70) return "bg-amber-500"
-    return "bg-red-500"
+    if (rate >= 85) return "bg-green-500 dark:bg-green-600"
+    if (rate >= 70) return "bg-amber-500 dark:bg-amber-600"
+    return "bg-red-500 dark:bg-red-600"
   }
   
   const getExperienceLevelDisplay = (level: string) => {
@@ -442,7 +442,7 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
                   <h4 className="text-sm font-medium text-muted-foreground mb-3">Key Responsibilities</h4>
                   <div className="space-y-2.5">
                     {strategy.job_description_key_points.responsibilities.map((resp, i) => (
-                      <div key={i} className="flex items-start gap-3">
+                      <div key={i} className="flex items-start gap-2.5">
                         <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mt-0.5 flex-shrink-0">
                           <span className="text-xs font-medium">{i+1}</span>
                         </div>
@@ -574,8 +574,8 @@ export default function StrategyViewPage({ params }: { params: { id: string } })
                       </div>
                       
                       {/* Experience */}
-                      <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-muted-foreground">Experience</h4>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-3">Experience</h4>
                         <div className="space-y-2">
                           {strategy.key_alignments.experience.map((exp, i) => (
                             <div key={i} className="flex items-start gap-2.5 text-sm">
