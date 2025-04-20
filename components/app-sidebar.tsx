@@ -6,16 +6,10 @@ import {
   IconChartBar,
   IconDashboard,
   IconDatabase,
-  IconFileAi,
   IconFileDescription,
-  IconFileWord,
   IconFolder,
-  IconHelp,
   IconListDetails,
   IconMessage,
-  IconRefresh,
-  IconReport,
-  IconSettings,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -33,11 +27,6 @@ import {
 import { useUser } from "@/hooks/use-user"
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -65,53 +54,7 @@ const data = {
       icon: IconChartBar,
     },
   ],
-  navClouds: [
-    {
-      title: "My Interviews",
-      icon: IconFolder,
-      url: "/dashboard/my-interviews",
-      items: [
-        {
-          title: "Recent Interviews",
-          url: "/dashboard/my-interviews/recent",
-        },
-        {
-          title: "Archived",
-          url: "/dashboard/my-interviews/archived",
-        },
-      ],
-    },
-    {
-      title: "Resources",
-      icon: IconDatabase,
-      url: "/dashboard/resources",
-      items: [
-        {
-          title: "Job Descriptions",
-          url: "/dashboard/resources/job-descriptions",
-        },
-        {
-          title: "Interview Guides",
-          url: "/dashboard/resources/guides",
-        },
-      ],
-    },
-    {
-      title: "AI Assistance",
-      icon: IconFileAi,
-      url: "/dashboard/ai-assistance",
-      items: [
-        {
-          title: "Resume Analyzer",
-          url: "/dashboard/ai-assistance/resume",
-        },
-        {
-          title: "Answer Formatter",
-          url: "/dashboard/ai-assistance/formatter",
-        },
-      ],
-    },
-  ],
+
   navSecondary: [
   ],
 }
@@ -131,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     name: user.name,
     email: user.email,
     avatar: user.avatar,
-  } : data.user;
+  } : defaultUser;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
