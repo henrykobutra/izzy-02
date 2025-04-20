@@ -13,16 +13,44 @@ export const saveProfile = async (profile: ProfileAnalysis, user_id: string) => 
     const supabase = await createClient()
     
     try {
-        const { data, error } = await supabase
+        // Check if the user already has a profile
+        const { data: existingProfile, error: fetchError } = await supabase
             .from('profiles')
-            .upsert([{user_id: user_id, ...profile}])
+            .select('*')
+            .eq('user_id', user_id)
             .single()
         
-        if (error) {
-            throw error
+        if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is "No rows returned" error
+            console.error('Error checking for existing profile:', fetchError)
+            return null
         }
         
-        return data
+        // If profile exists, delete it
+        if (existingProfile) {
+            const { error: deleteError } = await supabase
+                .from('profiles')
+                .delete()
+                .eq('user_id', user_id)
+            
+            if (deleteError) {
+                console.error('Error deleting existing profile:', deleteError)
+                return null
+            }
+        }
+        
+        // Create a new profile record
+        const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{user_id: user_id, ...profile}])
+            .select()
+            .single()
+        
+        if (insertError) {
+            console.error('Error creating new profile:', insertError)
+            return null
+        }
+        
+        return newProfile
     } catch (error) {
         console.error('Error saving profile:', error)
         return null
