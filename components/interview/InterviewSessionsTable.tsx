@@ -277,28 +277,28 @@ export function InterviewSessionsTable({
                         <div className="flex items-center justify-end space-x-2 transition-opacity">
                           {isCreated && (
                             <Button
-                              variant="default"
+                              variant="outline"
                               size="sm"
-                              className="h-8 gap-1"
+                              className="h-8 px-2.5"
                               asChild
                             >
                               <Link href={`/dashboard/practice-interview/${session.id}`}>
-                                <Mic className="h-3.5 w-3.5" />
-                                <span>Start</span>
+                                <Mic className="h-3.5 w-3.5 mr-1" />
+                                <span className="text-xs">Start</span>
                               </Link>
                             </Button>
                           )}
 
                           {isCanceled && (
                             <Button
-                              variant="default"
+                              variant="outline"
                               size="sm"
-                              className="h-8 gap-1"
+                              className="h-8 px-2.5"
                               asChild
                             >
                               <Link href={`/dashboard/practice-interview/${session.id}`}>
-                                <Mic className="h-3.5 w-3.5" />
-                                <span>Restart</span>
+                                <Mic className="h-3.5 w-3.5 mr-1" />
+                                <span className="text-xs">Restart</span>
                               </Link>
                             </Button>
                           )}
@@ -306,14 +306,14 @@ export function InterviewSessionsTable({
                           {isComplete && (
                             <div className="flex items-center space-x-2">
                               <Button
-                                variant="default"
+                                variant="outline"
                                 size="sm"
-                                className="h-8 gap-1"
+                                className="h-8 px-2.5"
                                 asChild
                               >
                                 <Link href={`/dashboard/practice-interview/${session.id}`}>
-                                  <FileText className="h-3.5 w-3.5" />
-                                  <span>View</span>
+                                  <FileText className="h-3.5 w-3.5 mr-1" />
+                                  <span className="text-xs">View</span>
                                 </Link>
                               </Button>
                               
@@ -340,12 +340,12 @@ export function InterviewSessionsTable({
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
-                                    variant="ghost"
+                                    variant="outline"
                                     size="sm"
-                                    className="h-8 w-8 p-0"
+                                    className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
                                     onClick={() => session.id ? setSessionToDelete(session.id) : null}
                                   >
-                                    <Trash className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                                    <Trash className="h-3.5 w-3.5" />
                                     <span className="sr-only">Delete</span>
                                   </Button>
                                 </TooltipTrigger>
@@ -358,13 +358,13 @@ export function InterviewSessionsTable({
                           
                           {!isComplete && (
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              className="h-8 w-8 p-0 ml-1"
+                              className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10 ml-1"
                               onClick={() => session.id ? setSessionToDelete(session.id) : null}
                             >
                               <span className="sr-only">Delete</span>
-                              <Trash className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                              <Trash className="h-3.5 w-3.5" />
                             </Button>
                           )}
                         </div>
