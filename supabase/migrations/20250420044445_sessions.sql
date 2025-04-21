@@ -30,11 +30,6 @@ CREATE TABLE interview_sessions (
     CONSTRAINT fk_profile_id FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE,
     -- Foreign key to interview_strategies(id) with cascade delete (nullable)
     CONSTRAINT fk_interview_strategy_id FOREIGN KEY (interview_strategy_id) REFERENCES interview_strategies(id) ON DELETE CASCADE,
-    -- Ensure interview_strategy_id is provided for specific sessions and job_title for generic sessions
-    CONSTRAINT check_input_source CHECK (
-        (session_source = 'specific' AND interview_strategy_id IS NOT NULL AND job_title IS NULL) OR
-        (session_source = 'generic' AND job_title IS NOT NULL AND interview_strategy_id IS NULL)
-    )
 );
 
 -- Add indexes for faster lookups
