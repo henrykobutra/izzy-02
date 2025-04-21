@@ -1,16 +1,18 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useInterviewSession } from "./hooks/useInterviewSession"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ArrowLeft, Mic, MicOff, MessageSquare, Code, CompassIcon, Loader2, UserRound } from "lucide-react"
+import { AlertCircle, ArrowLeft, Mic, MicOff, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { userService } from "@/services/user.service"
 import { cn } from "@/lib/utils"
 import SpeechVisualizer from "./components/SpeechVisualizer"
+import { vapi } from "@/lib/vapi/vapi.sdk"
+import { startVapiAssistant, setupVapiEventListeners } from "@/lib/vapi/vapi.utils"
 
 // Updated type definition for Next.js 15.3.1 params
 interface PageProps {
@@ -20,17 +22,17 @@ interface PageProps {
 }
 
 // Interview state enum
-type InterviewState = 
-  | "before_start" 
-  | "interviewer_speaking" 
-  | "candidate_speaking" 
+type InterviewState =
+  | "before_start"
+  | "interviewer_speaking"
+  | "candidate_speaking"
   | "processing"
   | "completed";
 
 export default function InterviewDetailPage({ params }: PageProps) {
   // Unwrap params Promise with React.use()
   const { id } = React.use(params)
-  
+
   // Use custom hook for data fetching
   const { session, loading, error } = useInterviewSession(id)
 
@@ -38,7 +40,12 @@ export default function InterviewDetailPage({ params }: PageProps) {
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false)
   const [userName, setUserName] = useState<string>("")
-  
+
+  // Vapi interview management
+  const [vapiCall, setVapiCall] = useState<any>(null)
+  const [speakerVolume, setSpeakerVolume] = useState<number>(0)
+  const cleanupEventListeners = useRef<(() => void) | null>(null)
+
   // Fetch user info
   useEffect(() => {
     const getUserInfo = async () => {
@@ -53,9 +60,95 @@ export default function InterviewDetailPage({ params }: PageProps) {
         console.error("Failed to get user info:", error);
       }
     };
-    
+
     getUserInfo();
   }, []);
+
+  // Cleanup Vapi event listeners when component unmounts
+  useEffect(() => {
+    return () => {
+      if (cleanupEventListeners.current) {
+        cleanupEventListeners.current();
+      }
+    };
+  }, []);
+
+  // Handle start interview with Vapi
+  const handleStartInterview = async () => {
+    try {
+      // Start in processing state
+      setInterviewState("processing");
+
+      // Start the Vapi assistant
+      const call = await startVapiAssistant(session, true);
+      setVapiCall(call);
+
+      // Setup event listeners to control UI
+      const cleanup = setupVapiEventListeners({
+        onCallStart: () => {
+          console.log("Interview call started");
+          setInterviewState("interviewer_speaking");
+        },
+        onCallEnd: () => {
+          console.log("Interview call ended");
+          setInterviewState("completed");
+        },
+        onSpeechStart: () => {
+          //TODO: Debounce state changes between who's speaking
+          console.log("Interviewer is speaking");
+          setInterviewState("interviewer_speaking");
+        },
+        onSpeechEnd: () => {
+          console.log("Interviewer stopped speaking");
+          // Transition to candidate speaking after the interviewer is done
+          setInterviewState("candidate_speaking");
+        },
+        onVolumeLevel: (volume) => {
+          setSpeakerVolume(volume);
+        },
+        onError: (error) => {
+          console.error("Vapi error:", error);
+          // Handle error state if needed
+        }
+      });
+
+      // Save cleanup function for unmounting
+      cleanupEventListeners.current = cleanup;
+    } catch (error) {
+      console.error("Failed to start interview:", error);
+      setInterviewState("before_start");
+    }
+  };
+
+  // Handle ending the interview
+  const handleEndInterview = () => {
+    // End the Vapi call if active
+    if (vapiCall) {
+      try {
+        // Use vapi.stop() to end the call - this is the correct method according to the Vapi docs
+        vapi.stop();
+      } catch (error) {
+        console.error("Error stopping Vapi call:", error);
+      }
+    }
+
+    setInterviewState("completed");
+  };
+
+  // Handle toggling mute/unmute
+  const toggleMute = async () => {
+    if (!vapiCall) return;
+
+    try {
+      // Get current mute state
+      const isMuted = vapiCall.isMuted();
+
+      // Toggle mute state
+      vapiCall.setMuted(!isMuted);
+    } catch (error) {
+      console.error("Error toggling mute:", error);
+    }
+  };
 
   // Handle loading state
   if (loading) {
@@ -71,7 +164,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
       </div>
     )
   }
-  
+
   // Handle error state
   if (error) {
     return (
@@ -93,14 +186,14 @@ export default function InterviewDetailPage({ params }: PageProps) {
       </div>
     )
   }
-  
+
   // Null check for session
   if (!session) return null
 
   // Determine which participant is active based on interview state
   const isInterviewerActive = interviewState === "interviewer_speaking";
   const isCandidateActive = interviewState === "candidate_speaking";
-  
+
   // Helper to render appropriate interview type badge
   const renderInterviewTypeBadge = () => {
     switch (session.interview_type) {
@@ -154,14 +247,14 @@ export default function InterviewDetailPage({ params }: PageProps) {
               </div>
             </div>
           </CardHeader>
-          
+
           {/* Video call-like interface */}
           <CardContent>
             <div className="flex flex-col items-center my-6">
               {/* Video call participants */}
               <div className="flex flex-col md:flex-row w-full max-w-3xl gap-6 mb-8">
                 {/* Interviewer */}
-                <div 
+                <div
                   className={cn(
                     "flex-1 flex flex-col items-center p-6 rounded-xl border transition-all duration-500 ease-in-out h-[240px]",
                     isInterviewerActive ? "border-primary bg-primary/5" : "border-muted-foreground/20"
@@ -169,7 +262,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                 >
                   <div className="relative mb-3">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src="/images/izzy-avatar.png" alt="Izzy" />
+                      <AvatarImage src="/faces/izzy-avatar.png" alt="Izzy" />
                       <AvatarFallback className="bg-primary text-primary-foreground text-lg">
                         IZ
                       </AvatarFallback>
@@ -198,9 +291,9 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Candidate (User) */}
-                <div 
+                <div
                   className={cn(
                     "flex-1 flex flex-col items-center p-6 rounded-xl border transition-all duration-500 ease-in-out h-[240px]",
                     isCandidateActive ? "border-primary bg-primary/5" : "border-muted-foreground/20"
@@ -237,26 +330,26 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Interview content based on state */}
-              <div className="w-full max-w-xl text-center transition-all duration-500 ease-in-out flex items-center justify-center" 
+              <div className="w-full max-w-xl text-center transition-all duration-500 ease-in-out flex items-center justify-center"
                 style={{
-                  height: interviewState === "before_start" ? "200px" : 
-                         interviewState === "interviewer_speaking" ? "180px" :
-                         interviewState === "candidate_speaking" ? "180px" :
-                         interviewState === "processing" ? "160px" : 
-                         interviewState === "completed" ? "200px" : "180px"
+                  height: interviewState === "before_start" ? "200px" :
+                    interviewState === "interviewer_speaking" ? "180px" :
+                      interviewState === "candidate_speaking" ? "180px" :
+                        interviewState === "processing" ? "160px" :
+                          interviewState === "completed" ? "200px" : "180px"
                 }}>
                 {interviewState === "before_start" && (
                   <div className="space-y-4">
                     <h2 className="text-xl font-medium">Ready to Start Your Practice Interview?</h2>
                     <p className="text-muted-foreground">
-                      You&apos;ll have a real-time conversation with Izzy, your AI interviewer. 
+                      You&apos;ll have a real-time conversation with Izzy, your AI interviewer.
                       Speak clearly into your microphone when it&apos;s your turn.
                     </p>
                   </div>
                 )}
-                
+
                 {interviewState === "interviewer_speaking" && (
                   <div className="space-y-4">
                     <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -270,7 +363,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     </p>
                   </div>
                 )}
-                
+
                 {interviewState === "candidate_speaking" && (
                   <div className="space-y-4 w-full">
                     <p className="text-muted-foreground">
@@ -281,7 +374,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     </div>
                   </div>
                 )}
-                
+
                 {interviewState === "processing" && (
                   <div className="space-y-4">
                     <h2 className="text-xl font-medium">Processing Your Interview</h2>
@@ -290,7 +383,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     </p>
                   </div>
                 )}
-                
+
                 {interviewState === "completed" && (
                   <div className="space-y-4">
                     <h2 className="text-xl font-medium">Interview Completed!</h2>
@@ -302,107 +395,76 @@ export default function InterviewDetailPage({ params }: PageProps) {
               </div>
             </div>
           </CardContent>
-          
+
           {/* Action buttons */}
           <CardFooter className="flex justify-center border-t pt-6">
             {interviewState === "before_start" && (
-              <div className="flex gap-3">
-                <Button variant="outline" asChild>
-                  <Link href="/dashboard/practice-interview">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Go Back
-                  </Link>
-                </Button>
-                <Button 
-                  onClick={() => setInterviewState("interviewer_speaking")}
-                  className="gap-2"
-                >
-                  <Mic className="h-4 w-4" />
-                  Start Interview
-                </Button>
-              </div>
+              <Button
+                className="mt-6 gap-2"
+                onClick={handleStartInterview}
+              >
+                <Play className="h-4 w-4" />
+                Start Interview
+              </Button>
             )}
-            
-            {interviewState === "interviewer_speaking" && (
-              <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setInterviewState("before_start")}
-                  className="gap-2"
+
+            {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
+              <div className="mt-6 flex gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleMute}
                 >
-                  <MicOff className="h-4 w-4" />
-                  Cancel Interview
+                  {interviewState === "candidate_speaking" ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </Button>
-                <Button 
-                  onClick={() => setInterviewState("candidate_speaking")}
+                <Button
+                  variant="destructive"
                   className="gap-2"
+                  onClick={handleEndInterview}
                 >
-                  <Mic className="h-4 w-4" />
-                  Answer Question
-                </Button>
-              </div>
-            )}
-            
-            {interviewState === "candidate_speaking" && (
-              <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setInterviewState("before_start")}
-                  className="gap-2"
-                >
-                  <MicOff className="h-4 w-4" />
-                  Cancel Interview
-                </Button>
-                <Button 
-                  onClick={() => setInterviewState("interviewer_speaking")}
-                  className="gap-2"
-                >
-                  Done Speaking
-                </Button>
-              </div>
-            )}
-            
-            {interviewState === "processing" && (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Processing...</span>
-              </div>
-            )}
-            
-            {interviewState === "completed" && (
-              <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setInterviewState("before_start")}
-                  className="gap-2"
-                >
-                  Retry Interview
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setIsGeneratingSummary(true);
-                    // Simulate generating a summary
-                    setTimeout(() => {
-                      setIsGeneratingSummary(false);
-                      // Handle viewing summary
-                    }, 2000);
-                  }}
-                  disabled={isGeneratingSummary}
-                  className="gap-2"
-                >
-                  {isGeneratingSummary ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Generating Summary...
-                    </>
-                  ) : (
-                    <>Generate Summary</>
-                  )}
+                  End Interview
                 </Button>
               </div>
             )}
           </CardFooter>
         </Card>
+        {/* Debug button */}
+        <div className="mt-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              console.log("Interview Session Data:", session);
+              try {
+                const call = await startVapiAssistant(session, true);
+                console.log("Vapi Assistant Started:", call);
+
+                // Set up event listeners for debugging
+                const cleanup = setupVapiEventListeners({
+                  onCallStart: () => console.log("Debug: Call started"),
+                  onCallEnd: () => console.log("Debug: Call ended"),
+                  onSpeechStart: () => console.log("Debug: Speech started"),
+                  onSpeechEnd: () => console.log("Debug: Speech ended"),
+                  onVolumeLevel: (vol) => console.log("Debug: Volume level", vol),
+                  onMessage: (msg) => console.log("Debug: Message received", msg),
+                  onError: (err) => console.error("Debug: Error occurred", err)
+                });
+
+                // Store the cleanup function
+                setTimeout(() => {
+                  console.log("Debug: Cleaning up event listeners");
+                  cleanup();
+                }, 30000); // Cleanup after 30 seconds for debug purposes
+              } catch (error) {
+                console.error("Error starting Vapi assistant:", error);
+              }
+            }}
+            className="gap-2"
+          >
+            <AlertCircle className="h-4 w-4" />
+            Debug Vapi Session
+          </Button>
+        </div>
       </div>
     </div>
   )
