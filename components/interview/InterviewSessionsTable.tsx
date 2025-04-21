@@ -24,7 +24,7 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { Play, Eye, RefreshCw, FileText, Code, MessageSquare, CompassIcon, CheckCircle, Clock, XCircle, Mic, Trash, Loader2 } from "lucide-react"
+import { RefreshCw, FileText, Code, MessageSquare, CompassIcon, CheckCircle, Clock, XCircle, Mic, Trash, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import type { InterviewSession } from "@/types/interview-session"
 import type { StrategyAnalysis } from "@/types/strategy"

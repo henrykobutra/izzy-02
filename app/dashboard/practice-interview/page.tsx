@@ -8,10 +8,6 @@ import { Label } from "@/components/ui/label"
 import {
   Play,
   BriefcaseIcon,
-  GraduationCapIcon,
-  BuildingIcon,
-  ArrowRightIcon,
-  ChevronDownIcon,
   Loader2,
   Check,
   MessageSquare,
@@ -105,7 +101,6 @@ export default function PracticeInterviewPage() {
   useEffect(() => {
     if (selectedTab === "generic") {
       setSelectedPosition(null)
-      console.log(sessions)
     } else {
       setGenericPosition(null)
     }
@@ -114,14 +109,14 @@ export default function PracticeInterviewPage() {
   // Handle strategy ID from URL query parameter
   useEffect(() => {
     const strategyId = searchParams.get('strategyId');
-    
+
     if (strategyId && !strategiesLoading && strategies && strategies.length > 0) {
       // Switch to the specific tab
       setSelectedTab('specific');
-      
+
       // Find the matching strategy in specificPositions
       const matchingPosition = specificPositions.find(position => position.id === strategyId);
-      
+
       if (matchingPosition) {
         setSelectedPosition(matchingPosition);
       } else {
@@ -135,6 +130,14 @@ export default function PracticeInterviewPage() {
       toast.error(`Failed to create interview session: ${createSessionError.message}`);
     }
   }, [createSessionError]);
+
+  useEffect(() => {
+    // Check if we can enable the start button
+    const canStart =
+      (selectedTab === "generic" && genericPosition !== null) ||
+      (selectedTab === "specific" && selectedPosition !== null);
+    setCanStartInterview(canStart);
+  }, [selectedTab, genericPosition, selectedPosition, sessions]);
 
   const handleStartInterview = async () => {
     // In a real app, this would navigate to the interview session or launch the interview
@@ -191,9 +194,7 @@ export default function PracticeInterviewPage() {
     }
   }
 
-  const canStartInterview =
-    (selectedTab === "generic" && genericPosition) ||
-    (selectedTab === "specific" && selectedPosition);
+  const [canStartInterview, setCanStartInterview] = useState(false);
 
   return (
     <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
@@ -567,7 +568,7 @@ export default function PracticeInterviewPage() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                <span className="text-primary font-medium">Note:</span> "Tell me about yourself" will always be included as the first question (standard interview practice).
+                <span className="text-primary font-medium">Note:</span> &quot;Tell me about yourself&quot; will always be included as the first question (standard interview practice).
               </p>
             </div>
 

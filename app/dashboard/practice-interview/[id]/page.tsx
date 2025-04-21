@@ -5,9 +5,8 @@ import { useInterviewSession } from "./hooks/useInterviewSession"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ArrowLeft, Mic, MicOff, MessageSquare, Code, CompassIcon, Loader2, User, UserRound } from "lucide-react"
+import { AlertCircle, ArrowLeft, Mic, MicOff, MessageSquare, Code, CompassIcon, Loader2, UserRound } from "lucide-react"
 import Link from "next/link"
-import { format } from "date-fns"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { userService } from "@/services/user.service"
 import { cn } from "@/lib/utils"
@@ -252,8 +251,8 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   <div className="space-y-4">
                     <h2 className="text-xl font-medium">Ready to Start Your Practice Interview?</h2>
                     <p className="text-muted-foreground">
-                      You'll have a real-time conversation with Izzy, your AI interviewer. 
-                      Speak clearly into your microphone when it's your turn.
+                      You&apos;ll have a real-time conversation with Izzy, your AI interviewer. 
+                      Speak clearly into your microphone when it&apos;s your turn.
                     </p>
                   </div>
                 )}
@@ -267,7 +266,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Listen carefully to Izzy's question before responding.
+                      Listen carefully to Izzy&apos;s question before responding.
                     </p>
                   </div>
                 )}
@@ -296,7 +295,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   <div className="space-y-4">
                     <h2 className="text-xl font-medium">Interview Completed!</h2>
                     <p className="text-muted-foreground">
-                      You've successfully completed your practice interview. What would you like to do next?
+                      You&apos;ve successfully completed your practice interview. What would you like to do next?
                     </p>
                   </div>
                 )}

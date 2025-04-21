@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { FileText, CheckCircle, Plus, Briefcase, Eye, Mic, Trash2, UserSquare2, ArrowRight, ChevronDown, ChevronUp, RefreshCw, AlertTriangle } from "lucide-react"
+import { FileText, Plus, Briefcase, Eye, Mic, Trash2, RefreshCw, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
@@ -18,7 +18,6 @@ import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useStrategies } from "@/hooks/strategies/useStrategies"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   AlertDialog,
   AlertDialogAction,
