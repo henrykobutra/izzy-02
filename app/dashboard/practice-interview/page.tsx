@@ -191,9 +191,17 @@ export default function PracticeInterviewPage() {
         className="mx-4 lg:mx-6"
       />
 
-      <Card className={cn("mx-4 lg:mx-6", !profileExists && "opacity-70")}>
-        <div className={cn("relative", !profileExists && "pointer-events-none")}>
-          {!profileExists && (
+      <Card className={cn("mx-4 lg:mx-6", !profileExists && !profileLoading && "opacity-70")}>
+        <div className={cn("relative", !profileExists && !profileLoading && "pointer-events-none")}>
+          {profileLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/70 rounded-lg backdrop-blur-[1px]">
+              <div className="text-center p-4">
+                <Loader2 className="h-6 w-6 text-primary mx-auto mb-2 animate-spin" />
+                <h3 className="font-medium text-sm">Loading Profile</h3>
+                <p className="text-xs text-muted-foreground mt-1">Please wait while we retrieve your profile data</p>
+              </div>
+            </div>
+          ) : !profileExists && (
             <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/70 rounded-lg backdrop-blur-[1px]">
               <div className="text-center p-4">
                 <AlertCircle className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
