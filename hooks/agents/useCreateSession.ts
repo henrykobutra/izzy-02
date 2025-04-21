@@ -23,22 +23,22 @@ export function useCreateSession() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  
+
   const createInterviewSession = useCallback(async (data: SessionFormInput) => {
     setIsLoading(true)
     setError(null)
-    
+
     try {
       // Determine session source based on positionType
-      const sessionSource: Database['public']['Enums']['session_source'] = 
+      const sessionSource: Database['public']['Enums']['session_source'] =
         data.positionType === 'generic' ? 'generic' : 'specific'
-      
+
       // Fetch the candidate profile data
       const profileData = await getProfile(data.userId)
       if (!profileData) {
         throw new Error('Failed to fetch candidate profile')
       }
-      
+
       // Fetch the strategy data if available
       let strategyData = null
       if (data.interviewStrategyId) {
@@ -47,7 +47,7 @@ export function useCreateSession() {
           console.warn('Strategy not found despite ID being provided')
         }
       }
-      
+
       // Generate questions for the session using the questions agent
       const questionsResponse = await generateQuestions({
         numberOfQuestions: data.numberOfQuestions,
@@ -57,7 +57,7 @@ export function useCreateSession() {
         candidateProfile: profileData,
         strategy: strategyData || undefined
       })
-      
+
       // Create session params from the form input and generated questions
       const sessionParams: CreateSessionParams = {
         interview_type: data.interviewType,
@@ -70,17 +70,17 @@ export function useCreateSession() {
         topics_covered: questionsResponse.topics_covered,
         user_id: data.userId
       }
-      
+
       // Create the session in the database
       const result = await createSession(sessionParams)
-      
+
       if (!result.success) {
         throw new Error('Failed to create interview session')
       }
-      
+
       // Navigate to the interview session page upon successful creation
-      router.push(`/dashboard/interview-session/${result.data.id}`)
-      
+      router.push(`/dashboard/practice-interview/${result.data.id}`)
+
       // Return the created session data
       return result.data
     } catch (err) {
@@ -91,7 +91,7 @@ export function useCreateSession() {
       setIsLoading(false)
     }
   }, [router])
-  
+
   return {
     createInterviewSession,
     isLoading,

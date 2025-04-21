@@ -556,8 +556,8 @@ export default function PracticeInterviewPage() {
             {/* Step 3: Number of Questions */}
             <div className="pt-4 border-t">
               <Label className="text-sm font-medium mb-3 block">Step 3: Number of Interview Questions</Label>
-              <div className="grid grid-cols-7 gap-2">
-                {[1, 2, 3, 4, 5, 6, 7].map(num => (
+              <div className="grid grid-cols-6 gap-2">
+                {[2, 3, 4, 5, 6, 7].map(num => (
                   <div
                     key={num}
                     className={`flex items-center justify-center p-3 rounded-md border cursor-pointer hover:bg-muted/50 ${numberOfQuestions === num ? 'border-primary bg-primary/5' : ''}`}
