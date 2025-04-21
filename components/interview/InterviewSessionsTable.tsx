@@ -23,7 +23,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import { Play, Eye, RefreshCw, FileText, Code, MessageSquare, CompassIcon, CheckCircle, Clock, XCircle } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Play, Eye, RefreshCw, FileText, Code, MessageSquare, CompassIcon, CheckCircle, Clock, XCircle, Mic, Trash } from "lucide-react"
 import { toast } from "sonner"
 import type { InterviewSession } from "@/types/interview-session"
 import type { StrategyAnalysis } from "@/types/strategy"
@@ -42,7 +43,7 @@ export function InterviewSessionsTable({
   hasSessions,
   refetchSessions
 }: InterviewSessionsTableProps) {
-  const [sessionToCancel, setSessionToCancel] = useState<string | null>(null);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const [strategies, setStrategies] = useState<Record<string, StrategyAnalysis>>({});
 
   // Calculate summary counts for the table footer
@@ -274,18 +275,6 @@ export function InterviewSessionsTable({
                       </TableCell>
                       <TableCell className="py-3 text-right pr-6">
                         <div className="flex items-center justify-end space-x-2 transition-opacity">
-                          {(isCreated || isComplete) && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 gap-1"
-                              onClick={() => session.id ? setSessionToCancel(session.id) : null}
-                            >
-                              <span className="sr-only">Cancel</span>
-                              <span>Cancel</span>
-                            </Button>
-                          )}
-
                           {isCreated && (
                             <Button
                               variant="default"
@@ -294,23 +283,88 @@ export function InterviewSessionsTable({
                               asChild
                             >
                               <Link href={`/dashboard/practice-interview/session/${session.id}`}>
+                                <Mic className="h-3.5 w-3.5" />
                                 <span>Start</span>
-                                <Play className="h-3.5 w-3.5 fill-current" />
                               </Link>
                             </Button>
                           )}
 
-                          {isComplete && (
+                          {isCanceled && (
                             <Button
-                              variant="outline"
+                              variant="default"
                               size="sm"
                               className="h-8 gap-1"
                               asChild
                             >
                               <Link href={`/dashboard/practice-interview/session/${session.id}`}>
-                                <Eye className="h-3.5 w-3.5" />
-                                <span>View</span>
+                                <Mic className="h-3.5 w-3.5" />
+                                <span>Restart</span>
                               </Link>
+                            </Button>
+                          )}
+
+                          {isComplete && (
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="default"
+                                size="sm"
+                                className="h-8 gap-1"
+                                asChild
+                              >
+                                <Link href={`/dashboard/practice-interview/session/${session.id}`}>
+                                  <FileText className="h-3.5 w-3.5" />
+                                  <span>View</span>
+                                </Link>
+                              </Button>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => {
+                                      toast.success("Creating new interview session...");
+                                      refetchSessions();
+                                    }}
+                                  >
+                                    <RefreshCw className="h-3.5 w-3.5" />
+                                    <span className="sr-only">Retry</span>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p>Retry Interview</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => session.id ? setSessionToDelete(session.id) : null}
+                                  >
+                                    <Trash className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                                    <span className="sr-only">Delete</span>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p>Delete Session</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          )}
+                          
+                          {!isComplete && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 ml-1"
+                              onClick={() => session.id ? setSessionToDelete(session.id) : null}
+                            >
+                              <span className="sr-only">Delete</span>
+                              <Trash className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                             </Button>
                           )}
                         </div>
@@ -363,27 +417,27 @@ export function InterviewSessionsTable({
         )}
       </div>
 
-      {/* Cancel session confirmation dialog */}
-      <AlertDialog open={!!sessionToCancel} onOpenChange={(open) => !open && setSessionToCancel(null)}>
+      {/* Delete session confirmation dialog */}
+      <AlertDialog open={!!sessionToDelete} onOpenChange={(open) => !open && setSessionToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Interview Session</AlertDialogTitle>
+            <AlertDialogTitle>Delete Interview Session</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to cancel this interview session? This action cannot be undone.
+              Are you sure you want to delete this interview session? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep Session</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
-                toast.success("Interview session cancelled successfully");
-                // In a real implementation, we would call an API to cancel the session
-                setSessionToCancel(null);
+                toast.success("Interview session deleted successfully");
+                // In a real implementation, we would call an API to delete the session
+                setSessionToDelete(null);
                 refetchSessions();
               }}
             >
-              Cancel Session
+              Delete Session
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
