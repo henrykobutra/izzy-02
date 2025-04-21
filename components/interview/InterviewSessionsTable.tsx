@@ -24,11 +24,12 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { Play, Eye, RefreshCw, FileText, Code, MessageSquare, CompassIcon, CheckCircle, Clock, XCircle, Mic, Trash } from "lucide-react"
+import { Play, Eye, RefreshCw, FileText, Code, MessageSquare, CompassIcon, CheckCircle, Clock, XCircle, Mic, Trash, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import type { InterviewSession } from "@/types/interview-session"
 import type { StrategyAnalysis } from "@/types/strategy"
 import { getStrategyById } from "@/services/database/strategies/getStrategy"
+import { deleteSession } from "@/services/database/interviews/deleteSession"
 
 interface InterviewSessionsTableProps {
   sessions: InterviewSession[]
@@ -44,6 +45,7 @@ export function InterviewSessionsTable({
   refetchSessions
 }: InterviewSessionsTableProps) {
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [strategies, setStrategies] = useState<Record<string, StrategyAnalysis>>({});
 
   // Calculate summary counts for the table footer
@@ -418,7 +420,7 @@ export function InterviewSessionsTable({
       </div>
 
       {/* Delete session confirmation dialog */}
-      <AlertDialog open={!!sessionToDelete} onOpenChange={(open) => !open && setSessionToDelete(null)}>
+      <AlertDialog open={!!sessionToDelete} onOpenChange={(open) => !open && !isDeleting && setSessionToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Interview Session</AlertDialogTitle>
@@ -427,17 +429,41 @@ export function InterviewSessionsTable({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                toast.success("Interview session deleted successfully");
-                // In a real implementation, we would call an API to delete the session
-                setSessionToDelete(null);
-                refetchSessions();
+              disabled={isDeleting}
+              onClick={async () => {
+                setIsDeleting(true);
+                try {
+                  if (sessionToDelete) {
+                    const result = await deleteSession(sessionToDelete);
+                    
+                    if (result.success) {
+                      toast.success("Interview session deleted successfully");
+                      refetchSessions();
+                    } else {
+                      toast.error("Failed to delete interview session");
+                      console.error("Error deleting session:", result.error);
+                    }
+                  }
+                } catch (error) {
+                  console.error("Error in delete handler:", error);
+                  toast.error("An unexpected error occurred");
+                } finally {
+                  setIsDeleting(false);
+                  setSessionToDelete(null);
+                }
               }}
             >
-              Delete Session
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Session"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
