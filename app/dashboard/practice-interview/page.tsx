@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { MultiStepLoader } from "@/components/ui/multi-step-loader"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import {
@@ -42,6 +43,7 @@ import { Database } from "@/types/supabase"
 import { useSearchParams } from "next/navigation"
 
 import { genericPositions } from "@/constants/positions"
+import { interviewSessionLoadingStates } from "@/constants/loadingStates"
 
 type Position = {
   id: string
@@ -611,6 +613,14 @@ export default function PracticeInterviewPage() {
           refetchSessions={refetchSessions}
         />
       </div>
+
+      {/* Multi-step loader for interview session creation */}
+      <MultiStepLoader 
+        loadingStates={interviewSessionLoadingStates} 
+        loading={isCreatingSession} 
+        duration={1800} 
+        loop={false}
+      />
     </div>
   )
 }

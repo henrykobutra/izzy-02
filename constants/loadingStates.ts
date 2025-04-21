@@ -45,3 +45,20 @@ export const synchronizationLoadingStates = [
   { text: "Adapting question response strategies..." },
   { text: "Finalizing synchronized strategy..." }
 ];
+
+/**
+ * Loading states for the practice interview session creation process
+ */
+export const interviewSessionLoadingStates = [
+  { text: "Initializing interview preparation..." },
+  { text: "Loading your candidate profile..." },
+  { text: "Analyzing position requirements..." },
+  { text: "Retrieving interview strategy..." },
+  { text: "Tailoring questions to your experience..." },
+  { text: "Generating behavioral questions..." },
+  { text: "Crafting technical assessment questions..." },
+  { text: "Preparing follow-up question scenarios..." },
+  { text: "Optimizing question difficulty..." },
+  { text: "Creating interview feedback framework..." },
+  { text: "Finalizing your practice interview..." }
+];
