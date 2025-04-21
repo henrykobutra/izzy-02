@@ -481,10 +481,12 @@ export default function InterviewStrategyPage() {
                                   </Button>
                                 </Link>
                                 <div className="flex flex-col sm:flex-row gap-1.5">
-                                  <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                                    <Mic className="h-3.5 w-3.5" />
-                                    <span className="sr-only">Practice</span>
-                                  </Button>
+                                  <Link href={`/dashboard/practice-interview?strategyId=${strategy.id}`}>
+                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                                      <Mic className="h-3.5 w-3.5" />
+                                      <span className="sr-only">Practice</span>
+                                    </Button>
+                                  </Link>
                                   <Button 
                                     variant="outline" 
                                     size="sm"

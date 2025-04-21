@@ -43,6 +43,7 @@ import { useCreateSession } from "@/hooks/agents/useCreateSession"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Database } from "@/types/supabase"
+import { useSearchParams } from "next/navigation"
 
 import { genericPositions } from "@/constants/positions"
 
@@ -76,6 +77,7 @@ export default function PracticeInterviewPage() {
   const { sessions, loading: sessionsLoading, hasSessions, refetch: refetchSessions } = useInterviewSessions();
   const { strategies, loading: strategiesLoading, hasStrategies } = useStrategies()
   const { createInterviewSession, isLoading: isCreatingSession, error: createSessionError } = useCreateSession();
+  const searchParams = useSearchParams();
 
   const interviewTypes: InterviewType[] = [
     { id: "technical", label: "Technical", icon: <Code className="h-4 w-4 mr-2" /> },
@@ -108,6 +110,25 @@ export default function PracticeInterviewPage() {
       setGenericPosition(null)
     }
   }, [selectedTab])
+
+  // Handle strategy ID from URL query parameter
+  useEffect(() => {
+    const strategyId = searchParams.get('strategyId');
+    
+    if (strategyId && !strategiesLoading && strategies && strategies.length > 0) {
+      // Switch to the specific tab
+      setSelectedTab('specific');
+      
+      // Find the matching strategy in specificPositions
+      const matchingPosition = specificPositions.find(position => position.id === strategyId);
+      
+      if (matchingPosition) {
+        setSelectedPosition(matchingPosition);
+      } else {
+        console.warn(`Strategy with ID ${strategyId} not found`);
+      }
+    }
+  }, [searchParams, strategies, strategiesLoading, specificPositions]);
 
   useEffect(() => {
     if (createSessionError) {
