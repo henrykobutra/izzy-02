@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { getSessions, getSessionsByProfileId } from '@/services/database/interviews/getSessions'
+import { getSessions, getSessionById } from '@/services/database/interviews/getSessions'
 import type { InterviewSession } from '@/types/interview-session'
 import { userService } from '@/services/user.service'
 
-export function useInterviewSessions(profileId?: string) {
+export function useInterviewSessions() {
     const [sessions, setSessions] = useState<InterviewSession[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<unknown>(null)
@@ -22,15 +22,8 @@ export function useInterviewSessions(profileId?: string) {
                 return
             }
             
-            let sessionsData: InterviewSession[] = []
-            
-            if (profileId) {
-                // Fetch sessions for a specific profile
-                sessionsData = await getSessionsByProfileId(profileId)
-            } else {
-                // Fetch all sessions for the user
-                sessionsData = await getSessions(userData.id)
-            }
+            // Fetch all sessions for the user
+            const sessionsData = await getSessions(userData.id)
             
             setSessions(sessionsData)
             setHasSessions(sessionsData.length > 0)
@@ -41,7 +34,7 @@ export function useInterviewSessions(profileId?: string) {
         } finally {
             setLoading(false)
         }
-    }, [profileId])
+    }, [])
 
     useEffect(() => {
         fetchSessions()
@@ -53,5 +46,42 @@ export function useInterviewSessions(profileId?: string) {
         error, 
         hasSessions, 
         refetch: fetchSessions 
+    }
+}
+
+export function useInterviewSession(sessionId: string) {
+    const [session, setSession] = useState<InterviewSession | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<unknown>(null)
+
+    const fetchSession = useCallback(async () => {
+        if (!sessionId) {
+            setSession(null)
+            setLoading(false)
+            return
+        }
+
+        setLoading(true)
+        setError(null)
+        try {
+            const sessionData = await getSessionById(sessionId)
+            setSession(sessionData)
+        } catch (error) {
+            setError(error)
+            setSession(null)
+        } finally {
+            setLoading(false)
+        }
+    }, [sessionId])
+
+    useEffect(() => {
+        fetchSession()
+    }, [fetchSession])
+
+    return {
+        session,
+        loading,
+        error,
+        refetch: fetchSession
     }
 }

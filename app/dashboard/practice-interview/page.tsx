@@ -1,56 +1,50 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/data-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
-import { 
-  Play, 
-  Briefcase, 
-  MessageSquare, 
-  Code, 
-  CompassIcon, 
-  CheckIcon, 
+import {
+  Play,
+  BriefcaseIcon,
+  GraduationCapIcon,
+  BuildingIcon,
+  ArrowRightIcon,
+  ChevronDownIcon,
+  Loader2,
+  Check,
+  MessageSquare,
+  Code,
+  CompassIcon,
   ChevronsUpDown,
-  MonitorIcon,
-  ServerIcon,
-  GanttChartIcon,
-  Layers,
-  ShieldCheck,
-  Smartphone,
-  Cloud,
-  PenToolIcon,
-  MousePointerClick,
-  Paintbrush,
-  BarChart3,
-  Database,
-  Brain,
-  LineChart,
-  Building2,
-  GraduationCap,
-  HeartPulse,
-  Scale,
-  Microscope,
-  Landmark,
-  DollarSign,
-  Users,
-  Eye
+  FileSearch,
+  PlusCircle,
+  AlertCircle
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { 
-  Command, 
-  CommandEmpty, 
-  CommandGroup, 
-  CommandInput, 
-  CommandItem, 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
   CommandList,
   CommandSeparator
 } from "@/components/ui/command"
+import { useProfiles } from "@/hooks/profile/useProfiles"
+import { ProfileSummaryCard } from "@/components/profile/ProfileSummaryCard"
+import { toast } from "sonner"
+import { useInterviewSessions } from "@/hooks/interview-sessions/useInterviewSessions"
+import { InterviewSessionsTable } from "@/components/interview/InterviewSessionsTable"
+import { useStrategies } from "@/hooks/strategies/useStrategies"
+import { useCreateSession } from "@/hooks/agents/useCreateSession"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { Database } from "@/types/supabase"
 
-import data from "../data.json"
+import { genericPositions } from "@/constants/positions"
 
 type Position = {
   id: string
@@ -58,6 +52,10 @@ type Position = {
   company: string
   date: string
   match: number
+  experience?: string
+  industry?: string
+  strengths?: string[]
+  alignments?: string[]
 }
 
 type InterviewType = {
@@ -71,118 +69,110 @@ export default function PracticeInterviewPage() {
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null)
   const [genericPosition, setGenericPosition] = useState<string | null>(null)
   const [interviewType, setInterviewType] = useState<string>("comprehensive")
+  const [numberOfQuestions, setNumberOfQuestions] = useState<number>(3)
   const [openPositionCombobox, setOpenPositionCombobox] = useState(false)
   const [openGenericCombobox, setOpenGenericCombobox] = useState(false)
-  
-  // Categorized generic positions
-  const genericPositions = {
-    popular: [
-      { id: "frontend", title: "Frontend Developer", icon: <MonitorIcon className="h-4 w-4" />, count: 28 },
-      { id: "backend", title: "Backend Developer", icon: <ServerIcon className="h-4 w-4" />, count: 24 },
-      { id: "fullstack", title: "Full Stack Developer", icon: <Layers className="h-4 w-4" />, count: 32 },
-      { id: "pm", title: "Product Manager", icon: <GanttChartIcon className="h-4 w-4" />, count: 18 },
-    ],
-    engineering: [
-      { id: "devops", title: "DevOps Engineer", icon: <Cloud className="h-4 w-4" />, count: 15 },
-      { id: "qa", title: "QA Engineer", icon: <ShieldCheck className="h-4 w-4" />, count: 12 },
-      { id: "mobile", title: "Mobile Developer", icon: <Smartphone className="h-4 w-4" />, count: 14 },
-      { id: "security", title: "Security Engineer", icon: <ShieldCheck className="h-4 w-4" />, count: 9 },
-      { id: "sre", title: "Site Reliability Engineer", icon: <ServerIcon className="h-4 w-4" />, count: 13 },
-    ],
-    design: [
-      { id: "ux", title: "UX Designer", icon: <MousePointerClick className="h-4 w-4" />, count: 16 },
-      { id: "ui", title: "UI Designer", icon: <Paintbrush className="h-4 w-4" />, count: 14 },
-      { id: "product", title: "Product Designer", icon: <PenToolIcon className="h-4 w-4" />, count: 13 },
-    ],
-    data: [
-      { id: "data", title: "Data Scientist", icon: <BarChart3 className="h-4 w-4" />, count: 20 },
-      { id: "data-engineer", title: "Data Engineer", icon: <Database className="h-4 w-4" />, count: 17 },
-      { id: "ml-engineer", title: "ML Engineer", icon: <Brain className="h-4 w-4" />, count: 15 },
-      { id: "analyst", title: "Data Analyst", icon: <LineChart className="h-4 w-4" />, count: 19 },
-    ],
-    ai: [
-      { id: "ai-engineer", title: "AI Engineer", icon: <Brain className="h-4 w-4" />, count: 22 },
-      { id: "robotics", title: "Robotics Engineer", icon: <Brain className="h-4 w-4" />, count: 14 },
-      { id: "cv-engineer", title: "Computer Vision Engineer", icon: <Eye className="h-4 w-4" />, count: 10 },
-      { id: "nlp-engineer", title: "NLP Engineer", icon: <MessageSquare className="h-4 w-4" />, count: 13 },
-    ],
-    nontech: [
-      { id: "marketing", title: "Marketing Manager", icon: <Building2 className="h-4 w-4" />, count: 26 },
-      { id: "teacher", title: "Teacher / Educator", icon: <GraduationCap className="h-4 w-4" />, count: 18 },
-      { id: "healthcare", title: "Healthcare Professional", icon: <HeartPulse className="h-4 w-4" />, count: 22 },
-      { id: "legal", title: "Legal Professional", icon: <Scale className="h-4 w-4" />, count: 15 },
-      { id: "research", title: "Research Scientist", icon: <Microscope className="h-4 w-4" />, count: 12 },
-      { id: "finance", title: "Finance Analyst", icon: <DollarSign className="h-4 w-4" />, count: 19 },
-      { id: "hr", title: "HR Professional", icon: <Users className="h-4 w-4" />, count: 17 },
-      { id: "government", title: "Government Official", icon: <Landmark className="h-4 w-4" />, count: 9 },
-    ]
-  }
-  
-  // Mock data for saved job targets/positions - in real app, fetch from API/database
-  const targetPositions: Position[] = [
-    {
-      id: "job-1",
-      title: "Senior Frontend Engineer",
-      company: "TechCorp Inc.",
-      date: "April 15, 2025",
-      match: 85
-    },
-    {
-      id: "job-2",
-      title: "Full Stack Developer",
-      company: "InnovateSoft",
-      date: "April 10, 2025",
-      match: 92
-    },
-    {
-      id: "job-3",
-      title: "React Developer",
-      company: "WebSolutions Ltd.",
-      date: "April 5, 2025",
-      match: 78
-    }
-  ]
-  
+  const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
+  const { sessions, loading: sessionsLoading, hasSessions, refetch: refetchSessions } = useInterviewSessions();
+  const { strategies, loading: strategiesLoading, hasStrategies } = useStrategies()
+  const { createInterviewSession, isLoading: isCreatingSession, error: createSessionError } = useCreateSession();
+
   const interviewTypes: InterviewType[] = [
     { id: "technical", label: "Technical", icon: <Code className="h-4 w-4 mr-2" /> },
     { id: "behavioral", label: "Behavioral", icon: <MessageSquare className="h-4 w-4 mr-2" /> },
     { id: "comprehensive", label: "Comprehensive", icon: <CompassIcon className="h-4 w-4 mr-2" /> },
   ]
 
+  const specificPositions = useMemo(() => {
+    if (!strategies || strategies.length === 0) return []
+
+    return strategies.map(strategy => ({
+      id: strategy.id || `strategy-${Math.random().toString(36).substring(2, 9)}`,
+      title: strategy.job_title,
+      company: strategy.job_company || 'Target Company',
+      date: strategy.created_at || new Date().toISOString(),
+      match: strategy.match_rate || 100,
+      experience: strategy.job_experience_level || 'mid',
+      industry: strategy.job_industry || '',
+      strengths: strategy.strengths || [],
+      alignments: strategy.key_alignments?.skills?.slice(0, 3) || []
+    }))
+  }, [strategies])
+
   // Reset selections when tab changes
   useEffect(() => {
     if (selectedTab === "generic") {
       setSelectedPosition(null)
+      console.log(sessions)
     } else {
       setGenericPosition(null)
     }
   }, [selectedTab])
 
-  const handleStartInterview = () => {
+  useEffect(() => {
+    if (createSessionError) {
+      toast.error(`Failed to create interview session: ${createSessionError.message}`);
+    }
+  }, [createSessionError]);
+
+  const handleStartInterview = async () => {
     // In a real app, this would navigate to the interview session or launch the interview
     if (selectedTab === "generic" && !genericPosition) {
       return // Can't start without selecting a generic position
     }
-    
-    if (selectedTab === "target" && !selectedPosition) {
-      return // Can't start without selecting a target position
+
+    if (selectedTab === "specific" && !selectedPosition) {
+      return // Can't start without selecting a specific position
     }
-    
-    const position = selectedTab === "generic" 
-      ? Object.values(genericPositions).flat().find(p => p.id === genericPosition)?.title 
-      : selectedPosition?.title
-      
-    console.log("Starting interview:", { 
-      positionType: selectedTab, 
-      position,
-      company: selectedPosition?.company,
-      interviewType 
-    })
+
+    if (!profileExists || !profile) {
+      toast.error("Please complete your profile before starting an interview")
+      return
+    }
+
+    const positionId = selectedTab === "generic"
+      ? genericPosition // This is already the generic job ID
+      : selectedPosition?.id // This is the strategy ID
+
+    try {
+      // Find the position title
+      const positionTitle = selectedTab === "generic"
+        ? Object.values(genericPositions).flat().find(p => p.id === genericPosition)?.title || ""
+        : selectedPosition?.title || "";
+
+      if (!positionTitle) {
+        toast.error("Invalid position selected");
+        return;
+      }
+
+      // Ensure profile has the required fields
+      if (!profile.id || !profile.user_id) {
+        toast.error("Profile information is incomplete");
+        return;
+      }
+
+      await createInterviewSession({
+        positionType: selectedTab === "generic" ? "generic" : "specific",
+        position: positionTitle,
+        company: selectedTab === "specific" && selectedPosition?.company ? selectedPosition.company : undefined,
+        interviewType: interviewType as Database['public']['Enums']['interview_type'],
+        numberOfQuestions,
+        profileId: profile.id,
+        userId: profile.user_id,
+        interviewStrategyId: selectedTab === "specific" && positionId ? positionId : null
+      });
+
+      // Refresh the sessions list after creating a new one
+      refetchSessions();
+    } catch (err) {
+      console.error("Error creating interview session:", err);
+      toast.error("Failed to create interview session. Please try again.");
+    }
   }
 
-  const canStartInterview = 
-    (selectedTab === "generic" && genericPosition) || 
-    (selectedTab === "target" && selectedPosition);
+  const canStartInterview =
+    (selectedTab === "generic" && genericPosition) ||
+    (selectedTab === "specific" && selectedPosition);
 
   return (
     <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
@@ -193,306 +183,403 @@ export default function PracticeInterviewPage() {
         </p>
       </div>
 
-      <Card className="mx-4 lg:mx-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-primary" />
-            Configure Your Practice Interview
-          </CardTitle>
-          <CardDescription>
-            Select position type, specific role, and interview format
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Step 1: Choose position type */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Step 1: Select Position Type</Label>
-            <Tabs 
-              value={selectedTab} 
-              onValueChange={setSelectedTab}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="generic">Generic Position</TabsTrigger>
-                <TabsTrigger value="target">Target Position</TabsTrigger>
-              </TabsList>
-              <TabsContent value="generic" className="pt-4">
-                <Label className="text-sm mb-2 block">Select a generic position type:</Label>
-                <Popover open={openGenericCombobox} onOpenChange={setOpenGenericCombobox}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openGenericCombobox}
-                      className="w-full justify-between"
-                    >
-                      {genericPosition
-                        ? Object.values(genericPositions).flat().find((position) => position.id === genericPosition)?.title
-                        : "Select position..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start" side="bottom">
-                    <Command className="w-full">
-                      <CommandInput placeholder="Search position..." className="w-full" />
-                      <CommandEmpty>No position found.</CommandEmpty>
-                      <CommandList className="w-full max-h-[300px] overflow-auto">
-                        <CommandGroup heading="Most Popular">
-                          {genericPositions.popular.map((position) => (
-                            <CommandItem
-                              key={position.id}
-                              value={position.id}
-                              onSelect={(currentValue) => {
-                                setGenericPosition(currentValue)
-                                setOpenGenericCombobox(false)
-                              }}
-                              className="w-full"
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="mr-2 text-primary">{position.icon}</div>
-                                <span className="flex-1">{position.title}</span>
-                                <span className="ml-auto text-xs text-muted-foreground">
-                                  {position.count} interviews
-                                </span>
-                                {genericPosition === position.id && (
-                                  <CheckIcon className="ml-2 h-4 w-4 text-primary" />
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        
-                        <CommandGroup heading="Engineering">
-                          {genericPositions.engineering.map((position) => (
-                            <CommandItem
-                              key={position.id}
-                              value={position.id}
-                              onSelect={(currentValue) => {
-                                setGenericPosition(currentValue)
-                                setOpenGenericCombobox(false)
-                              }}
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="mr-2 text-blue-500">{position.icon}</div>
-                                <span className="flex-1">{position.title}</span>
-                                {genericPosition === position.id && (
-                                  <CheckIcon className="ml-2 h-4 w-4 text-primary" />
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        
-                        <CommandGroup heading="AI & Robotics">
-                          {genericPositions.ai.map((position) => (
-                            <CommandItem
-                              key={position.id}
-                              value={position.id}
-                              onSelect={(currentValue) => {
-                                setGenericPosition(currentValue)
-                                setOpenGenericCombobox(false)
-                              }}
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="mr-2 text-purple-500">{position.icon}</div>
-                                <span className="flex-1">{position.title}</span>
-                                {genericPosition === position.id && (
-                                  <CheckIcon className="ml-2 h-4 w-4 text-primary" />
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        
-                        <CommandGroup heading="Design">
-                          {genericPositions.design.map((position) => (
-                            <CommandItem
-                              key={position.id}
-                              value={position.id}
-                              onSelect={(currentValue) => {
-                                setGenericPosition(currentValue)
-                                setOpenGenericCombobox(false)
-                              }}
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="mr-2 text-amber-500">{position.icon}</div>
-                                <span className="flex-1">{position.title}</span>
-                                {genericPosition === position.id && (
-                                  <CheckIcon className="ml-2 h-4 w-4 text-primary" />
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        
-                        <CommandGroup heading="Data & Analytics">
-                          {genericPositions.data.map((position) => (
-                            <CommandItem
-                              key={position.id}
-                              value={position.id}
-                              onSelect={(currentValue) => {
-                                setGenericPosition(currentValue)
-                                setOpenGenericCombobox(false)
-                              }}
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="mr-2 text-green-500">{position.icon}</div>
-                                <span className="flex-1">{position.title}</span>
-                                {genericPosition === position.id && (
-                                  <CheckIcon className="ml-2 h-4 w-4 text-primary" />
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        
-                        <CommandGroup heading="Non-Tech Positions">
-                          {genericPositions.nontech.map((position) => (
-                            <CommandItem
-                              key={position.id}
-                              value={position.id}
-                              onSelect={(currentValue) => {
-                                setGenericPosition(currentValue)
-                                setOpenGenericCombobox(false)
-                              }}
-                            >
-                              <div className="flex items-center w-full">
-                                <div className="mr-2 text-orange-500">{position.icon}</div>
-                                <span className="flex-1">{position.title}</span>
-                                {genericPosition === position.id && (
-                                  <CheckIcon className="ml-2 h-4 w-4 text-primary" />
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </TabsContent>
-              <TabsContent value="target" className="pt-4">
-                <Label className="text-sm mb-2 block">Select one of your target positions:</Label>
-                <Popover open={openPositionCombobox} onOpenChange={setOpenPositionCombobox}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openPositionCombobox}
-                      className="w-full justify-between"
-                    >
-                      {selectedPosition
-                        ? `${selectedPosition.title} (${selectedPosition.company})`
-                        : "Select position..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start" side="bottom">
-                    <Command className="w-full">
-                      <CommandInput placeholder="Search target positions..." className="w-full" />
-                      <CommandEmpty>No positions found. Add positions in Interview Strategy.</CommandEmpty>
-                      <CommandList className="w-full max-h-[300px] overflow-auto">
-                        <CommandGroup heading="Your Target Positions">
-                          {targetPositions
-                            .sort((a, b) => b.match - a.match) // Sort by match score descending
-                            .map((position) => (
+      {/* Profile Summary Card */}
+      <ProfileSummaryCard
+        profileExists={profileExists}
+        profileLoading={profileLoading}
+        profile={profile}
+        className="mx-4 lg:mx-6"
+      />
+
+      <Card className={cn("mx-4 lg:mx-6", !profileExists && "opacity-70")}>
+        <div className={cn("relative", !profileExists && "pointer-events-none")}>
+          {!profileExists && (
+            <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/70 rounded-lg backdrop-blur-[1px]">
+              <div className="text-center p-4">
+                <AlertCircle className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
+                <h3 className="font-medium text-sm">Profile Required</h3>
+                <p className="text-xs text-muted-foreground mt-1">Complete your profile to start practicing</p>
+              </div>
+            </div>
+          )}
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BriefcaseIcon className="h-5 w-5 text-primary" />
+              Configure Your Practice Interview
+            </CardTitle>
+            <CardDescription>
+              Select position type, specific role, and interview format
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Step 1: Choose position type */}
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Step 1: Select Position Type</Label>
+              <Tabs
+                value={selectedTab}
+                onValueChange={setSelectedTab}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="generic">Generic Position</TabsTrigger>
+                  <TabsTrigger value="specific">Target Position</TabsTrigger>
+                </TabsList>
+                <TabsContent value="generic" className="pt-4">
+                  <Label className="text-sm mb-2 block">Select a generic position type:</Label>
+                  <Popover open={openGenericCombobox} onOpenChange={setOpenGenericCombobox}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openGenericCombobox}
+                        className="w-full justify-between"
+                      >
+                        {genericPosition
+                          ? Object.values(genericPositions).flat().find((position) => position.id === genericPosition)?.title
+                          : "Select position..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start" side="bottom">
+                      <Command className="w-full">
+                        <CommandInput placeholder="Search position..." className="w-full" />
+                        <CommandEmpty>No position found.</CommandEmpty>
+                        <CommandList className="w-full max-h-[300px] overflow-auto">
+                          <CommandGroup heading="Most Popular">
+                            {genericPositions.popular.map((position) => (
                               <CommandItem
                                 key={position.id}
                                 value={position.id}
                                 onSelect={(currentValue) => {
-                                  const selected = targetPositions.find(p => p.id === currentValue)
-                                  setSelectedPosition(selected || null)
-                                  setOpenPositionCombobox(false)
+                                  setGenericPosition(currentValue)
+                                  setOpenGenericCombobox(false)
                                 }}
                                 className="w-full"
                               >
                                 <div className="flex items-center w-full">
-                                  <div className="flex-1">
-                                    <div className="font-medium">{position.title}</div>
-                                    <div className="text-muted-foreground text-xs">
-                                      {position.company}
-                                    </div>
+                                  <div className="mr-2 text-primary">
+                                    {React.createElement(position.icon, { className: "h-4 w-4" })}
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <Badge 
-                                      variant={position.match >= 85 ? 'success' : position.match >= 70 ? 'warning' : 'secondary'} 
-                                      className="px-1.5 py-0 text-xs"
-                                    >
-                                      {position.match}% Match
-                                    </Badge>
-                                    {selectedPosition?.id === position.id && (
-                                      <CheckIcon className="h-4 w-4 text-primary" />
-                                    )}
-                                  </div>
+                                  <span className="flex-1">{position.title}</span>
+                                  <span className="ml-auto text-xs text-muted-foreground">
+                                    {position.count} interviews
+                                  </span>
+                                  {genericPosition === position.id && (
+                                    <Check className="ml-2 h-4 w-4 text-primary" />
+                                  )}
                                 </div>
                               </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        <div className="py-1.5 px-2 text-xs text-muted-foreground italic">
-                          These positions are from your Interview Strategy section.
-                        </div>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          {/* Step 2: Interview Type */}
-          <div className="pt-4 border-t">
-            <Label className="text-sm font-medium mb-3 block">Step 2: Select Interview Type</Label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {interviewTypes.map(type => (
-                <div 
-                  key={type.id}
-                  className={`flex items-center p-3 rounded-md border cursor-pointer hover:bg-muted/50 ${interviewType === type.id ? 'border-primary bg-primary/5' : ''}`}
-                  onClick={() => setInterviewType(type.id)}
-                >
-                  <div className="flex items-center">
-                    {type.icon}
-                    <span className="font-medium">{type.label}</span>
-                  </div>
-                  {type.id === "comprehensive" && (
-                    <Badge variant="outline" className="ml-auto text-xs">Recommended</Badge>
-                  )}
-                </div>
-              ))}
+                            ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+
+                          <CommandGroup heading="Engineering">
+                            {genericPositions.engineering.map((position) => (
+                              <CommandItem
+                                key={position.id}
+                                value={position.id}
+                                onSelect={(currentValue) => {
+                                  setGenericPosition(currentValue)
+                                  setOpenGenericCombobox(false)
+                                }}
+                              >
+                                <div className="flex items-center w-full">
+                                  <div className="mr-2 text-blue-500">
+                                    {React.createElement(position.icon, { className: "h-4 w-4" })}
+                                  </div>
+                                  <span className="flex-1">{position.title}</span>
+                                  {genericPosition === position.id && (
+                                    <Check className="ml-2 h-4 w-4 text-primary" />
+                                  )}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+
+                          <CommandGroup heading="AI & Robotics">
+                            {genericPositions.ai.map((position) => (
+                              <CommandItem
+                                key={position.id}
+                                value={position.id}
+                                onSelect={(currentValue) => {
+                                  setGenericPosition(currentValue)
+                                  setOpenGenericCombobox(false)
+                                }}
+                              >
+                                <div className="flex items-center w-full">
+                                  <div className="mr-2 text-purple-500">
+                                    {React.createElement(position.icon, { className: "h-4 w-4" })}
+                                  </div>
+                                  <span className="flex-1">{position.title}</span>
+                                  {genericPosition === position.id && (
+                                    <Check className="ml-2 h-4 w-4 text-primary" />
+                                  )}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+
+                          <CommandGroup heading="Design">
+                            {genericPositions.design.map((position) => (
+                              <CommandItem
+                                key={position.id}
+                                value={position.id}
+                                onSelect={(currentValue) => {
+                                  setGenericPosition(currentValue)
+                                  setOpenGenericCombobox(false)
+                                }}
+                              >
+                                <div className="flex items-center w-full">
+                                  <div className="mr-2 text-amber-500">
+                                    {React.createElement(position.icon, { className: "h-4 w-4" })}
+                                  </div>
+                                  <span className="flex-1">{position.title}</span>
+                                  {genericPosition === position.id && (
+                                    <Check className="ml-2 h-4 w-4 text-primary" />
+                                  )}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+
+                          <CommandGroup heading="Data & Analytics">
+                            {genericPositions.data.map((position) => (
+                              <CommandItem
+                                key={position.id}
+                                value={position.id}
+                                onSelect={(currentValue) => {
+                                  setGenericPosition(currentValue)
+                                  setOpenGenericCombobox(false)
+                                }}
+                              >
+                                <div className="flex items-center w-full">
+                                  <div className="mr-2 text-green-500">
+                                    {React.createElement(position.icon, { className: "h-4 w-4" })}
+                                  </div>
+                                  <span className="flex-1">{position.title}</span>
+                                  {genericPosition === position.id && (
+                                    <Check className="ml-2 h-4 w-4 text-primary" />
+                                  )}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+
+                          <CommandGroup heading="Non-Tech Positions">
+                            {genericPositions.nontech.map((position) => (
+                              <CommandItem
+                                key={position.id}
+                                value={position.id}
+                                onSelect={(currentValue) => {
+                                  setGenericPosition(currentValue)
+                                  setOpenGenericCombobox(false)
+                                }}
+                              >
+                                <div className="flex items-center w-full">
+                                  <div className="mr-2 text-orange-500">
+                                    {React.createElement(position.icon, { className: "h-4 w-4" })}
+                                  </div>
+                                  <span className="flex-1">{position.title}</span>
+                                  {genericPosition === position.id && (
+                                    <Check className="ml-2 h-4 w-4 text-primary" />
+                                  )}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </TabsContent>
+                <TabsContent value="specific" className="pt-4">
+                  <Label className="text-sm mb-2 block">Select one of your target positions:</Label>
+                  <Popover open={openPositionCombobox} onOpenChange={setOpenPositionCombobox}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openPositionCombobox}
+                        className="w-full justify-between"
+                      >
+                        {selectedPosition
+                          ? `${selectedPosition.title} (${selectedPosition.company})`
+                          : "Select position..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start" side="bottom">
+                      <Command className="w-full">
+                        <CommandInput
+                          placeholder="Search target positions..."
+                          className="w-full"
+                          disabled={specificPositions.length === 0 || strategiesLoading}
+                        />
+                        <CommandEmpty></CommandEmpty>
+                        <CommandList className="w-full max-h-[300px] overflow-auto">
+                          <CommandGroup>
+                            {strategiesLoading ? (
+                              <div className="py-3 px-2 text-sm text-center">
+                                <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />
+                                Loading your target positions...
+                              </div>
+                            ) : hasStrategies && specificPositions.length > 0 ? (
+                              specificPositions.map((position) => (
+                                <CommandItem
+                                  key={position.id}
+                                  value={position.id}
+                                  onSelect={() => {
+                                    setSelectedPosition(position)
+                                    setOpenPositionCombobox(false)
+                                  }}
+                                >
+                                  <div className="flex items-center w-full">
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        selectedPosition?.id === position.id ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    <div>
+                                      <span className="font-medium">{position.title}</span>
+                                      {position.company && (
+                                        <span className="text-muted-foreground text-xs ml-1">
+                                          ({position.company})
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="ml-auto">
+                                      <span
+                                        className={cn(
+                                          "text-xs rounded-full px-1.5 py-0.5 font-medium",
+                                          position.match >= 80 ? "bg-green-100 text-green-800" :
+                                            position.match >= 60 ? "bg-yellow-100 text-yellow-800" :
+                                              "bg-gray-100 text-gray-800"
+                                        )}
+                                      >
+                                        {position.match}%
+                                      </span>
+                                    </span>
+                                  </div>
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <div className="py-6 px-4 text-sm text-center flex flex-col items-center gap-3">
+                                <div className="rounded-full bg-blue-100 dark:bg-blue-900/40 p-2 mb-1">
+                                  <FileSearch className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                                </div>
+                                <div className="font-medium">No target positions available</div>
+                                <p className="text-xs text-muted-foreground max-w-[260px]">
+                                  You need to create an interview strategy with a target job position to practice with.
+                                </p>
+                                <Link href="/dashboard/interview-strategy">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-1 border-blue-500 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                  >
+                                    <PlusCircle className="h-3.5 w-3.5 mr-1.5" />
+                                    Create Interview Strategy
+                                  </Button>
+                                </Link>
+                              </div>
+                            )}
+                          </CommandGroup>
+                          <CommandSeparator />
+                          <div className="py-1.5 px-2 text-xs text-muted-foreground italic">
+                            These positions are from your Interview Strategy section.
+                          </div>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </TabsContent>
+              </Tabs>
             </div>
-          </div>
-          
-          {/* Step 3: Start Button */}
-          <div className="pt-4 border-t">
-            <Button 
-              className="w-full gap-2" 
-              size="lg"
-              onClick={handleStartInterview}
-              disabled={!canStartInterview}
-            >
-              <Play className="h-4 w-4 fill-current" /> 
-              Start Interview Session
-            </Button>
-            {!canStartInterview && (
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Please select a position to start the interview
+
+            {/* Step 2: Interview Type */}
+            <div className="pt-4 border-t">
+              <Label className="text-sm font-medium mb-3 block">Step 2: Select Interview Type</Label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {interviewTypes.map(type => (
+                  <div
+                    key={type.id}
+                    className={`flex items-center p-3 rounded-md border cursor-pointer hover:bg-muted/50 ${interviewType === type.id ? 'border-primary bg-primary/5' : ''}`}
+                    onClick={() => setInterviewType(type.id)}
+                  >
+                    <div className="flex items-center">
+                      {type.icon}
+                      <span className="font-medium">{type.label}</span>
+                    </div>
+                    {type.id === "comprehensive" && (
+                      <Badge variant="outline" className="ml-auto text-xs">Recommended</Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 3: Number of Questions */}
+            <div className="pt-4 border-t">
+              <Label className="text-sm font-medium mb-3 block">Step 3: Number of Interview Questions</Label>
+              <div className="grid grid-cols-7 gap-2">
+                {[1, 2, 3, 4, 5, 6, 7].map(num => (
+                  <div
+                    key={num}
+                    className={`flex items-center justify-center p-3 rounded-md border cursor-pointer hover:bg-muted/50 ${numberOfQuestions === num ? 'border-primary bg-primary/5' : ''}`}
+                    onClick={() => setNumberOfQuestions(num)}
+                  >
+                    <span className="font-medium">{num}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <span className="text-primary font-medium">Note:</span> "Tell me about yourself" will always be included as the first question (standard interview practice).
               </p>
-            )}
-          </div>
-        </CardContent>
+            </div>
+
+            {/* Step 4: Start Button */}
+            <div className="pt-4 border-t">
+              <Button
+                className="w-full gap-2"
+                size="lg"
+                onClick={handleStartInterview}
+                disabled={!canStartInterview || isCreatingSession}
+              >
+                {isCreatingSession ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating Session...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 fill-current" />
+                    Start Interview Session
+                  </>
+                )}
+              </Button>
+              {!canStartInterview && (
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Please select a position to start the interview
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </div>
       </Card>
 
-      <div>
-        <div className="px-4 lg:px-6 mb-2">
-          <h2 className="text-xl font-semibold tracking-tight">Recent Interviews</h2>
-          <p className="text-muted-foreground">Your latest practice sessions and their results</p>
-        </div>
-        <DataTable data={data} />
+      {/* Interview Sessions Table */}
+      <div className="px-4 lg:px-6 mb-6">
+        <InterviewSessionsTable
+          sessions={sessions}
+          loading={sessionsLoading}
+          hasSessions={hasSessions}
+          refetchSessions={refetchSessions}
+        />
       </div>
     </div>
   )

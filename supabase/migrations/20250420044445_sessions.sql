@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create ENUM types for session_source, interview_type, and status
 CREATE TYPE session_source AS ENUM ('specific', 'generic');
 CREATE TYPE interview_type AS ENUM ('technical', 'behavioral', 'comprehensive');
-CREATE TYPE session_status AS ENUM ('canceled', 'completed');
+CREATE TYPE session_status AS ENUM ('created','canceled', 'completed');
 
 -- Create the interview_sessions table
 CREATE TABLE interview_sessions (
@@ -15,10 +15,12 @@ CREATE TABLE interview_sessions (
     interview_strategy_id UUID, -- Required for specific sessions
     job_title TEXT, -- Required for generic sessions
     interview_type interview_type NOT NULL,
+    interview_question_amount INT NOT NULL DEFAULT 10, -- Number of questions to generate
+    suggested_interview_questions JSONB NOT NULL DEFAULT '{}', -- Suggested interview questions
     topics_covered JSONB NOT NULL DEFAULT '{}', -- e.g., {"technical": ["Python programming"], "behavioral": ["Teamwork scenarios"]}
     status session_status NOT NULL DEFAULT 'completed',
     transcript JSONB, -- Nullable, e.g., {"interviewer": ["Tell me about yourself"], "user": ["I have 4 years of experience…"]}
-    session_start TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    session_start TIMESTAMP WITH TIME ZONE,
     session_end TIMESTAMP WITH TIME ZONE, -- Nullable if session is canceled or ongoing
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

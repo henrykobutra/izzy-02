@@ -1,16 +1,15 @@
-import { Json } from "./supabase";
 import { ProfileAnalysis } from "./profile";
 
 export type InterviewSession = {
   id?: string;
   user_id: string;
   profile_id: string;
-  interview_type: "behavioral" | "technical" | "mixed" | "mock";
+  interview_type: "behavioral" | "technical" | "comprehensive";
   interview_question_amount: number;
   interview_strategy_id?: string | null;
   job_title?: string | null;
   session_source: "user" | "ai" | "recruiter";
-  session_status: "pending" | "in_progress" | "completed" | "cancelled";
+  status: "created" | "canceled" | "completed";
   session_start?: string | null;
   session_end?: string | null;
   suggested_interview_questions: any[]; // JSON array
@@ -18,7 +17,7 @@ export type InterviewSession = {
   transcript?: Record<string, any> | null; // JSON object
   created_at?: string;
   updated_at?: string | null;
-  
+
   // Additional fields for UI state or relationships
   profile?: ProfileAnalysis;
 };

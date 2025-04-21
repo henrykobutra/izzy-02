@@ -9,59 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      interview_feedback: {
-        Row: {
-          areas_for_improvement: Json
-          confidence_score: number
-          created_at: string | null
-          feedback_summary: string
-          id: string
-          overall_score: number
-          session_id: string
-          skills_breakdown: Json
-          strengths: Json
-          updated_at: string | null
-          user_id: string
-          weaknesses: Json
-        }
-        Insert: {
-          areas_for_improvement: Json
-          confidence_score: number
-          created_at?: string | null
-          feedback_summary: string
-          id?: string
-          overall_score: number
-          session_id: string
-          skills_breakdown: Json
-          strengths: Json
-          updated_at?: string | null
-          user_id: string
-          weaknesses: Json
-        }
-        Update: {
-          areas_for_improvement?: Json
-          confidence_score?: number
-          created_at?: string | null
-          feedback_summary?: string
-          id?: string
-          overall_score?: number
-          session_id?: string
-          skills_breakdown?: Json
-          strengths?: Json
-          updated_at?: string | null
-          user_id?: string
-          weaknesses?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_session_id"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "interview_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       interview_preferences: {
         Row: {
           created_at: string | null
@@ -125,14 +72,16 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          interview_question_amount: number
           interview_strategy_id: string | null
           interview_type: Database["public"]["Enums"]["interview_type"]
           job_title: string | null
           profile_id: string
           session_end: string | null
           session_source: Database["public"]["Enums"]["session_source"]
-          session_start: string
+          session_start: string | null
           status: Database["public"]["Enums"]["session_status"]
+          suggested_interview_questions: Json
           topics_covered: Json
           transcript: Json | null
           updated_at: string | null
@@ -141,14 +90,16 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          interview_question_amount?: number
           interview_strategy_id?: string | null
           interview_type: Database["public"]["Enums"]["interview_type"]
           job_title?: string | null
           profile_id: string
           session_end?: string | null
           session_source: Database["public"]["Enums"]["session_source"]
-          session_start?: string
+          session_start?: string | null
           status?: Database["public"]["Enums"]["session_status"]
+          suggested_interview_questions?: Json
           topics_covered?: Json
           transcript?: Json | null
           updated_at?: string | null
@@ -157,14 +108,16 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          interview_question_amount?: number
           interview_strategy_id?: string | null
           interview_type?: Database["public"]["Enums"]["interview_type"]
           job_title?: string | null
           profile_id?: string
           session_end?: string | null
           session_source?: Database["public"]["Enums"]["session_source"]
-          session_start?: string
+          session_start?: string | null
           status?: Database["public"]["Enums"]["session_status"]
+          suggested_interview_questions?: Json
           topics_covered?: Json
           transcript?: Json | null
           updated_at?: string | null
@@ -331,7 +284,7 @@ export type Database = {
       language_preference: "english"
       seniority_level: "junior" | "mid_level" | "senior"
       session_source: "specific" | "generic"
-      session_status: "canceled" | "completed"
+      session_status: "canceled" | "completed" | "created"
       setting_source: "dynamic" | "override"
       toughness_level: "easy" | "medium" | "hard"
     }
@@ -454,7 +407,7 @@ export const Constants = {
       language_preference: ["english"],
       seniority_level: ["junior", "mid_level", "senior"],
       session_source: ["specific", "generic"],
-      session_status: ["canceled", "completed"],
+      session_status: ["canceled", "completed", "created"],
       setting_source: ["dynamic", "override"],
       toughness_level: ["easy", "medium", "hard"],
     },

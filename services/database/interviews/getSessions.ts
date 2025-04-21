@@ -14,18 +14,7 @@ export const getSessions = async (userId: string) => {
     try {
         const { data, error } = await supabase
             .from('interview_sessions')
-            .select(`
-                *,
-                profiles:profile_id (
-                    id,
-                    name,
-                    summary,
-                    experience_level,
-                    experience_level_description,
-                    industry_experience,
-                    last_analyzed
-                )
-            `)
+            .select('*')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
         
@@ -49,67 +38,21 @@ export const getSessionById = async (id: string) => {
     const supabase = await createClient()
     
     try {
-        const { data, error } = await supabase
+        // Fetch the session data
+        const { data: sessionData, error: sessionError } = await supabase
             .from('interview_sessions')
-            .select(`
-                *,
-                profiles:profile_id (
-                    id,
-                    name,
-                    summary,
-                    experience_level,
-                    experience_level_description,
-                    industry_experience,
-                    last_analyzed
-                )
-            `)
+            .select('*')
             .eq('id', id)
             .single()
-        
-        if (error) {
-            throw error
+            
+        if (sessionError) {
+            throw sessionError
         }
         
-        return data as InterviewSession
+        // Return just the session data
+        return sessionData as InterviewSession
     } catch (error) {
         console.error('Error fetching interview session:', error)
         return null
-    }
-}
-
-/**
- * Fetches all interview sessions for a specific profile
- * @param profileId The ID of the profile whose sessions to retrieve
- * @returns Array of interview sessions or empty array on error
- */
-export const getSessionsByProfileId = async (profileId: string) => {
-    const supabase = await createClient()
-    
-    try {
-        const { data, error } = await supabase
-            .from('interview_sessions')
-            .select(`
-                *,
-                profiles:profile_id (
-                    id,
-                    name,
-                    summary,
-                    experience_level,
-                    experience_level_description,
-                    industry_experience,
-                    last_analyzed
-                )
-            `)
-            .eq('profile_id', profileId)
-            .order('created_at', { ascending: false })
-        
-        if (error) {
-            throw error
-        }
-        
-        return data as InterviewSession[]
-    } catch (error) {
-        console.error('Error fetching profile interview sessions:', error)
-        return []
     }
 }
