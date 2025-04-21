@@ -282,7 +282,7 @@ export function InterviewSessionsTable({
                               className="h-8 gap-1"
                               asChild
                             >
-                              <Link href={`/dashboard/practice-interview/session/${session.id}`}>
+                              <Link href={`/dashboard/practice-interview/${session.id}`}>
                                 <Mic className="h-3.5 w-3.5" />
                                 <span>Start</span>
                               </Link>
@@ -296,7 +296,7 @@ export function InterviewSessionsTable({
                               className="h-8 gap-1"
                               asChild
                             >
-                              <Link href={`/dashboard/practice-interview/session/${session.id}`}>
+                              <Link href={`/dashboard/practice-interview/${session.id}`}>
                                 <Mic className="h-3.5 w-3.5" />
                                 <span>Restart</span>
                               </Link>
@@ -311,7 +311,7 @@ export function InterviewSessionsTable({
                                 className="h-8 gap-1"
                                 asChild
                               >
-                                <Link href={`/dashboard/practice-interview/session/${session.id}`}>
+                                <Link href={`/dashboard/practice-interview/${session.id}`}>
                                   <FileText className="h-3.5 w-3.5" />
                                   <span>View</span>
                                 </Link>
