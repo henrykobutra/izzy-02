@@ -22,4 +22,5 @@ export type ProfileAnalysis = {
     industries: string[];
     is_resume: boolean;
     experience_level: "junior" | "mid" | "senior" | "principal";
+    created_at?: string;
   };
