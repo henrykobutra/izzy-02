@@ -1,7 +1,11 @@
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
+"use client"
 
-import data from "./data.json"
+import { ProfileStatusCard } from "@/components/profile-status-card"
+import { InterviewStrategyCard } from "@/components/interview-strategy-card"
+import { PracticeInterviewCard } from "@/components/practice-interview-card"
+import { FeedbackCard } from "@/components/feedback-card"
+import { DashboardPerformanceMetrics } from "@/components/dashboard-performance-metrics"
+import { InterviewTipCard } from "@/components/interview-tip-card"
 
 export default function DashboardPage() {
   return (
@@ -12,15 +16,20 @@ export default function DashboardPage() {
           Track your progress and prepare for your next interview
         </p>
       </div>
+
+      <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+        <ProfileStatusCard />
+        <InterviewStrategyCard />
+        <PracticeInterviewCard />
+        <FeedbackCard />
+      </div>
+
+      <div className="px-4 lg:px-6">
+        <DashboardPerformanceMetrics />
+      </div>
       
-      <SectionCards />
-      
-      <div>
-        <div className="px-4 lg:px-6 mb-2">
-          <h2 className="text-xl font-semibold tracking-tight">Recent Interviews</h2>
-          <p className="text-muted-foreground">Your latest practice sessions and their results</p>
-        </div>
-        <DataTable data={data} />
+      <div className="px-4 lg:px-6">
+        <InterviewTipCard />
       </div>
     </div>
   )
