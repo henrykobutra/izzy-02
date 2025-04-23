@@ -125,10 +125,10 @@ export default function FeedbackDetailPage({ params }: PageProps) {
           <p className="text-muted-foreground text-sm">
             {error || "There was a problem loading your feedback. Please try again later."}
           </p>
-          <Button asChild>
+          <Button asChild className="cursor-pointer">
             <Link href="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Return to Dashboard
+              Return to Feedback & Evaluation
             </Link>
           </Button>
         </div>
@@ -165,9 +165,9 @@ export default function FeedbackDetailPage({ params }: PageProps) {
         {/* Back button */}
         <div className="mb-6 flex items-center">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-1" aria-label="Back to dashboard">
+            <Button variant="ghost" size="sm" className="gap-1 cursor-pointer" aria-label="Back to Feedback & Evaluation">
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Dashboard</span>
+              <span>Back to Feedback & Evaluation</span>
             </Button>
           </Link>
         </div>
@@ -177,7 +177,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
           <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8 justify-between">
             <div className="space-y-3 md:space-y-4 w-full">
               <div className="flex flex-wrap items-center gap-3 text-sm">
-                <Badge className="px-2 py-1">
+                <Badge variant="outline" className="px-2 py-1 text-muted-foreground">
                   Interview Feedback
                 </Badge>
                 <span className="text-muted-foreground flex items-center gap-1.5">

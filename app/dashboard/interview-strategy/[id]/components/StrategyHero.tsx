@@ -56,7 +56,7 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8 justify-between">
           <div className="space-y-3 md:space-y-4 w-full">
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <Badge className="px-2 py-1">
+              <Badge variant="outline" className="px-2 py-1 text-muted-foreground">
                 {getExperienceLevelDisplay(strategy.job_experience_level)}
               </Badge>
               <span className="text-muted-foreground flex items-center gap-1.5">
