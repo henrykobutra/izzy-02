@@ -412,43 +412,6 @@ export default function InterviewDetailPage({ params }: PageProps) {
             )}
           </CardFooter>
         </Card>
-        {/* Debug button */}
-        <div className="mt-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              console.log("Interview Session Data:", session);
-              try {
-                const call = await startVapiAssistant(session, true);
-                console.log("Vapi Assistant Started:", call);
-
-                // Set up event listeners for debugging
-                const cleanup = setupVapiEventListeners({
-                  onCallStart: () => console.log("Debug: Call started"),
-                  onCallEnd: () => console.log("Debug: Call ended"),
-                  onSpeechStart: () => console.log("Debug: Speech started"),
-                  onSpeechEnd: () => console.log("Debug: Speech ended"),
-                  onVolumeLevel: (vol) => console.log("Debug: Volume level", vol),
-                  onMessage: (msg) => console.log("Debug: Message received", msg),
-                  onError: (err) => console.error("Debug: Error occurred", err)
-                });
-
-                // Store the cleanup function
-                setTimeout(() => {
-                  console.log("Debug: Cleaning up event listeners");
-                  cleanup();
-                }, 30000); // Cleanup after 30 seconds for debug purposes
-              } catch (error) {
-                console.error("Error starting Vapi assistant:", error);
-              }
-            }}
-            className="gap-2"
-          >
-            <AlertCircle className="h-4 w-4" />
-            Debug Vapi Session
-          </Button>
-        </div>
       </div>
     </div>
   )
