@@ -30,4 +30,8 @@ export type FeedbackWithMetadata = InterviewFeedback & {
   session_id: string
   created_at: string
   updated_at: string | null
+  interview_sessions?: {
+    job_title: string | null
+    interview_type: string
+  }
 }

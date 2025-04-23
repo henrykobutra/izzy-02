@@ -21,7 +21,13 @@ export const getAllFeedback = async (
 
         const response = await supabase
             .from('interview_feedback')
-            .select('*')
+            .select(`
+                *,
+                interview_sessions (
+                    job_title,
+                    interview_type
+                )
+            `)
             .eq('user_id', userId)
             .eq('is_removed', false)
             .order('created_at', { ascending: false })

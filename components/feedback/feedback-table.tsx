@@ -36,7 +36,7 @@ type FeedbackTableData = InterviewFeedback & {
   session_id: string; 
   created_at: string;
   interview_sessions?: {
-    position: string;
+    job_title: string | null;
     interview_type: string;
   }
 };
@@ -139,7 +139,7 @@ export function FeedbackTable({
                     <TableCell className="py-3 pl-6">
                       <div className="space-y-1">
                         <div className="font-medium">
-                          {feedback.interview_sessions?.position || "Generic Interview"}
+                          {feedback.interview_sessions?.job_title || "Generic Interview"}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {feedback.created_at && format(new Date(feedback.created_at), 'MMM d, yyyy')}
