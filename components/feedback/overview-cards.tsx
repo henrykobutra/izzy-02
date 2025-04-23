@@ -1,4 +1,4 @@
-import { IconBrain, IconChartBar, IconStar, IconTarget } from "@tabler/icons-react"
+import { IconChartBar, IconStar } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -12,7 +12,7 @@ import {
 
 export function FeedbackOverviewCards() {
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2">
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Average Score</CardDescription>
@@ -55,52 +55,6 @@ export function FeedbackOverviewCards() {
           </div>
           <div className="text-muted-foreground">
             Clear explanations and structured responses
-          </div>
-        </CardFooter>
-      </Card>
-      
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Skills Improved</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            6
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconBrain className="h-3.5 w-3.5 mr-1" />
-              +2 this month
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Consistent growth in technical abilities
-          </div>
-          <div className="text-muted-foreground">
-            Skills showing significant improvement
-          </div>
-        </CardFooter>
-      </Card>
-      
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Focus Areas</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            3
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTarget className="h-3.5 w-3.5 mr-1" />
-              High priority
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Key areas for targeted improvement
-          </div>
-          <div className="text-muted-foreground">
-            System Design, Algorithms, Behavioral
           </div>
         </CardFooter>
       </Card>
