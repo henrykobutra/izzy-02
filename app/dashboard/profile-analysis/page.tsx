@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { toast } from "sonner"
 
 export default function ProfileAnalysisPage() {
   const [resumeContent, setResumeContent] = useState("")
@@ -20,9 +21,9 @@ export default function ProfileAnalysisPage() {
   const [highlightProfileCard, setHighlightProfileCard] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<ProfileAnalysis | null>(null)
-  const { generateProfile } = useGenerateProfile();
+  const { generateProfile, error: generateProfileError } = useGenerateProfile();
   const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
-  
+
   // Control collapsible state based on profile existence
   useEffect(() => {
     // Open by default when no profile exists, close when profile exists
@@ -31,19 +32,28 @@ export default function ProfileAnalysisPage() {
 
   const handleAnalyzeProfile = async () => {
     if (!resumeContent.trim()) return
-    
+
     setIsAnalyzing(true)
     setAnalysisResult(null)
-    
+
     try {
       const result = await generateProfile(resumeContent);
 
-      setAnalysisResult(result);
-      
+      if (!result || generateProfileError) {
+        toast("Failed to generate profile", {
+          description: generateProfileError ? (generateProfileError as string) : "Please try again.",
+        })
+        return
+      }
+
+      setAnalysisResult({ ...result, is_removed: false });
+
       // Close the update panel after successful analysis
       setIsUpdateOpen(false);
     } catch (err) {
-      console.error("Profile analysis error:", err);
+      toast("Failed to generate profile", {
+        description: err instanceof Error ? err.message : "Please try again.",
+      })
     } finally {
       setIsAnalyzing(false)
       window.scrollTo({ top: document.getElementById("analysis-results")?.offsetTop || 0, behavior: "smooth" })
@@ -66,8 +76,8 @@ export default function ProfileAnalysisPage() {
               <div>
                 <CardTitle>Profile Update</CardTitle>
                 <CardDescription className="mt-1.5">
-                  {profileExists 
-                    ? "Update your existing profile with new information" 
+                  {profileExists
+                    ? "Update your existing profile with new information"
                     : "Create your profile by pasting your resume or using our AI assistant"}
                 </CardDescription>
               </div>
@@ -98,15 +108,15 @@ export default function ProfileAnalysisPage() {
                       <FileText className="h-5 w-5 text-primary" />
                       <h3 className="font-medium">Option 1: Paste Your Resume</h3>
                     </div>
-                    <Textarea 
-                      placeholder="Paste your resume text here..." 
+                    <Textarea
+                      placeholder="Paste your resume text here..."
                       className="h-[180px] font-mono text-sm"
                       value={resumeContent}
                       onChange={(e) => setResumeContent(e.target.value)}
                       disabled={isAnalyzing}
                     />
                     <div className="flex justify-end">
-                      <Button 
+                      <Button
                         onClick={handleAnalyzeProfile}
                         disabled={!resumeContent.trim() || isAnalyzing}
                         className={(!resumeContent.trim() || isAnalyzing) ? '' : 'cursor-pointer'}
@@ -144,8 +154,8 @@ export default function ProfileAnalysisPage() {
                         Build your profile through conversation with our AI assistant
                       </p>
                     </div>
-                    <Button 
-                      variant="default" 
+                    <Button
+                      variant="default"
                       className="gap-2 cursor-pointer"
                       disabled={isAnalyzing}
                     >
@@ -156,7 +166,7 @@ export default function ProfileAnalysisPage() {
                 </div>
 
                 <Separator className="my-6" />
-                
+
                 <div className="rounded-lg border bg-slate-50 dark:bg-slate-900/40 p-4">
                   <h3 className="text-sm font-medium mb-3">More Profile Options</h3>
                   <div className="flex flex-wrap gap-3">
@@ -165,7 +175,7 @@ export default function ProfileAnalysisPage() {
                       <span>Upload Resume</span>
                       <Badge variant="outline" className="ml-1 text-xs px-1.5 py-0">Coming Soon</Badge>
                     </div>
-                    
+
                     <div className={`inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed select-none ${isAnalyzing ? 'opacity-40' : 'opacity-60'}`}>
                       <Linkedin className="h-4 w-4 text-muted-foreground" />
                       <span>Sync with LinkedIn</span>
@@ -221,10 +231,10 @@ export default function ProfileAnalysisPage() {
                       Your profile has been successfully analyzed and saved to your account.
                     </p>
                   </div>
-                  
+
                   <div className="p-3 bg-white dark:bg-gray-950">
                     <div className="flex flex-wrap gap-2">
-                      <Button 
+                      <Button
                         variant="outline"
                         size="sm"
                         className="gap-1.5 bg-white dark:bg-gray-950 cursor-pointer"
@@ -233,9 +243,9 @@ export default function ProfileAnalysisPage() {
                         <RefreshCw className="h-3.5 w-3.5" />
                         View Saved Profile
                       </Button>
-                      
+
                       <Link href="/dashboard/interview-strategy">
-                        <Button 
+                        <Button
                           size="sm"
                           className="gap-1.5 bg-blue-500 hover:bg-blue-600 cursor-pointer"
                         >
@@ -243,9 +253,9 @@ export default function ProfileAnalysisPage() {
                           Set Target Position
                         </Button>
                       </Link>
-                      
+
                       <Link href="/dashboard/practice-interview">
-                        <Button 
+                        <Button
                           size="sm"
                           className="gap-1.5 bg-purple-500 hover:bg-purple-600 cursor-pointer"
                         >
@@ -269,7 +279,7 @@ export default function ProfileAnalysisPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Technical Skills Analysis */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -294,7 +304,7 @@ export default function ProfileAnalysisPage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {analysisResult?.skills?.secondary_category_name && (
                         <div className="space-y-3">
                           <h4 className="font-medium text-sm">{analysisResult.skills.secondary_category_name}</h4>
@@ -312,7 +322,7 @@ export default function ProfileAnalysisPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     {analysisResult?.skills?.other && analysisResult.skills.other.length > 0 && (
                       <div className="pt-2">
                         <h4 className="font-medium text-sm mb-2">Other Technical Competencies</h4>
@@ -366,7 +376,7 @@ export default function ProfileAnalysisPage() {
                     setIsUpdateOpen(true);
                     setTimeout(() => setHighlightProfileCard(false), 1500);
                   }}
-                  className="cursor-pointer"
+                    className="cursor-pointer"
                   >
                     Get Started
                   </Button>
@@ -403,7 +413,7 @@ export default function ProfileAnalysisPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Technical Skills Analysis */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -428,7 +438,7 @@ export default function ProfileAnalysisPage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {profile?.skills?.secondary_category_name && (
                         <div className="space-y-3">
                           <h4 className="font-medium text-sm">{profile.skills.secondary_category_name}</h4>
@@ -446,7 +456,7 @@ export default function ProfileAnalysisPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     {profile?.skills?.other && profile.skills.other.length > 0 && (
                       <div className="pt-2">
                         <h4 className="font-medium text-sm mb-2">Other Technical Competencies</h4>
@@ -461,7 +471,7 @@ export default function ProfileAnalysisPage() {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Experience Analysis */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -476,7 +486,7 @@ export default function ProfileAnalysisPage() {
                       </Badge>
                       <p className="text-xs text-muted-foreground">{profile?.experience_level_summary}</p>
                     </div>
-                    
+
                     {profile?.industries && profile.industries.length > 0 && (
                       <div className="space-y-2">
                         <h4 className="font-medium">Industry Experience</h4>
@@ -489,7 +499,7 @@ export default function ProfileAnalysisPage() {
                         </div>
                       </div>
                     )}
-                    
+
                     {profile?.achievements && profile.achievements.length > 0 && (
                       <div className="space-y-2">
                         <h4 className="font-medium">Notable Achievements</h4>
@@ -500,7 +510,7 @@ export default function ProfileAnalysisPage() {
                         </ul>
                       </div>
                     )}
-                    
+
                     {profile?.experience && profile.experience.length > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-medium">Work Experience</h4>
@@ -520,7 +530,7 @@ export default function ProfileAnalysisPage() {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Education & Certifications */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -540,7 +550,7 @@ export default function ProfileAnalysisPage() {
                         </ul>
                       </div>
                     )}
-                    
+
                     {profile?.certifications && profile.certifications.length > 0 && (
                       <div className="space-y-2">
                         <h4 className="font-medium">Certifications</h4>
@@ -553,7 +563,7 @@ export default function ProfileAnalysisPage() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="rounded-lg border overflow-hidden">
                   <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/30 p-4 border-b">
                     <div className="flex items-center gap-2">
@@ -564,7 +574,7 @@ export default function ProfileAnalysisPage() {
                       Your profile analysis is ready. Where would you like to go next?
                     </p>
                   </div>
-                  
+
                   <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Card 1: Set Target Position */}
                     <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-950">
@@ -580,14 +590,14 @@ export default function ProfileAnalysisPage() {
                         </div>
                       </div>
                       <Link href="/dashboard/interview-strategy" className="w-full">
-                        <Button 
+                        <Button
                           className="w-full mt-3 bg-blue-500 hover:bg-blue-600 cursor-pointer"
                         >
                           Continue
                         </Button>
                       </Link>
                     </div>
-                    
+
                     {/* Card 2: Practice Interview */}
                     <div className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-950">
                       <div className="flex items-center gap-3">
@@ -602,7 +612,7 @@ export default function ProfileAnalysisPage() {
                         </div>
                       </div>
                       <Link href="/dashboard/practice-interview" className="w-full">
-                        <Button 
+                        <Button
                           className="w-full mt-3 bg-purple-500 hover:bg-purple-600 cursor-pointer"
                         >
                           Start Practice

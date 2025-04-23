@@ -75,6 +75,7 @@ export type Database = {
           interview_question_amount: number
           interview_strategy_id: string | null
           interview_type: Database["public"]["Enums"]["interview_type"]
+          is_removed: boolean
           job_title: string | null
           profile_id: string
           session_end: string | null
@@ -93,6 +94,7 @@ export type Database = {
           interview_question_amount?: number
           interview_strategy_id?: string | null
           interview_type: Database["public"]["Enums"]["interview_type"]
+          is_removed?: boolean
           job_title?: string | null
           profile_id: string
           session_end?: string | null
@@ -111,6 +113,7 @@ export type Database = {
           interview_question_amount?: number
           interview_strategy_id?: string | null
           interview_type?: Database["public"]["Enums"]["interview_type"]
+          is_removed?: boolean
           job_title?: string | null
           profile_id?: string
           session_end?: string | null
@@ -148,6 +151,7 @@ export type Database = {
           id: string
           interview_strategy: Json
           is_job_description: boolean
+          is_removed: boolean
           job_company: string
           job_description: string
           job_description_key_points: Json
@@ -171,6 +175,7 @@ export type Database = {
           id?: string
           interview_strategy: Json
           is_job_description: boolean
+          is_removed?: boolean
           job_company: string
           job_description: string
           job_description_key_points: Json
@@ -194,6 +199,7 @@ export type Database = {
           id?: string
           interview_strategy?: Json
           is_job_description?: boolean
+          is_removed?: boolean
           job_company?: string
           job_description?: string
           job_description_key_points?: Json
@@ -231,6 +237,7 @@ export type Database = {
           experience_level_summary: string
           id: string
           industries: Json
+          is_removed: boolean
           is_resume: boolean
           professional_summary: string
           skills: Json
@@ -247,6 +254,7 @@ export type Database = {
           experience_level_summary: string
           id?: string
           industries: Json
+          is_removed?: boolean
           is_resume: boolean
           professional_summary: string
           skills: Json
@@ -263,6 +271,7 @@ export type Database = {
           experience_level_summary?: string
           id?: string
           industries?: Json
+          is_removed?: boolean
           is_resume?: boolean
           professional_summary?: string
           skills?: Json
