@@ -6,34 +6,24 @@ import { ReadyForFeedbackTable } from "@/components/feedback/ready-for-feedback-
 import { FeedbackMetrics } from "@/components/feedback/metrics";
 import { useUser } from "@/hooks/users/useUser";
 import { useFeedback } from "@/hooks/feedback/useFeedback";
-import { Button } from "@/components/ui/button";
+
 import { RefreshCw, FileText, CheckCircle, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 
 export default function FeedbackPage() {
-  const router = useRouter();
+
   const { userId } = useUser();
   const {
     feedbackData,
     isLoading,
     hasFeedback,
-    fetchFeedback,
     improvementAreas,
     sessionsReadyForFeedback,
-    loadingReadySessions,
-    fetchReadyForFeedback
+    loadingReadySessions
   } = useFeedback(userId);
 
-  const handleRefresh = () => {
-    if (userId) {
-      fetchFeedback(userId);
-      fetchReadyForFeedback(userId);
-    }
-  };
-
-  const handleProvideFeedback = (sessionId: string) => {
-    router.push(`/dashboard/feedback/${sessionId}/create`);
+  const handleGenerateFeedback = (sessionId: string) => {
+    console.log("handleGenerateFeedback", sessionId);
   };
 
   return (
@@ -69,7 +59,7 @@ export default function FeedbackPage() {
             ) : (
               <ReadyForFeedbackTable
                 data={sessionsReadyForFeedback}
-                onProvideFeedback={handleProvideFeedback}
+                onProvideFeedback={handleGenerateFeedback}
               />
             )}
           </div>
