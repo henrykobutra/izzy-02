@@ -116,3 +116,24 @@ export const profileAnalysisLoadingStates = [
   { text: "Polishing career analysis results..." },
   { text: "Completing professional evaluation report..." }
 ];
+
+/**
+ * Loading states for the feedback score generation process
+ */
+export const feedbackGenerationLoadingStates = [
+  { text: "Initializing feedback engine..." },
+  { text: "Loading interview transcript..." },
+  { text: "Processing interviewer and candidate dialogue..." },
+  { text: "Analyzing communication patterns..." },
+  { text: "Evaluating technical knowledge demonstration..." },
+  { text: "Assessing problem-solving approach..." },
+  { text: "Measuring critical thinking skills..." },
+  { text: "Identifying strength areas..." },
+  { text: "Detecting improvement opportunities..." },
+  { text: "Calculating skill-specific scores..." },
+  { text: "Determining overall performance rating..." },
+  { text: "Formulating actionable feedback..." },
+  { text: "Preparing improvement recommendations..." },
+  { text: "Generating comprehensive assessment..." },
+  { text: "Finalizing interview feedback report..." }
+];

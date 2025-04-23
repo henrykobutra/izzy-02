@@ -82,7 +82,22 @@ For the skills breakdown, you MUST include assessments for these specific skills
 - Communication
 - Critical Thinking
 
-You may include additional skills in your assessment as appropriate for the position.
+You may also include any of these additional skills in your assessment as appropriate for the position:
+- Leadership
+- Adaptability
+- Teamwork
+- Domain Expertise
+- Time Management
+- Attention to Detail
+
+All scores should be on a scale of 0-100, where:
+- 0-20: Poor performance
+- 21-40: Below average performance
+- 41-60: Average performance
+- 61-80: Above average performance
+- 81-100: Excellent performance
+
+Important: When assigning scores, avoid scores that end in 0 or 5 (e.g., avoid 70, 75, 80, etc.). Instead, provide more precise scores (e.g., 72, 83, 94, etc.) to reflect nuanced assessment.
 
 Provide a fair and balanced assessment with actionable feedback. Your analysis should be:
 - Specific and evidence-based (citing examples from the transcript)

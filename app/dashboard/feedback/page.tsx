@@ -9,6 +9,8 @@ import { useUser } from "@/hooks/users/useUser";
 import { useFeedback } from "@/hooks/feedback/useFeedback";
 import { generateAndSaveFeedback } from "@/services/feedback/generateAndSaveFeedback";
 import { useRouter } from "next/navigation";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { feedbackGenerationLoadingStates } from "@/constants/loadingStates";
 
 import { RefreshCw, FileText, CheckCircle, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,11 +37,7 @@ export default function FeedbackPage() {
 
     try {
       setGeneratingFeedback(sessionId);
-      toast.loading("Generating feedback...", {
-        description: "Please wait while AI analyzes your interview",
-        duration: 5000,
-      });
-
+      
       // Generate feedback and save to database
       const feedbackId = await generateAndSaveFeedback(sessionId, userId);
 
@@ -66,6 +64,14 @@ export default function FeedbackPage() {
 
   return (
     <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
+      {/* Multi-Step Loader for feedback generation */}
+      <MultiStepLoader 
+        loadingStates={feedbackGenerationLoadingStates}
+        loading={!!generatingFeedback}
+        duration={1800} 
+        loop={false}
+      />
+
       <div className="px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight mb-2">Interview Feedback & Evaluation</h1>
         <p className="text-muted-foreground">
