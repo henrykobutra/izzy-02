@@ -9,6 +9,7 @@ interface UseUserResult {
   fullName: string
   email: string
   avatar: string
+  userId: string
   isLoading: boolean
   error: Error | null
   refetch: () => Promise<void>
@@ -23,6 +24,7 @@ export function useUser(): UseUserResult {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [avatar, setAvatar] = useState("")
+  const [userId, setUserId] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -38,12 +40,14 @@ export function useUser(): UseUserResult {
         setFullName(user.name)
         setEmail(user.email)
         setAvatar(user.avatar)
+        setUserId(user.id || "")
       } else {
         // Reset values if no user
         setFirstName("")
         setFullName("")
         setEmail("")
         setAvatar("")
+        setUserId("")
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to fetch user data"))
@@ -61,6 +65,7 @@ export function useUser(): UseUserResult {
     fullName,
     email,
     avatar,
+    userId,
     isLoading,
     error,
     refetch: fetchUserData

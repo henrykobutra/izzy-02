@@ -1,6 +1,3 @@
--- Enable the UUID extension for generating UUIDs
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Create the interview_feedback table
 CREATE TABLE interview_feedback (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,21 +26,6 @@ CREATE TABLE interview_feedback (
 CREATE INDEX idx_interview_feedback_user_id ON interview_feedback (user_id);
 CREATE INDEX idx_interview_feedback_session_id ON interview_feedback (session_id);
 CREATE INDEX idx_interview_feedback_created_at ON interview_feedback (created_at);
-
--- Create a function to update the updated_at timestamp
-CREATE OR REPLACE FUNCTION update_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Create a trigger to call the update_timestamp function
-CREATE TRIGGER update_interview_feedback_timestamp
-    BEFORE UPDATE ON interview_feedback
-    FOR EACH ROW
-    EXECUTE FUNCTION update_timestamp();
 
 -- Enable Row-Level Security (RLS) on the interview_feedback table
 ALTER TABLE interview_feedback ENABLE ROW LEVEL SECURITY;
