@@ -1,81 +1,29 @@
 "use client"
 
-import { useEffect, useState } from "react";
 import { FeedbackOverviewCards } from "@/components/feedback/overview-cards";
 import { FeedbackTable } from "@/components/feedback/feedback-table";
 import { FeedbackMetrics } from "@/components/feedback/metrics";
 import { useUser } from "@/hooks/users/useUser";
-import { createClient } from "@/utils/supabase/client";
+import { useFeedback } from "@/hooks/feedback/useFeedback";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { InterviewFeedback } from "@/types/interview-feedback";
 
 export default function FeedbackPage() {
   const { userId } = useUser();
-  const [isLoading, setIsLoading] = useState(true);
-  const [feedbackData, setFeedbackData] = useState<Array<InterviewFeedback & { id: string; session_id: string; created_at: string }>>([]);
-  const [hasFeedback, setHasFeedback] = useState(false);
+  const { 
+    feedbackData, 
+    isLoading, 
+    hasFeedback, 
+    fetchFeedback, 
+    improvementAreas 
+  } = useFeedback(userId);
 
-  const fetchFeedback = async () => {
-    if (!userId) return;
-    
-    setIsLoading(true);
-    try {
-      const supabase = createClient();
-      
-      // Fetch all feedback for the current user
-      const { data, error } = await supabase
-        .from('interview_feedback')
-        .select(`
-          id, 
-          session_id,
-          overall_score, 
-          skills_breakdown, 
-          strengths, 
-          weaknesses, 
-          areas_for_improvement, 
-          feedback_summary,
-          confidence_score,
-          created_at,
-          interview_sessions(position, interview_type)
-        `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching feedback:", error);
-        return;
-      }
-      
-      if (data && data.length > 0) {
-        setFeedbackData(data);
-        setHasFeedback(true);
-      } else {
-        setHasFeedback(false);
-      }
-    } catch (err) {
-      console.error("Failed to fetch feedback:", err);
-    } finally {
-      setIsLoading(false);
+  const handleRefresh = () => {
+    if (userId) {
+      fetchFeedback(userId);
     }
   };
-
-  // Get improvement areas from all feedback
-  const improvementAreas = feedbackData
-    .flatMap(feedback => feedback.areas_for_improvement || [])
-    .slice(0, 3)
-    .map(area => ({
-      skill: area.topic,
-      score: Math.round(Math.random() * 20) + 60, // Generate a score between 60-80 for visualization
-      action: area.description
-    }));
-
-  useEffect(() => {
-    if (userId) {
-      fetchFeedback();
-    }
-  }, [userId]);
 
   return (
     <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
@@ -136,7 +84,7 @@ export default function FeedbackPage() {
               <CardDescription>Detailed feedback from your interview sessions</CardDescription>
             </div>
             <Button
-              onClick={fetchFeedback}
+              onClick={handleRefresh}
               size="sm"
               variant="outline"
               className="gap-1.5 cursor-pointer"
