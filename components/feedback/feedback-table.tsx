@@ -149,7 +149,7 @@ export function FeedbackTable({
                   <TableHead className="w-[25%] py-3 font-medium pl-6">Job Position</TableHead>
                   <TableHead className="w-[15%] py-3 font-medium">Interview Type</TableHead>
                   <TableHead className="w-[20%] py-3 font-medium">Performance</TableHead>
-                  <TableHead className="w-[15%] py-3 font-medium">Completed</TableHead>
+                  <TableHead className="w-[15%] py-3 font-medium">Evaluated</TableHead>
                   <TableHead className="py-3 text-right font-medium pr-6">Manage</TableHead>
                 </TableRow>
               </TableHeader>
@@ -210,7 +210,7 @@ export function FeedbackTable({
                     </TableCell>
                     <TableCell className="py-4 align-middle">
                       <div className="flex flex-col w-full">
-                        <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex flex-col mb-1.5">
                           <span className="text-sm font-medium">{getScoreLabel(feedback.overall_score)}</span>
                           <span className="text-xs text-muted-foreground">{Math.round(feedback.overall_score)}/100</span>
                         </div>
