@@ -2,27 +2,38 @@
 
 import { FeedbackOverviewCards } from "@/components/feedback/overview-cards";
 import { FeedbackTable } from "@/components/feedback/feedback-table";
+import { ReadyForFeedbackTable } from "@/components/feedback/ready-for-feedback-table";
 import { FeedbackMetrics } from "@/components/feedback/metrics";
 import { useUser } from "@/hooks/users/useUser";
 import { useFeedback } from "@/hooks/feedback/useFeedback";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, FileText } from "lucide-react";
+import { RefreshCw, FileText, CheckCircle, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 export default function FeedbackPage() {
+  const router = useRouter();
   const { userId } = useUser();
-  const { 
-    feedbackData, 
-    isLoading, 
-    hasFeedback, 
-    fetchFeedback, 
-    improvementAreas 
+  const {
+    feedbackData,
+    isLoading,
+    hasFeedback,
+    fetchFeedback,
+    improvementAreas,
+    sessionsReadyForFeedback,
+    loadingReadySessions,
+    fetchReadyForFeedback
   } = useFeedback(userId);
 
   const handleRefresh = () => {
     if (userId) {
       fetchFeedback(userId);
+      fetchReadyForFeedback(userId);
     }
+  };
+
+  const handleProvideFeedback = (sessionId: string) => {
+    router.push(`/dashboard/feedback/${sessionId}/create`);
   };
 
   return (
@@ -33,9 +44,42 @@ export default function FeedbackPage() {
           Review detailed feedback and track your progress
         </p>
       </div>
-      
+
+      {sessionsReadyForFeedback.length > 0 && (
+        <Card className="mx-4 lg:mx-6 border border-green-200 dark:border-green-800">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full">
+                  <span className="absolute inset-0 rounded-full animate-ping bg-green-400 opacity-75"></span>
+                </div>
+                <Sparkles className="h-5 w-5 text-green-500" />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-medium">AI Feedback Available</CardTitle>
+                <CardDescription>Completed interviews ready for AI-generated feedback</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <div>
+            {loadingReadySessions ? (
+              <div className="py-8 flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <ReadyForFeedbackTable
+                data={sessionsReadyForFeedback}
+                onProvideFeedback={handleProvideFeedback}
+              />
+            )}
+          </div>
+        </Card>
+      )}
+
       <FeedbackOverviewCards />
-      
+
+
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 lg:px-6">
         <div className="md:col-span-2">
           <div className="mb-3">
@@ -44,7 +88,7 @@ export default function FeedbackPage() {
           </div>
           <FeedbackMetrics />
         </div>
-        
+
         <div className="bg-card rounded-lg p-4 shadow">
           <div className="mb-3">
             <h2 className="text-lg font-semibold">Improvement Areas</h2>
@@ -59,8 +103,8 @@ export default function FeedbackPage() {
                     <span className="text-sm text-muted-foreground">{area.score}%</span>
                   </div>
                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full bg-primary" 
+                    <div
+                      className="h-full rounded-full bg-primary"
                       style={{ width: `${area.score}%` }}
                     />
                   </div>
@@ -83,15 +127,6 @@ export default function FeedbackPage() {
               <CardTitle className="text-lg font-medium">Feedback History</CardTitle>
               <CardDescription>Detailed feedback from your interview sessions</CardDescription>
             </div>
-            <Button
-              onClick={handleRefresh}
-              size="sm"
-              variant="outline"
-              className="gap-1.5 cursor-pointer"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>Refresh</span>
-            </Button>
           </div>
         </CardHeader>
         <div>

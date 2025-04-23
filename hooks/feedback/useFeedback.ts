@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getAllFeedback } from "@/services/database/feedback/getAllFeedback"
+import { fetchAllFeedback as fetchAllFeedbackAction, fetchReadyForFeedback as fetchReadyForFeedbackAction } from "@/services/feedback/actions"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
+import type { InterviewSession } from "@/types/interview-session"
 
 interface UseFeedbackReturn {
   feedbackData: FeedbackWithMetadata[]
@@ -14,19 +15,24 @@ interface UseFeedbackReturn {
     score: number
     action: string
   }>
+  sessionsReadyForFeedback: InterviewSession[]
+  loadingReadySessions: boolean
+  fetchReadyForFeedback: (userId: string) => Promise<void>
 }
 
 export function useFeedback(initialUserId?: string): UseFeedbackReturn {
   const [feedbackData, setFeedbackData] = useState<FeedbackWithMetadata[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasFeedback, setHasFeedback] = useState(false)
+  const [sessionsReadyForFeedback, setSessionsReadyForFeedback] = useState<InterviewSession[]>([])
+  const [loadingReadySessions, setLoadingReadySessions] = useState(false)
 
   const fetchFeedback = async (userId: string) => {
     if (!userId) return
     
     setIsLoading(true)
     try {
-      const data = await getAllFeedback(userId)
+      const data = await fetchAllFeedbackAction(userId)
       
       if (data && data.length > 0) {
         setFeedbackData(data)
@@ -38,6 +44,20 @@ export function useFeedback(initialUserId?: string): UseFeedbackReturn {
       console.error("Failed to fetch feedback:", err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchReadyForFeedback = async (userId: string) => {
+    if (!userId) return
+    
+    setLoadingReadySessions(true)
+    try {
+      const data = await fetchReadyForFeedbackAction(userId)
+      setSessionsReadyForFeedback(data)
+    } catch (err) {
+      console.error("Failed to fetch sessions ready for feedback:", err)
+    } finally {
+      setLoadingReadySessions(false)
     }
   }
 
@@ -54,6 +74,7 @@ export function useFeedback(initialUserId?: string): UseFeedbackReturn {
   useEffect(() => {
     if (initialUserId) {
       fetchFeedback(initialUserId)
+      fetchReadyForFeedback(initialUserId)
     }
   }, [initialUserId])
 
@@ -62,6 +83,9 @@ export function useFeedback(initialUserId?: string): UseFeedbackReturn {
     isLoading,
     hasFeedback,
     fetchFeedback,
-    improvementAreas
+    improvementAreas,
+    sessionsReadyForFeedback,
+    loadingReadySessions,
+    fetchReadyForFeedback
   }
 }
