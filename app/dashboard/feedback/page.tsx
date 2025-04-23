@@ -1,23 +1,82 @@
+"use client"
+
+import { useEffect, useState } from "react";
 import { FeedbackOverviewCards } from "@/components/feedback/overview-cards";
 import { FeedbackTable } from "@/components/feedback/feedback-table";
 import { FeedbackMetrics } from "@/components/feedback/metrics";
-
-import feedbackDataRaw from "./data.json";
-
-// Use 'unknown' to break the typing chain, then cast to a compatible format
-// This satisfies TypeScript while allowing potential runtime differences
-const feedbackData = (feedbackDataRaw as unknown) as Array<{
-  id: number;
-  interviewTitle: string;
-  type: string;
-  date: string;
-  overallScore: number;
-  strengths: string[];
-  improvements: string[];
-  metrics: Record<string, number>;
-}>;
+import { useUser } from "@/hooks/users/useUser";
+import { createClient } from "@/utils/supabase/client";
+import { Button } from "@/components/ui/button";
+import { RefreshCw, FileText } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { InterviewFeedback } from "@/types/interview-feedback";
 
 export default function FeedbackPage() {
+  const { userId } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
+  const [feedbackData, setFeedbackData] = useState<Array<InterviewFeedback & { id: string; session_id: string; created_at: string }>>([]);
+  const [hasFeedback, setHasFeedback] = useState(false);
+
+  const fetchFeedback = async () => {
+    if (!userId) return;
+    
+    setIsLoading(true);
+    try {
+      const supabase = createClient();
+      
+      // Fetch all feedback for the current user
+      const { data, error } = await supabase
+        .from('interview_feedback')
+        .select(`
+          id, 
+          session_id,
+          overall_score, 
+          skills_breakdown, 
+          strengths, 
+          weaknesses, 
+          areas_for_improvement, 
+          feedback_summary,
+          confidence_score,
+          created_at,
+          interview_sessions(position, interview_type)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching feedback:", error);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        setFeedbackData(data);
+        setHasFeedback(true);
+      } else {
+        setHasFeedback(false);
+      }
+    } catch (err) {
+      console.error("Failed to fetch feedback:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Get improvement areas from all feedback
+  const improvementAreas = feedbackData
+    .flatMap(feedback => feedback.areas_for_improvement || [])
+    .slice(0, 3)
+    .map(area => ({
+      skill: area.topic,
+      score: Math.round(Math.random() * 20) + 60, // Generate a score between 60-80 for visualization
+      action: area.description
+    }));
+
+  useEffect(() => {
+    if (userId) {
+      fetchFeedback();
+    }
+  }, [userId]);
+
   return (
     <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
       <div className="px-4 lg:px-6">
@@ -43,37 +102,76 @@ export default function FeedbackPage() {
             <h2 className="text-lg font-semibold">Improvement Areas</h2>
             <p className="text-sm text-muted-foreground">Focus on these skills</p>
           </div>
-          <div className="space-y-4">
-            {[
-              { skill: "System Design", score: 65, action: "Practice architecture diagrams" },
-              { skill: "Algorithm Efficiency", score: 72, action: "Review Big O notation" },
-              { skill: "Behavioral Scenarios", score: 78, action: "Prepare more STAR examples" }
-            ].map((area, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-sm">{area.skill}</span>
-                  <span className="text-sm text-muted-foreground">{area.score}%</span>
+          {improvementAreas.length > 0 ? (
+            <div className="space-y-4">
+              {improvementAreas.map((area, i) => (
+                <div key={i} className="flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-sm">{area.skill}</span>
+                    <span className="text-sm text-muted-foreground">{area.score}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full rounded-full bg-primary" 
+                      style={{ width: `${area.score}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">{area.action}</p>
                 </div>
-                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full rounded-full bg-primary" 
-                    style={{ width: `${area.score}%` }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">{area.action}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground py-4 text-center">
+              No improvement areas found. Complete interviews to get recommendations.
+            </div>
+          )}
         </div>
       </div>
 
-      <div>
-        <div className="px-4 lg:px-6 mb-2">
-          <h2 className="text-lg font-semibold">Interview History</h2>
-          <p className="text-sm text-muted-foreground">Feedback from practice sessions</p>
+      <Card className="mx-4 lg:mx-6">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-medium">Feedback History</CardTitle>
+              <CardDescription>Detailed feedback from your interview sessions</CardDescription>
+            </div>
+            <Button
+              onClick={fetchFeedback}
+              size="sm"
+              variant="outline"
+              className="gap-1.5 cursor-pointer"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span>Refresh</span>
+            </Button>
+          </div>
+        </CardHeader>
+        <div>
+          {isLoading ? (
+            <div className="py-8 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              <h3 className="text-lg font-medium">Loading feedback...</h3>
+              <p className="text-muted-foreground mt-1">Please wait while we retrieve your interview feedback</p>
+            </div>
+          ) : !hasFeedback ? (
+            <CardContent className="py-6">
+              <div className="flex flex-col items-center justify-center text-center space-y-4">
+                <div className="rounded-full bg-primary/10 p-6">
+                  <FileText className="h-10 w-10 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-lg">No Feedback Yet</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    Complete practice interviews to receive detailed feedback on your performance.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          ) : (
+            <FeedbackTable data={feedbackData} />
+          )}
         </div>
-        <FeedbackTable data={feedbackData} />
-      </div>
+      </Card>
     </div>
   );
 }

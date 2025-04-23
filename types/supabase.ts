@@ -9,6 +9,62 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      interview_feedback: {
+        Row: {
+          areas_for_improvement: Json
+          confidence_score: number
+          created_at: string | null
+          feedback_summary: string
+          id: string
+          is_removed: boolean
+          overall_score: number
+          session_id: string
+          skills_breakdown: Json
+          strengths: Json
+          updated_at: string | null
+          user_id: string
+          weaknesses: Json
+        }
+        Insert: {
+          areas_for_improvement: Json
+          confidence_score: number
+          created_at?: string | null
+          feedback_summary: string
+          id?: string
+          is_removed?: boolean
+          overall_score: number
+          session_id: string
+          skills_breakdown: Json
+          strengths: Json
+          updated_at?: string | null
+          user_id: string
+          weaknesses: Json
+        }
+        Update: {
+          areas_for_improvement?: Json
+          confidence_score?: number
+          created_at?: string | null
+          feedback_summary?: string
+          id?: string
+          is_removed?: boolean
+          overall_score?: number
+          session_id?: string
+          skills_breakdown?: Json
+          strengths?: Json
+          updated_at?: string | null
+          user_id?: string
+          weaknesses?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_session_id"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "interview_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       interview_preferences: {
         Row: {
           created_at: string | null

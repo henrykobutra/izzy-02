@@ -19,4 +19,15 @@ export interface InterviewFeedback {
   }>
   feedback_summary: string
   confidence_score: number
+  id?: string
+  session_id?: string
+  is_removed?: boolean
+  user_id?: string
+}
+
+export type FeedbackWithMetadata = InterviewFeedback & {
+  id: string
+  session_id: string
+  created_at: string
+  updated_at: string | null
 }
