@@ -437,13 +437,23 @@ export default function InterviewDetailPage({ params }: PageProps) {
           {/* Action buttons */}
           <CardFooter className="flex justify-center border-t pt-6">
             {interviewState === "before_start" && session.status !== "completed" && (
-              <Button
-                className="mt-6 gap-2"
-                onClick={handleStartInterview}
-              >
-                <Play className="h-4 w-4" />
-                Start Interview
-              </Button>
+              <div className="mt-6 flex gap-3">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.location.href = "/dashboard/practice-interview"}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Go back to interviews
+                </Button>
+                <Button
+                  className="gap-2"
+                  onClick={handleStartInterview}
+                >
+                  <Play className="h-4 w-4" />
+                  Start Interview
+                </Button>
+              </div>
             )}
 
             {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
