@@ -32,28 +32,28 @@ export default function FeedbackPage() {
 
   const handleGenerateFeedback = async (sessionId: string) => {
     if (!userId) return;
-    
+
     try {
       setGeneratingFeedback(sessionId);
       toast.loading("Generating feedback...", {
         description: "Please wait while AI analyzes your interview",
         duration: 5000,
       });
-      
+
       // Generate feedback and save to database
       const feedbackId = await generateAndSaveFeedback(sessionId, userId);
-      
+
       // Refresh data
       await fetchFeedback(userId);
       await fetchReadyForFeedback(userId);
-      
+
       toast.success("Feedback generated successfully!", {
         description: "Your interview feedback is ready to view",
       });
-      
+
       // Navigate to the feedback detail page
       router.push(`/dashboard/feedback/${feedbackId}`);
-      
+
     } catch (error) {
       console.error("Error generating feedback:", error);
       toast.error("Error generating feedback", {
@@ -179,7 +179,12 @@ export default function FeedbackPage() {
               </div>
             </CardContent>
           ) : (
-            <FeedbackTable data={feedbackData} />
+            <FeedbackTable
+              data={feedbackData}
+              loading={isLoading}
+              hasFeedback={hasFeedback}
+              refetchFeedback={() => fetchFeedback(userId)}
+            />
           )}
         </div>
       </Card>
