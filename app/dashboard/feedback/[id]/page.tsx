@@ -6,14 +6,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, AlertCircle, Award, Briefcase, BarChart, Clock, Target } from "lucide-react"
+import { 
+  ArrowLeft, 
+  Loader2,
+  AlertCircle
+} from "lucide-react"
 import Link from "next/link"
-import { Loader2 } from "lucide-react"
 import { getFeedback } from "@/services/database/feedback/getFeedback"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 import { getScoreColor, getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score-utils"
+import { getSkillIconComponent, feedbackIcons, itemIndicatorIcons, metadataIcons } from "@/utils/icons"
 
 /**
  * Formats a date into a readable string
@@ -126,12 +130,12 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                   Interview Feedback
                 </Badge>
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Clock className="h-4 w-4" />
+                  <metadataIcons.date className="h-4 w-4" />
                   {formattedDate}
                 </span>
                 {feedback.interview_sessions?.job_title && (
                   <span className="text-muted-foreground flex items-center gap-1.5">
-                    <Briefcase className="h-4 w-4" />
+                    <metadataIcons.jobTitle className="h-4 w-4" />
                     {feedback.interview_sessions.job_title}
                   </span>
                 )}
@@ -141,7 +145,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 <h1 className="text-3xl font-bold tracking-tight mb-2">Interview Performance</h1>
                 {feedback.interview_sessions?.job_title && (
                   <p className="text-lg font-medium flex items-center gap-2 mb-4">
-                    <Briefcase className="h-5 w-5" aria-hidden="true" />
+                    <metadataIcons.interviewType className="h-5 w-5" aria-hidden="true" />
                     {feedback.interview_sessions.interview_type} Interview
                   </p>
                 )}
@@ -192,7 +196,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                     </svg>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-muted-foreground" />
+                    <metadataIcons.performance className="h-5 w-5 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground font-medium">
                       {getScoreLabel(feedback.overall_score)}
                     </span>
@@ -204,56 +208,63 @@ export default function FeedbackDetailPage({ params }: PageProps) {
         </div>
         
         {/* Skills Breakdown */}
-        <Card className="mb-8">
-          <CardHeader className="pb-3">
-            <CardTitle>Skills Assessment</CardTitle>
-            <CardDescription>Breakdown of your performance by skill category</CardDescription>
+        <Card className="mt-8">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <feedbackIcons.skillsAssessment className="h-5 w-5 text-primary" />
+              <CardTitle>Skills Assessment</CardTitle>
+            </div>
+            <CardDescription>
+              Detailed breakdown of performance across key interview skills
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {feedback.skills_breakdown.map((skill, index) => (
-                <Collapsible key={index} className="w-full border rounded-lg p-4">
-                  <div className="flex justify-between items-center">
+            <div className="space-y-5">
+              {feedback.skills_breakdown?.map((skill) => (
+                <Collapsible key={skill.skill} className="border rounded-md px-4 py-3.5 hover:bg-muted/20 transition-colors">
+                  <CollapsibleTrigger className="flex justify-between items-center w-full group">
+                    <div className="flex items-center gap-2.5">
+                      {(() => {
+                        const SkillIcon = getSkillIconComponent(skill.skill);
+                        return <SkillIcon className="h-5 w-5 text-primary/80" />;
+                      })()}
+                      <span className="font-medium">{skill.skill}</span>
+                    </div>
                     <div className="flex items-center gap-3">
-                      <BarChart className="h-5 w-5" style={{ color: getScoreBarColor(skill.score) }} />
-                      <div>
-                        <p className="font-medium">{skill.skill}</p>
-                        <div className="flex items-center mt-1">
-                          <Progress 
-                            value={skill.score} 
-                            className="h-2 w-48"
-                            style={{ 
-                              "--progress-background": getScoreBarColor(skill.score)
-                            } as React.CSSProperties}
-                          />
-                          <span className="ml-3 text-sm text-muted-foreground">
-                            {skill.score}/100 • {getScoreLabel(skill.score)}
-                          </span>
-                        </div>
+                      <span 
+                        className={cn(
+                          "font-mono font-medium text-sm px-1.5 py-0.5 rounded", 
+                          skill.score >= 80 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
+                          skill.score >= 60 ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" :
+                          skill.score >= 40 ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" :
+                          "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                        )}
+                      >
+                        {skill.score}%
+                      </span>
+                      <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors pr-1">
+                        Read more
+                      </span>
+                      <div className="text-muted-foreground group-hover:text-foreground transition-colors">
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180">
+                          <path d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                        </svg>
                       </div>
                     </div>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <span className="sr-only">Toggle</span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </Button>
-                    </CollapsibleTrigger>
+                  </CollapsibleTrigger>
+                  <div className="pt-3 pb-1">
+                    <div className="overflow-hidden rounded-full bg-secondary h-2.5">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${skill.score}%`,
+                          backgroundColor: getScoreBarColor(skill.score),
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                  <CollapsibleContent className="mt-4">
-                    <div className="text-sm text-muted-foreground">{skill.feedback}</div>
+                  <CollapsibleContent className="pt-2 text-sm text-muted-foreground">
+                    <p className="pb-1.5">{skill.feedback}</p>
                   </CollapsibleContent>
                 </Collapsible>
               ))}
@@ -261,45 +272,82 @@ export default function FeedbackDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
 
-        {/* Improvement Suggestions */}
-        <Card className="mb-8">
-          <CardHeader className="pb-3">
-            <CardTitle>Areas to Improve</CardTitle>
-            <CardDescription>Points to focus on for improvement</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {feedback.areas_for_improvement.map((area, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
-                  <div className="mt-0.5">
-                    <AlertCircle className="h-5 w-5 text-amber-500" />
+        {/* Strengths and weaknesses */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          {/* Strengths */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <feedbackIcons.strengths className="h-5 w-5 text-green-500" />
+                <CardTitle>Strengths</CardTitle>
+              </div>
+              <CardDescription>
+                Key areas where you demonstrated strong performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="space-y-4">
+                {feedback.strengths?.map((strength, index) => (
+                  <div key={index} className="pb-3 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <itemIndicatorIcons.strength className="h-4 w-4 text-primary" />
+                      <h4 className="font-medium">{strength.trait}</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground pl-6">{strength.description}</p>
                   </div>
-                  <div>
-                    <h4 className="font-medium">{area.topic}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{area.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Strengths */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle>Key Strengths</CardTitle>
-            <CardDescription>Areas where you performed well</CardDescription>
+          {/* Weaknesses */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <feedbackIcons.areasToImprove className="h-5 w-5 text-amber-500" />
+                <CardTitle>Areas to Improve</CardTitle>
+              </div>
+              <CardDescription>
+                Opportunities for growth in your interview performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <div className="space-y-4">
+                {feedback.weaknesses?.map((weakness, index) => (
+                  <div key={index} className="pb-3 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <itemIndicatorIcons.weakness className="h-4 w-4 text-amber-500" />
+                      <h4 className="font-medium">{weakness.trait}</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground pl-6">{weakness.description}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Improvement action items */}
+        <Card className="mt-8">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <feedbackIcons.actionPlan className="h-5 w-5 text-primary" />
+              <CardTitle>Action Plan</CardTitle>
+            </div>
+            <CardDescription>
+              Specific steps to improve your interview performance
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {feedback.strengths.map((strength, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
-                  <div className="mt-0.5">
-                    <Award className="h-5 w-5 text-emerald-500" />
+              {feedback.areas_for_improvement?.map((area, index) => (
+                <div key={index} className="flex gap-4 pb-4 last:pb-0 last:border-0">
+                  <div className="flex items-center justify-center rounded-full bg-primary/10 h-8 w-8 flex-shrink-0 mt-0.5">
+                    <itemIndicatorIcons.actionItem className="h-4 w-4 text-primary" />
                   </div>
-                  <div>
-                    <h4 className="font-medium">{strength.trait}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{strength.description}</p>
+                  <div className="space-y-1">
+                    <h4 className="font-medium">{area.topic}</h4>
+                    <p className="text-sm text-muted-foreground">{area.description}</p>
                   </div>
                 </div>
               ))}
