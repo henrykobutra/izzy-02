@@ -11,6 +11,7 @@ import { generateAndSaveFeedback } from "@/services/feedback/generateAndSaveFeed
 import { useRouter } from "next/navigation";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { feedbackGenerationLoadingStates } from "@/constants/loadingStates";
+import { processFeedback } from "@/utils/processFeedback";
 
 import { RefreshCw, FileText, CheckCircle, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +32,9 @@ export default function FeedbackPage() {
     fetchFeedback,
     fetchReadyForFeedback
   } = useFeedback(userId);
+
+  // Process feedback data to get metrics
+  const feedbackMetrics = processFeedback(feedbackData || []);
 
   const handleGenerateFeedback = async (sessionId: string) => {
     if (!userId) return;
@@ -110,14 +114,14 @@ export default function FeedbackPage() {
         </Card>
       )}
 
-      <FeedbackOverviewCards />
+      <FeedbackOverviewCards feedbackMetrics={feedbackMetrics} />
 
       <div className="px-4 lg:px-6">
         <div className="mb-3">
           <h2 className="text-lg font-semibold">Performance Metrics</h2>
           <p className="text-sm text-muted-foreground">Key interview skills assessment</p>
         </div>
-        <FeedbackMetrics />
+        <FeedbackMetrics feedbackMetrics={feedbackMetrics} />
       </div>
 
       <Card className="mx-4 lg:mx-6">

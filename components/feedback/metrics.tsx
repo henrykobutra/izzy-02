@@ -4,17 +4,38 @@ import { IconCalendar, IconBrain, IconMessageCircle, IconCode, IconPuzzle, IconS
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ProcessedFeedback } from "@/utils/processFeedback";
+import { useUser } from "@/hooks/users/useUser";
+import { formatDistanceToNow } from "date-fns";
 
-// Mock data for metrics
-const skillMetrics = [
-  { skill: "Technical Knowledge", score: 82, color: "#8884d8", icon: IconCode },
-  { skill: "Problem Solving", score: 79, color: "#f97316", icon: IconPuzzle },
-  { skill: "Communication", score: 86, color: "#10b981", icon: IconMessageCircle },
-  { skill: "Critical Thinking", score: 78, color: "#6366f1", icon: IconBrain }
-];
+// Map of skills to their visual properties
+const skillColors = {
+  "Technical Knowledge": { color: "#8884d8", icon: IconCode },
+  "Problem Solving": { color: "#f97316", icon: IconPuzzle },
+  "Communication": { color: "#10b981", icon: IconMessageCircle },
+  "Critical Thinking": { color: "#6366f1", icon: IconBrain }
+};
 
-export function FeedbackMetrics() {
+interface FeedbackMetricsProps {
+  feedbackMetrics: ProcessedFeedback;
+}
+
+export function FeedbackMetrics({ feedbackMetrics }: FeedbackMetricsProps) {
+  const { averages, best, latest } = feedbackMetrics;
+  const { createdAt, isLoading } = useUser();
+  
+  // Create metrics array from the averages
+  const skillMetrics = Object.entries(averages).map(([skill, score]) => ({
+    skill,
+    score,
+    ...skillColors[skill as keyof typeof skillColors]
+  }));
+
+  // Format the time since account creation
+  const formattedTimeSince = createdAt 
+    ? `Since ${formatDistanceToNow(new Date(createdAt))} ago`
+    : "Since account creation";
+
   return (
     <Card className="p-4">
       <div className="flex flex-col gap-4">
@@ -37,20 +58,10 @@ export function FeedbackMetrics() {
           </Tabs>
           
           <div className="flex gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8">
-                  <IconCalendar className="h-4 w-4 mr-2" />
-                  <span>Last 3 Months</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Last Month</DropdownMenuItem>
-                <DropdownMenuItem>Last 3 Months</DropdownMenuItem>
-                <DropdownMenuItem>Last 6 Months</DropdownMenuItem>
-                <DropdownMenuItem>All Time</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <IconCalendar className="h-4 w-4 mr-2" />
+              <span>{isLoading ? "Loading..." : formattedTimeSince}</span>
+            </div>
           </div>
         </div>
         

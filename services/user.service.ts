@@ -31,7 +31,9 @@ export const userService = {
         name,
         email: authUser.email || '',
         // Use a default avatar if none is provided
-        avatar: authUser.user_metadata?.avatar_url || ''
+        avatar: authUser.user_metadata?.avatar_url || '',
+        // Include user creation date
+        createdAt: authUser.created_at
       }
     } catch (error) {
       console.error('Error fetching user:', error)
