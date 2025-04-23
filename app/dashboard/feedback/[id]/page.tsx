@@ -24,7 +24,7 @@ import type { FeedbackWithMetadata } from "@/types/interview-feedback"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 import { getScoreColor, getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score-utils"
-import { getSkillIconComponent, feedbackIcons, itemIndicatorIcons, metadataIcons } from "@/utils/icons"
+import { getSkillIconComponent, getSkillColor, feedbackIcons, itemIndicatorIcons, metadataIcons } from "@/utils/icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getInterviewTranscript } from "@/services/database/interviews/getTranscript"
 import { useUser } from "@/hooks/users/useUser"
@@ -290,7 +290,8 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                         <div className="flex items-center gap-2.5">
                           {(() => {
                             const SkillIcon = getSkillIconComponent(skill.skill);
-                            return <SkillIcon className="h-5 w-5 text-primary/80" />;
+                            const skillColorClass = getSkillColor(skill.skill);
+                            return <SkillIcon className={cn("h-5 w-5", skillColorClass)} />;
                           })()}
                           <span className="font-medium">{skill.skill}</span>
                         </div>
@@ -298,8 +299,9 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                           <span 
                             className={cn(
                               "font-mono font-medium text-sm px-1.5 py-0.5 rounded", 
+                              skill.score > 90 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400" :
                               skill.score >= 80 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
-                              skill.score >= 60 ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" :
+                              skill.score >= 60 ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
                               skill.score >= 40 ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" :
                               "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                             )}
@@ -319,10 +321,16 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                       <div className="pt-3 pb-1">
                         <div className="overflow-hidden rounded-full bg-secondary h-2.5">
                           <div
-                            className="h-full rounded-full transition-all"
+                            className={cn(
+                              "h-full rounded-full transition-all",
+                              skill.score > 90 ? "bg-emerald-500 dark:bg-emerald-600" :
+                              skill.score >= 80 ? "bg-green-500 dark:bg-green-600" :
+                              skill.score >= 60 ? "bg-yellow-500 dark:bg-yellow-600" :
+                              skill.score >= 40 ? "bg-amber-500 dark:bg-amber-600" :
+                              "bg-red-500 dark:bg-red-600"
+                            )}
                             style={{
                               width: `${skill.score}%`,
-                              backgroundColor: getScoreBarColor(skill.score),
                             }}
                           ></div>
                         </div>

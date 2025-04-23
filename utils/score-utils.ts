@@ -7,9 +7,10 @@
  * @param score - A number between 0-100
  */
 export const getScoreColor = (score: number): string => {
-  if (score >= 90) return "bg-green-500";
-  if (score >= 80) return "bg-emerald-500";
-  if (score >= 70) return "bg-amber-500";
+  if (score > 90) return "bg-emerald-500";
+  if (score >= 80) return "bg-green-500";
+  if (score >= 60) return "bg-yellow-500";
+  if (score >= 40) return "bg-amber-500";
   return "bg-red-500";
 };
 
@@ -18,9 +19,10 @@ export const getScoreColor = (score: number): string => {
  * @param score - A number between 0-100
  */
 export const getScoreBarColor = (score: number): string => {
-  if (score >= 90) return "#22c55e"; // green-500
-  if (score >= 80) return "#10b981"; // emerald-500
-  if (score >= 70) return "#f59e0b"; // amber-500
+  if (score > 90) return "#10b981"; // emerald-500
+  if (score >= 80) return "#22c55e"; // green-500
+  if (score >= 60) return "#eab308"; // yellow-500
+  if (score >= 40) return "#f59e0b"; // amber-500
   return "#ef4444"; // red-500
 };
 
@@ -29,11 +31,11 @@ export const getScoreBarColor = (score: number): string => {
  * @param score - A number between 0-100
  */
 export const getScoreLabel = (score: number): string => {
-  if (score >= 90) return "Excellent";
-  if (score >= 80) return "Good";
-  if (score >= 70) return "Satisfactory";
-  if (score >= 60) return "Needs Improvement";
-  return "Poor";
+  if (score > 90) return "Excellent";
+  if (score >= 80) return "Very Good";
+  if (score >= 60) return "Good";
+  if (score >= 40) return "Satisfactory";
+  return "Needs Improvement";
 };
 
 /**
@@ -41,8 +43,9 @@ export const getScoreLabel = (score: number): string => {
  * @param score - A number between 0-100
  */
 export const getScoreGradient = (score: number): string => {
-  if (score >= 90) return "from-green-500/20 to-green-600/30";
-  if (score >= 80) return "from-emerald-500/20 to-emerald-600/30";
-  if (score >= 70) return "from-amber-500/20 to-amber-600/30";
-  return "from-red-500/20 to-red-600/30";
+  if (score > 90) return "from-violet-100 via-blue-100 to-emerald-100 dark:from-violet-800/30 dark:via-blue-800/30 dark:to-emerald-700/40";
+  if (score >= 80) return "from-green-50 to-green-100 dark:from-green-800/30 dark:to-green-700/40";
+  if (score >= 60) return "from-yellow-50 to-yellow-100 dark:from-yellow-800/30 dark:to-yellow-700/40";
+  if (score >= 40) return "from-amber-50 to-amber-100 dark:from-amber-800/30 dark:to-amber-700/40";
+  return "from-red-50 to-red-100 dark:from-red-800/30 dark:to-red-700/40";
 };
