@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import { useInterviewSession } from "./hooks/useInterviewSession"
+import { useInterviewTranscript } from "@/hooks/interview-sessions/useInterviewTranscript"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ArrowLeft, Mic, MicOff, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play } from "lucide-react"
+import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, FileText } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
@@ -13,6 +14,8 @@ import SpeechVisualizer from "./components/SpeechVisualizer"
 import { vapi } from "@/lib/vapi/vapi.sdk"
 import { startVapiAssistant, setupVapiEventListeners } from "@/lib/vapi/vapi.utils"
 import { useUser } from "@/hooks/users/useUser"
+import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
 
 // Updated type definition for Next.js 15.3.1 params
 interface PageProps {
@@ -33,20 +36,27 @@ export default function InterviewDetailPage({ params }: PageProps) {
   // Unwrap params Promise with React.use()
   const { id } = React.use(params)
 
-  // Use custom hook for data fetching
+  // Use custom hooks for data fetching and transcript management
   const { session, loading, error } = useInterviewSession(id)
+  const { recordSessionStart, endInterviewSession, isUpdating } = useInterviewTranscript(id)
 
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false)
-  
+  const [sessionStart, setSessionStart] = useState<string>("")
+  const [sessionEnd, setSessionEnd] = useState<string>("")
+  const [transcript, setTranscript] = useState<string>("")
+
+  // Conversation messages (to store transcript)
+  const [conversationMessages, setConversationMessages] = useState<any[]>([])
+
   // Get user data with the hook
   const { firstName } = useUser()
 
   // Vapi interview management
   const [vapiCall, setVapiCall] = useState<any>(null)
-  const [speakerVolume, setSpeakerVolume] = useState<number>(0)
   const cleanupEventListeners = useRef<(() => void) | null>(null)
+  const speechEndTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Cleanup Vapi event listeners when component unmounts
   useEffect(() => {
@@ -63,35 +73,56 @@ export default function InterviewDetailPage({ params }: PageProps) {
       // Start in processing state
       setInterviewState("processing");
 
+      // Record session start time
+      const startTime = new Date().toISOString();
+      setSessionStart(startTime);
+
+      // Save session start time to database
+      await recordSessionStart(startTime);
+
       // Start the Vapi assistant
       const call = await startVapiAssistant(session, true);
       setVapiCall(call);
 
       // Setup event listeners to control UI
       const cleanup = setupVapiEventListeners({
+        onMessage: (message) => {
+          if (message.type === "conversation-update") {
+            // Store conversation messages for transcript
+            setConversationMessages(() => [message]);
+          }
+        },
         onCallStart: () => {
-          console.log("Interview call started");
           setInterviewState("interviewer_speaking");
         },
         onCallEnd: () => {
-          console.log("Interview call ended");
           setInterviewState("completed");
         },
         onSpeechStart: () => {
-          //TODO: Debounce state changes between who's speaking
-          console.log("Interviewer is speaking");
           setInterviewState("interviewer_speaking");
+
+          // Clear any pending debounced state changes when interviewer starts speaking
+          if (speechEndTimerRef.current) {
+            clearTimeout(speechEndTimerRef.current);
+            speechEndTimerRef.current = null;
+          }
         },
         onSpeechEnd: () => {
-          console.log("Interviewer stopped speaking");
-          // Transition to candidate speaking after the interviewer is done
-          setInterviewState("candidate_speaking");
-        },
-        onVolumeLevel: (volume) => {
-          setSpeakerVolume(volume);
+          // Clear any existing timeout first
+          if (speechEndTimerRef.current) {
+            clearTimeout(speechEndTimerRef.current);
+          }
+
+          // Set a new timeout with 1-second delay
+          speechEndTimerRef.current = setTimeout(() => {
+            setInterviewState("candidate_speaking");
+            speechEndTimerRef.current = null;
+          }, 500);
         },
         onError: (error) => {
-          console.error("Vapi error:", error);
+          toast.error("Error during interview", {
+            description: "Something went wrong with the interview. Please try again.",
+          });
           // Handle error state if needed
         }
       });
@@ -99,38 +130,67 @@ export default function InterviewDetailPage({ params }: PageProps) {
       // Save cleanup function for unmounting
       cleanupEventListeners.current = cleanup;
     } catch (error) {
-      console.error("Failed to start interview:", error);
+      toast.error("Failed to start interview", {
+        description: "There was a problem starting the interview. Please try again.",
+      });
       setInterviewState("before_start");
     }
   };
 
   // Handle ending the interview
-  const handleEndInterview = () => {
-    // End the Vapi call if active
-    if (vapiCall) {
-      try {
-        // Use vapi.stop() to end the call - this is the correct method according to the Vapi docs
-        vapi.stop();
-      } catch (error) {
-        console.error("Error stopping Vapi call:", error);
-      }
-    }
-
-    setInterviewState("completed");
-  };
-
-  // Handle toggling mute/unmute
-  const toggleMute = async () => {
-    if (!vapiCall) return;
-
+  const handleEndInterview = async () => {
     try {
-      // Get current mute state
-      const isMuted = vapiCall.isMuted();
+      // End the Vapi call if active
+      if (vapiCall) {
+        try {
+          // Use vapi.stop() to end the call - this is the correct method according to the Vapi docs
+          vapi.stop();
+        } catch (error) {
+          toast.error("Error ending interview", {
+            description: "The session has been marked as completed, but there was an error ending the call.",
+          });
+        }
+      }
 
-      // Toggle mute state
-      vapiCall.setMuted(!isMuted);
+      // Record session end time
+      const endTime = new Date().toISOString();
+      setSessionEnd(endTime);
+
+      // Save transcript and mark session as completed
+      if (conversationMessages.length > 0) {
+        // Show loading toast
+        const loadingToast = toast.loading("Saving interview transcript...");
+
+        try {
+          const result = await endInterviewSession(conversationMessages);
+
+          if (result.success) {
+            toast.success("Interview completed", {
+              description: "Your interview transcript has been saved successfully.",
+              id: loadingToast,
+            });
+          } else {
+            throw new Error("Failed to save transcript");
+          }
+        } catch (error) {
+          toast.error("Error saving transcript", {
+            description: "There was a problem saving your interview transcript.",
+            id: loadingToast,
+          });
+        }
+      } else {
+        toast.warning("No interview data", {
+          description: "No interview data was recorded to save.",
+        });
+      }
+
+      setInterviewState("completed");
     } catch (error) {
-      console.error("Error toggling mute:", error);
+      toast.error("Error ending interview", {
+        description: "There was a problem ending the interview.",
+      });
+      // Still set to completed state even if there's an error
+      setInterviewState("completed");
     }
   };
 
@@ -209,6 +269,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
+      <Toaster />
       <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 pb-20">
         {/* Info card with interview session details */}
         <Card className="mt-6">
@@ -361,18 +422,18 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
                 {interviewState === "processing" && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-medium">Processing Your Interview</h2>
+                    <h2 className="text-xl font-medium">Izzy is joining the call</h2>
                     <p className="text-muted-foreground">
-                      Please wait while we analyze your responses...
+                      She&apos;ll be with you momentarily...
                     </p>
                   </div>
                 )}
 
                 {interviewState === "completed" && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-medium">Interview Completed!</h2>
+                    <h2 className="text-xl font-medium">Interview Ended</h2>
                     <p className="text-muted-foreground">
-                      You&apos;ve successfully completed your practice interview. What would you like to do next?
+                      Your practice interview session has concluded. What would you like to do next?
                     </p>
                   </div>
                 )}
@@ -395,18 +456,42 @@ export default function InterviewDetailPage({ params }: PageProps) {
             {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
               <div className="mt-6 flex gap-3">
                 <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleMute}
-                >
-                  {interviewState === "candidate_speaking" ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                </Button>
-                <Button
                   variant="destructive"
                   className="gap-2"
                   onClick={handleEndInterview}
                 >
                   End Interview
+                </Button>
+              </div>
+            )}
+
+            {interviewState === "completed" && (
+              <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.location.href = "/dashboard/practice-interview"}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Go back to interviews
+                </Button>
+                <Button
+                  className="gap-2"
+                  onClick={handleStartInterview}
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  Start Interview Again
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="gap-2"
+                  onClick={() => {
+                    // Replace with actual feedback generation logic
+                    alert("Generating interview feedback...");
+                  }}
+                >
+                  <FileText className="h-4 w-4" />
+                  Generate Interview Feedback
                 </Button>
               </div>
             )}

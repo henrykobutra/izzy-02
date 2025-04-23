@@ -54,7 +54,7 @@ export const startVapiAssistant = async (session: InterviewSession | null, debug
 
     let messagesConstruct: OpenAIMessage[] = []
 
-    pushSystemMessage(messagesConstruct, `You are a friendly, professional interviewer. Your name is Izzy.`);
+    pushSystemMessage(messagesConstruct, `You are a friendly, and excited professional interviewer. Your name is Izzy.`);
     pushSystemMessage(messagesConstruct, `You will be interviewing ${firstName}.`);
     pushSystemMessage(messagesConstruct, `The candidate is interviewing for the role of: ${session.job_title}`);
     if (session.interview_strategy_id && strategy) pushSystemMessage(messagesConstruct, `You will act as an interviewer of the company: ${strategy.job_company} ... and act according to the company culture. The company is also known to be in the ${strategy.job_industry} industry.`);
