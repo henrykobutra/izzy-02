@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import { updateTranscript } from '@/services/database/interviews/updateTranscript'
 
-interface ConversationMessage {
+export interface ConversationMessage {
   type: string
   conversation: Array<{
     role: string

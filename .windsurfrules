@@ -1,0 +1,5 @@
+- use pnpm as package manager
+- use shadcn components
+- use pnpm lint for linting
+- use pnpm exec tsc --noEmit for type checking
+- do not run a dev server, user runs by himself

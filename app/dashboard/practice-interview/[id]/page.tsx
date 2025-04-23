@@ -16,6 +16,7 @@ import { startVapiAssistant, setupVapiEventListeners } from "@/lib/vapi/vapi.uti
 import { useUser } from "@/hooks/users/useUser"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import type { ConversationMessage } from "@/hooks/interview-sessions/useInterviewTranscript";
 
 // Updated type definition for Next.js 15.3.1 params
 interface PageProps {
@@ -38,23 +39,19 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Use custom hooks for data fetching and transcript management
   const { session, loading, error } = useInterviewSession(id)
-  const { recordSessionStart, endInterviewSession, isUpdating } = useInterviewTranscript(id)
+  const { endInterviewSession } = useInterviewTranscript(id)
 
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
-  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false)
-  const [sessionStart, setSessionStart] = useState<string>("")
-  const [sessionEnd, setSessionEnd] = useState<string>("")
-  const [transcript, setTranscript] = useState<string>("")
 
   // Conversation messages (to store transcript)
-  const [conversationMessages, setConversationMessages] = useState<any[]>([])
+  const [conversationMessages, setConversationMessages] = useState<ConversationMessage[]>([])
 
   // Get user data with the hook
   const { firstName } = useUser()
 
   // Vapi interview management
-  const [vapiCall, setVapiCall] = useState<any>(null)
+  const [vapiCall, setVapiCall] = useState<unknown>(null)
   const cleanupEventListeners = useRef<(() => void) | null>(null)
   const speechEndTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -73,23 +70,20 @@ export default function InterviewDetailPage({ params }: PageProps) {
       // Start in processing state
       setInterviewState("processing");
 
-      // Record session start time
-      const startTime = new Date().toISOString();
-      setSessionStart(startTime);
-
-      // Save session start time to database
-      await recordSessionStart(startTime);
-
       // Start the Vapi assistant
       const call = await startVapiAssistant(session, true);
       setVapiCall(call);
 
       // Setup event listeners to control UI
       const cleanup = setupVapiEventListeners({
-        onMessage: (message) => {
-          if (message.type === "conversation-update") {
-            // Store conversation messages for transcript
-            setConversationMessages(() => [message]);
+        onMessage: (message: unknown) => {
+          // Basic type guard to check if the message structure matches ConversationMessage
+          if (typeof message === 'object' && message !== null &&
+            'type' in message && typeof message.type === 'string' &&
+            message.type === 'conversation-update' && // Only store conversation updates for now
+            'conversation' in message && Array.isArray(message.conversation)) {
+            // Now TypeScript knows message likely conforms to ConversationMessage
+            setConversationMessages(() => [message as ConversationMessage]);
           }
         },
         onCallStart: () => {
@@ -119,17 +113,16 @@ export default function InterviewDetailPage({ params }: PageProps) {
             speechEndTimerRef.current = null;
           }, 500);
         },
-        onError: (error) => {
+        onError: () => {
           toast.error("Error during interview", {
             description: "Something went wrong with the interview. Please try again.",
           });
-          // Handle error state if needed
         }
       });
 
       // Save cleanup function for unmounting
       cleanupEventListeners.current = cleanup;
-    } catch (error) {
+    } catch {
       toast.error("Failed to start interview", {
         description: "There was a problem starting the interview. Please try again.",
       });
@@ -145,16 +138,12 @@ export default function InterviewDetailPage({ params }: PageProps) {
         try {
           // Use vapi.stop() to end the call - this is the correct method according to the Vapi docs
           vapi.stop();
-        } catch (error) {
+        } catch {
           toast.error("Error ending interview", {
             description: "The session has been marked as completed, but there was an error ending the call.",
           });
         }
       }
-
-      // Record session end time
-      const endTime = new Date().toISOString();
-      setSessionEnd(endTime);
 
       // Save transcript and mark session as completed
       if (conversationMessages.length > 0) {
@@ -172,7 +161,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
           } else {
             throw new Error("Failed to save transcript");
           }
-        } catch (error) {
+        } catch {
           toast.error("Error saving transcript", {
             description: "There was a problem saving your interview transcript.",
             id: loadingToast,
@@ -185,7 +174,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
       }
 
       setInterviewState("completed");
-    } catch (error) {
+    } catch {
       toast.error("Error ending interview", {
         description: "There was a problem ending the interview.",
       });
@@ -458,7 +447,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                 <Button
                   variant="destructive"
                   className="gap-2"
-                  onClick={handleEndInterview}
+                  onClick={() => handleEndInterview()}
                 >
                   End Interview
                 </Button>

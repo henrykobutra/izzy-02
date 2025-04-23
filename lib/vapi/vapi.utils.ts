@@ -1,5 +1,5 @@
 import { vapi } from './vapi.sdk';
-import type { CreateAssistantDTO, AssistantOverrides } from '@vapi-ai/web/dist/api';
+import type { CreateAssistantDTO, Call } from '@vapi-ai/web/dist/api';
 import type { InterviewSession } from '@/types/interview-session';
 import { setupVapiEventListeners } from './vapi.events';
 import type { VapiEventHandlers } from './vapi.events';
@@ -12,22 +12,13 @@ import {
 import type { StrategyAnalysis } from '@/types/strategy';
 import { getStrategyById } from '@/services/database/strategies/getStrategy';
 
-// This type definition assumes Vapi SDK uses specific string literals
-// If we had access to @vapi-ai/web types, we would import them directly
-interface DeepgramTranscriber {
-  provider: "deepgram";
-  model: string;
-  language: "en-US"; // Using hardcoded value to match expected type
-}
-
 /**
  * Starts the Vapi assistant using session data from useInterviewSession
  * @param session The interview session data
  * @param debug Whether to log debug information
- * @returns Promise with the call object
+ * @returns Promise with the call object or null
  */
-export const startVapiAssistant = async (session: InterviewSession | null, debug = false): Promise<any> => {
-
+export const startVapiAssistant = async (session: InterviewSession | null, debug = false): Promise<Call | null> => {
 
   try {
 
@@ -35,11 +26,9 @@ export const startVapiAssistant = async (session: InterviewSession | null, debug
       throw new Error('No session data provided');
     }
 
-    let strategy: StrategyAnalysis | null = null
-
-    if (session.interview_strategy_id) {
-      strategy = await getStrategyById(session.interview_strategy_id)
-    }
+    const strategy: StrategyAnalysis | null = session.interview_strategy_id
+      ? await getStrategyById(session.interview_strategy_id)
+      : null;
 
     if (debug) {
       console.log('Starting Vapi assistant with session data:', session);
@@ -52,7 +41,7 @@ export const startVapiAssistant = async (session: InterviewSession | null, debug
       ? formatInterviewQuestionsForAI(session.suggested_interview_questions as InterviewQuestion[])
       : "";
 
-    let messagesConstruct: OpenAIMessage[] = []
+    const messagesConstruct: OpenAIMessage[] = []
 
     pushSystemMessage(messagesConstruct, `You are a friendly, and excited professional interviewer. Your name is Izzy.`);
     pushSystemMessage(messagesConstruct, `You will be interviewing ${firstName}.`);
