@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge"
 import { AlertCircle, ArrowLeft, Mic, MicOff, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { userService } from "@/services/user.service"
 import { cn } from "@/lib/utils"
 import SpeechVisualizer from "./components/SpeechVisualizer"
 import { vapi } from "@/lib/vapi/vapi.sdk"
 import { startVapiAssistant, setupVapiEventListeners } from "@/lib/vapi/vapi.utils"
+import { useUser } from "@/hooks/users/useUser"
 
 // Updated type definition for Next.js 15.3.1 params
 interface PageProps {
@@ -39,30 +39,14 @@ export default function InterviewDetailPage({ params }: PageProps) {
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false)
-  const [userName, setUserName] = useState<string>("")
+  
+  // Get user data with the hook
+  const { firstName } = useUser()
 
   // Vapi interview management
   const [vapiCall, setVapiCall] = useState<any>(null)
   const [speakerVolume, setSpeakerVolume] = useState<number>(0)
   const cleanupEventListeners = useRef<(() => void) | null>(null)
-
-  // Fetch user info
-  useEffect(() => {
-    const getUserInfo = async () => {
-      try {
-        const user = await userService.getCurrentUser();
-        if (user && user.name) {
-          // Extract first name
-          const firstName = user.name.split(' ')[0];
-          setUserName(firstName);
-        }
-      } catch (error) {
-        console.error("Failed to get user info:", error);
-      }
-    };
-
-    getUserInfo();
-  }, []);
 
   // Cleanup Vapi event listeners when component unmounts
   useEffect(() => {
@@ -312,7 +296,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     )}
                   </div>
                   <div className="text-center">
-                    <h3 className="font-medium">{userName || "Candidate"}</h3>
+                    <h3 className="font-medium">{firstName || "Candidate"}</h3>
                     <p className="text-xs text-muted-foreground">You</p>
                   </div>
                   <div className="mt-auto pt-3">

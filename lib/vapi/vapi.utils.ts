@@ -1,5 +1,16 @@
 import { vapi } from './vapi.sdk';
+import type { CreateAssistantDTO, AssistantOverrides } from '@vapi-ai/web/dist/api';
 import type { InterviewSession } from '@/types/interview-session';
+import { setupVapiEventListeners } from './vapi.events';
+import type { VapiEventHandlers } from './vapi.events';
+import { getUserInfo } from '@/services/user/getUserInfo';
+import { formatInterviewQuestionsForAI, InterviewQuestion } from '@/utils/format-interview-questions';
+import {
+  OpenAIMessage,
+  pushSystemMessage
+} from '@/utils/openai-message-utils';
+import type { StrategyAnalysis } from '@/types/strategy';
+import { getStrategyById } from '@/services/database/strategies/getStrategy';
 
 // This type definition assumes Vapi SDK uses specific string literals
 // If we had access to @vapi-ai/web types, we would import them directly
@@ -9,112 +20,6 @@ interface DeepgramTranscriber {
   language: "en-US"; // Using hardcoded value to match expected type
 }
 
-// OpenAI message types used by Vapi
-type OpenAIMessageRole = "system" | "user" | "assistant" | "function" | "tool";
-interface OpenAIMessage {
-  role: OpenAIMessageRole;
-  content: string;
-}
-
-interface AssistantOverrides {
-  transcriber?: DeepgramTranscriber;
-  recordingEnabled?: boolean;
-  variableValues?: Record<string, any>;
-}
-
-interface CreateAssistantConfig {
-  transcriber?: DeepgramTranscriber;
-  model: {
-    provider: string;
-    model: string;
-    messages: OpenAIMessage[];
-  };
-  voice: {
-    provider: string;
-    voiceId: string;
-  };
-  name?: string;
-}
-
-// Interface for UI event handlers
-export interface VapiEventHandlers {
-  onCallStart?: () => void;
-  onCallEnd?: () => void;
-  onSpeechStart?: () => void;
-  onSpeechEnd?: () => void;
-  onVolumeLevel?: (volume: number) => void;
-  onMessage?: (message: any) => void;
-  onError?: (error: any) => void;
-}
-
-/**
- * Sets up event listeners for the Vapi instance
- * @param handlers Object containing event handler functions
- * @returns A cleanup function to remove all event listeners
- */
-export function setupVapiEventListeners(handlers: VapiEventHandlers): () => void {
-  // Set up all event handlers
-  if (handlers.onCallStart) {
-    vapi.on("call-start", handlers.onCallStart);
-  }
-  
-  if (handlers.onCallEnd) {
-    vapi.on("call-end", handlers.onCallEnd);
-  }
-  
-  if (handlers.onSpeechStart) {
-    vapi.on("speech-start", handlers.onSpeechStart);
-  }
-  
-  if (handlers.onSpeechEnd) {
-    vapi.on("speech-end", handlers.onSpeechEnd);
-  }
-  
-  if (handlers.onVolumeLevel) {
-    vapi.on("volume-level", handlers.onVolumeLevel);
-  }
-  
-  if (handlers.onMessage) {
-    vapi.on("message", handlers.onMessage);
-  }
-  
-  if (handlers.onError) {
-    vapi.on("error", handlers.onError);
-  }
-  
-  // Return a cleanup function
-  return () => {
-    // Remove all event handlers
-    if (handlers.onCallStart) {
-      vapi.off("call-start", handlers.onCallStart);
-    }
-    
-    if (handlers.onCallEnd) {
-      vapi.off("call-end", handlers.onCallEnd);
-    }
-    
-    if (handlers.onSpeechStart) {
-      vapi.off("speech-start", handlers.onSpeechStart);
-    }
-    
-    if (handlers.onSpeechEnd) {
-      vapi.off("speech-end", handlers.onSpeechEnd);
-    }
-    
-    if (handlers.onVolumeLevel) {
-      vapi.off("volume-level", handlers.onVolumeLevel);
-    }
-    
-    if (handlers.onMessage) {
-      vapi.off("message", handlers.onMessage);
-    }
-    
-    if (handlers.onError) {
-      vapi.off("error", handlers.onError);
-    }
-  };
-}
-
 /**
  * Starts the Vapi assistant using session data from useInterviewSession
  * @param session The interview session data
@@ -122,72 +27,83 @@ export function setupVapiEventListeners(handlers: VapiEventHandlers): () => void
  * @returns Promise with the call object
  */
 export const startVapiAssistant = async (session: InterviewSession | null, debug = false): Promise<any> => {
+
+
   try {
+
     if (!session) {
       throw new Error('No session data provided');
     }
-    
+
+    let strategy: StrategyAnalysis | null = null
+
+    if (session.interview_strategy_id) {
+      strategy = await getStrategyById(session.interview_strategy_id)
+    }
+
     if (debug) {
       console.log('Starting Vapi assistant with session data:', session);
     }
 
-    // Check for a custom property that might store the assistant ID
-    // Checking multiple possible property names since it's not in the InterviewSession type
-    const assistantId = (session as any).assistant_id || 
-                       (session as any).vapi_assistant_id || 
-                       null;
+    const { firstName } = await getUserInfo();
 
-    if (assistantId) {
-      const overrides: AssistantOverrides = {
-        variableValues: {
-          jobTitle: session.job_title || 'Software Engineer',
-          interviewType: session.interview_type || 'behavioral',
-          questionAmount: session.interview_question_amount || 3,
-        }
-      };
-      
-      if (debug) {
-        console.log('Using existing assistant ID with overrides:', overrides);
+    // Format the interview questions if they exist
+    const formattedQuestions = session.suggested_interview_questions
+      ? formatInterviewQuestionsForAI(session.suggested_interview_questions as InterviewQuestion[])
+      : "";
+
+    let messagesConstruct: OpenAIMessage[] = []
+
+    pushSystemMessage(messagesConstruct, `You are a friendly, professional interviewer. Your name is Izzy.`);
+    pushSystemMessage(messagesConstruct, `You will be interviewing ${firstName}.`);
+    pushSystemMessage(messagesConstruct, `The candidate is interviewing for the role of: ${session.job_title}`);
+    if (session.interview_strategy_id && strategy) pushSystemMessage(messagesConstruct, `You will act as an interviewer of the company: ${strategy.job_company} ... and act according to the company culture. The company is also known to be in the ${strategy.job_industry} industry.`);
+    pushSystemMessage(messagesConstruct, `You will be asking exactly ${session.interview_question_amount} questions.`);
+    pushSystemMessage(messagesConstruct, `You will be asking the following questions: ${formattedQuestions} (in that order). These questions have been desinged based on the job profile and the candidate's profile by a professional interview question writer.`);
+    pushSystemMessage(messagesConstruct, `If the candidate's answer are unclear, you will ask follow up questions to clarify.`);
+    pushSystemMessage(messagesConstruct, `When giving feedback, be honest, constructive, yet professional`);
+    pushSystemMessage(messagesConstruct, `You will be concise in your feedback and follow up questions`);
+    pushSystemMessage(messagesConstruct, `Your are allowed to chit-chat with the candidate a little in the beginning.`);
+    pushSystemMessage(messagesConstruct, `At the end, ask if the candidate has any questions about the role or the company.`);
+    pushSystemMessage(messagesConstruct, `You will only speak for your self as the interviewer, and not for the candidate ${firstName}.`);
+
+    const config: CreateAssistantDTO = {
+      transcriber: {
+        provider: "deepgram",
+        model: "nova-2",
+        language: "en-US",
+      },
+      model: {
+        provider: "openai",
+        model: "gpt-4o",
+        messages: messagesConstruct,
+      },
+      voice: {
+        provider: "vapi",
+        voiceId: "Savannah",
+      },
+      firstMessage: "Introduce yourself, give your name, tell what you gonna do, and greet the user by their name and ask how they're doing",
+      firstMessageMode: "assistant-speaks-first-with-model-generated-message",
+      silenceTimeoutSeconds: 45,
+      maxDurationSeconds: 600,
+      endCallMessage: "That concludes our interview. If you'd like to try again, feel free to start again! Have a nice day!",
+      messagePlan: {
+        idleMessages: [
+          `Hi ${firstName}, You still there?`,
+          `I haven't heard you for a while, ${firstName}, are you still there?`,
+          `Are you still there?`,
+        ],
+        idleTimeoutSeconds: 12,
       }
-      
-      return await vapi.start(assistantId, overrides);
-    } else {
-      // Create an inline configuration for the assistant
-      const config: CreateAssistantConfig = {
-        transcriber: {
-          provider: "deepgram",
-          model: "nova-2",
-          language: "en-US"
-        },
-        model: {
-          provider: "openai",
-          model: "gpt-4o",
-          messages: [
-            {
-              role: "system", // Now using the specific OpenAIMessageRole type
-              content: `You are an interviewer for a ${session.job_title || 'Software Engineer'} position. 
-                        This is a ${session.interview_type || 'behavioral'} interview with ${session.interview_question_amount || 3} questions.
-                        Ask relevant questions and provide helpful feedback.`,
-            },
-          ],
-        },
-        voice: {
-          provider: "playht",
-          voiceId: "jennifer", // Choose appropriate voice
-        },
-        name: `${session.interview_type || 'Behavioral'} Interview Assistant`,
-      };
-      
-      if (debug) {
-        console.log('Creating assistant with config:', config);
-      }
-      
-      // Cast to 'any' to bypass strict typing issues with the Vapi SDK
-      // This is a workaround until we have proper types from the SDK
-      return await vapi.start(config as any);
-    }
+    };
+    return await vapi.start(config);
+
   } catch (error) {
     console.error('Error starting Vapi assistant:', error);
     throw error;
   }
 };
+
+// Re-export the event handlers from vapi.events.ts
+export { setupVapiEventListeners };
+export type { VapiEventHandlers };
