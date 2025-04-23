@@ -92,12 +92,12 @@ export function InterviewSessionsTable({
   useEffect(() => {
     const fetchStrategies = async () => {
       const strategiesMap: Record<string, StrategyAnalysis> = {};
-      
+
       // Only process sessions with a strategy ID
       const sessionsWithStrategy = sessions.filter(
         session => session.interview_strategy_id
       );
-      
+
       // Fetch all strategy data in parallel
       const strategiesPromises = sessionsWithStrategy.map(async (session) => {
         if (session.interview_strategy_id) {
@@ -111,7 +111,7 @@ export function InterviewSessionsTable({
           }
         }
       });
-      
+
       await Promise.all(strategiesPromises);
       setStrategies(strategiesMap);
     };
@@ -133,7 +133,7 @@ export function InterviewSessionsTable({
             onClick={refetchSessions}
             size="sm"
             variant="outline"
-            className="gap-1.5"
+            className="gap-1.5 cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Refresh</span>
@@ -281,7 +281,7 @@ export function InterviewSessionsTable({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 px-2.5"
+                              className="h-8 px-2.5 cursor-pointer"
                               asChild
                             >
                               <Link href={`/dashboard/practice-interview/${session.id}`}>
@@ -295,7 +295,7 @@ export function InterviewSessionsTable({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 px-2.5"
+                              className="h-8 px-2.5 cursor-pointer"
                               asChild
                             >
                               <Link href={`/dashboard/practice-interview/${session.id}`}>
@@ -310,7 +310,7 @@ export function InterviewSessionsTable({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 px-2.5"
+                                className="h-8 px-2.5 cursor-pointer"
                                 asChild
                               >
                                 <Link href={`/dashboard/practice-interview/${session.id}`}>
@@ -318,33 +318,30 @@ export function InterviewSessionsTable({
                                   <span className="text-xs">View</span>
                                 </Link>
                               </Button>
-                              
+
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-8 w-8 p-0"
-                                    onClick={() => {
-                                      toast.success("Creating new interview session...");
-                                      refetchSessions();
-                                    }}
-                                  >
-                                    <RefreshCw className="h-3.5 w-3.5" />
-                                    <span className="sr-only">Retry</span>
+                                    className="h-8 w-8 p-0 cursor-pointer"
+                                  ><Link href={`/dashboard/practice-interview/${session.id}`}>
+                                      <RefreshCw className="h-3.5 w-3.5" />
+                                      <span className="sr-only">Retry</span>
+                                    </Link>
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
                                   <p>Retry Interview</p>
                                 </TooltipContent>
                               </Tooltip>
-                              
+
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                    className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10 cursor-pointer"
                                     onClick={() => session.id ? setSessionToDelete(session.id) : null}
                                   >
                                     <Trash className="h-3.5 w-3.5" />
@@ -357,12 +354,12 @@ export function InterviewSessionsTable({
                               </Tooltip>
                             </div>
                           )}
-                          
+
                           {!isComplete && (
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10 ml-1"
+                              className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10 ml-1 cursor-pointer"
                               onClick={() => session.id ? setSessionToDelete(session.id) : null}
                             >
                               <span className="sr-only">Delete</span>
@@ -394,7 +391,7 @@ export function InterviewSessionsTable({
                           {summaryCounts.types.comprehensive}
                         </Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground font-medium">Status:</span>
                         <Badge variant="outline" className="px-1.5 py-0 h-5 text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800">
@@ -429,16 +426,16 @@ export function InterviewSessionsTable({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting} className="cursor-pointer">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
               disabled={isDeleting}
               onClick={async () => {
                 setIsDeleting(true);
                 try {
                   if (sessionToDelete) {
                     const result = await deleteSession(sessionToDelete);
-                    
+
                     if (result.success) {
                       toast.success("Interview session deleted successfully");
                       refetchSessions();

@@ -440,14 +440,14 @@ export default function InterviewDetailPage({ params }: PageProps) {
               <div className="mt-6 flex gap-3">
                 <Button
                   variant="outline"
-                  className="gap-2"
+                  className="gap-2 cursor-pointer"
                   onClick={() => window.location.href = "/dashboard/practice-interview"}
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Go back to interviews
                 </Button>
                 <Button
-                  className="gap-2"
+                  className="gap-2 cursor-pointer"
                   onClick={handleStartInterview}
                 >
                   <Play className="h-4 w-4" />
@@ -460,7 +460,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
               <div className="mt-6 flex gap-3">
                 <Button
                   variant="destructive"
-                  className="gap-2"
+                  className="gap-2 cursor-pointer"
                   onClick={() => handleEndInterview()}
                 >
                   End Interview
@@ -472,7 +472,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
               <div className="mt-6 flex flex-wrap gap-3 justify-center">
                 <Button
                   variant="outline"
-                  className="gap-2"
+                  className="gap-2 cursor-pointer"
                   onClick={() => window.location.href = "/dashboard/practice-interview"}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -481,7 +481,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
-                      className="gap-2"
+                      className="gap-2 cursor-pointer"
                       onClick={() => setShowRestartAlert(true)}
                     >
                       <RefreshCcw className="h-4 w-4" />
@@ -496,8 +496,8 @@ export default function InterviewDetailPage({ params }: PageProps) {
                       Are you sure you want to restart the interview? All progress will be lost.
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogCancel onClick={() => setShowRestartAlert(false)}>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => {
+                      <AlertDialogCancel className="cursor-pointer" onClick={() => setShowRestartAlert(false)}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction className="cursor-pointer" onClick={() => {
                         setShowRestartAlert(false);
                         handleStartInterview();
                       }}>
@@ -508,7 +508,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
                 </AlertDialog>
                 <Button
                   variant="secondary"
-                  className="gap-2"
+                  className="gap-2 cursor-pointer"
                   onClick={() => {
                     // Replace with actual feedback generation logic
                     alert("Generating interview feedback...");
