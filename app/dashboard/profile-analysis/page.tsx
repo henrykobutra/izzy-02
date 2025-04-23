@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { toast } from "sonner"
+import { MultiStepLoader } from "@/components/ui/multi-step-loader"
+import { profileAnalysisLoadingStates } from "@/constants/loadingStates"
 
 export default function ProfileAnalysisPage() {
   const [resumeContent, setResumeContent] = useState("")
@@ -191,17 +193,17 @@ export default function ProfileAnalysisPage() {
           </Collapsible>
         </Card>
 
+        <MultiStepLoader 
+          loadingStates={profileAnalysisLoadingStates}
+          loading={isAnalyzing}
+          duration={1800}
+          loop={false}
+        />
+
         {/* Profile Analysis Results */}
         <div id="analysis-results">
           {isAnalyzing ? (
-            <Card>
-              <CardContent className="py-10">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4" />
-                  <p className="text-sm text-muted-foreground">Analyzing your profile...</p>
-                </div>
-              </CardContent>
-            </Card>
+            <></>
           ) : analysisResult ? (
             <Card>
               <CardHeader>
@@ -340,14 +342,7 @@ export default function ProfileAnalysisPage() {
               </CardContent>
             </Card>
           ) : profileLoading ? (
-            <Card>
-              <CardContent className="py-10">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4" />
-                  <p className="text-sm text-muted-foreground">Loading your profile...</p>
-                </div>
-              </CardContent>
-            </Card>
+            <></>
           ) : !profileExists ? (
             <Card>
               <CardHeader>
