@@ -9,9 +9,13 @@ import { Button } from "@/components/ui/button"
 import { 
   ArrowLeft, 
   Loader2,
-  AlertCircle
+  AlertCircle,
+  MessageSquare,
+  Code,
+  Compass as CompassIcon
 } from "lucide-react"
 import Link from "next/link"
+import { format } from "date-fns"
 import { getFeedback } from "@/services/database/feedback/getFeedback"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -24,13 +28,7 @@ import { getSkillIconComponent, feedbackIcons, itemIndicatorIcons, metadataIcons
  * @param date The date to format
  * @returns Formatted date string (e.g. "April 23, 2025")
  */
-const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(date)
-}
+// Removed custom formatDate function
 
 // Updated type definition for Next.js params
 interface PageProps {
@@ -106,7 +104,27 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   }
 
   // Format date for display
-  const formattedDate = feedback.created_at ? formatDate(new Date(feedback.created_at)) : "Unknown"
+  const formattedDate = feedback.created_at ? format(new Date(feedback.created_at), 'MMMM d, yyyy') : "Unknown"
+
+  // Get the appropriate icon for the interview type
+  const getInterviewTypeIcon = () => {
+    switch (feedback.interview_sessions?.interview_type) {
+      case 'behavioral':
+        return <MessageSquare className="h-5 w-5" aria-hidden="true" />;
+      case 'technical':
+        return <Code className="h-5 w-5" aria-hidden="true" />;
+      case 'comprehensive':
+        return <CompassIcon className="h-5 w-5" aria-hidden="true" />;
+      default:
+        return <metadataIcons.interviewType className="h-5 w-5" aria-hidden="true" />;
+    }
+  };
+
+  // Capitalize the interview type
+  const capitalizeInterviewType = (type: string | null | undefined) => {
+    if (!type) return 'Generic';
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  };
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
@@ -133,20 +151,18 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                   <metadataIcons.date className="h-4 w-4" />
                   {formattedDate}
                 </span>
-                {feedback.interview_sessions?.job_title && (
-                  <span className="text-muted-foreground flex items-center gap-1.5">
-                    <metadataIcons.jobTitle className="h-4 w-4" />
-                    {feedback.interview_sessions.job_title}
-                  </span>
-                )}
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  {getInterviewTypeIcon()}
+                  {capitalizeInterviewType(feedback.interview_sessions?.interview_type)} Interview
+                </span>
               </div>
               
               <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">Interview Performance</h1>
                 {feedback.interview_sessions?.job_title && (
                   <p className="text-lg font-medium flex items-center gap-2 mb-4">
-                    <metadataIcons.interviewType className="h-5 w-5" aria-hidden="true" />
-                    {feedback.interview_sessions.interview_type} Interview
+                    <metadataIcons.jobTitle className="h-5 w-5" aria-hidden="true" />
+                    {feedback.interview_sessions.job_title}
                   </p>
                 )}
                 <p className="text-muted-foreground line-clamp-3">

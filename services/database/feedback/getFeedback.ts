@@ -21,7 +21,15 @@ export const getFeedback = async (
 
         const { data, error } = await supabase
             .from('interview_feedback')
-            .select('*')
+            .select(`
+                *,
+                interview_sessions (
+                    job_title,
+                    interview_type,
+                    interview_strategy_id,
+                    interview_question_amount
+                )
+            `)
             .eq('id', feedbackId)
             .eq('is_removed', false)
             .single()
