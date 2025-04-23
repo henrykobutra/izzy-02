@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import type { InterviewSession } from "@/types/interview-session"
 import { format } from "date-fns"
 import { formatDistanceToNow } from "date-fns"
-import { Clock, FileEdit } from "lucide-react"
+import { Clock, FileEdit, CheckCircle } from "lucide-react"
 
 interface ReadyForFeedbackTableProps {
   data: InterviewSession[]
@@ -21,7 +21,7 @@ export function ReadyForFeedbackTable({ data, onProvideFeedback }: ReadyForFeedb
         <TableHeader>
           <TableRow className="border-b bg-muted/30">
             <TableHead className="w-[40%] py-2 font-medium pl-6">Interview Position</TableHead>
-            <TableHead className="w-[20%] py-2 font-medium">Date</TableHead>
+            <TableHead className="w-[20%] py-2 font-medium">Date Completed</TableHead>
             <TableHead className="w-[20%] py-2 font-medium">Duration</TableHead>
             <TableHead className="py-2 text-right font-medium pr-6">Actions</TableHead>
           </TableRow>
@@ -29,7 +29,12 @@ export function ReadyForFeedbackTable({ data, onProvideFeedback }: ReadyForFeedb
         <TableBody>
           {data.map((session) => (
             <TableRow key={session.id} className="hover:bg-muted/50">
-              <TableCell className="font-medium pl-6">{session.job_title || 'Unnamed Position'}</TableCell>
+              <TableCell className="font-medium pl-6">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span>{session.job_title || 'Unnamed Position'}</span>
+                </div>
+              </TableCell>
               <TableCell>
                 {session.created_at ? (
                   <Tooltip>
@@ -60,10 +65,10 @@ export function ReadyForFeedbackTable({ data, onProvideFeedback }: ReadyForFeedb
                 <Button 
                   size="sm" 
                   onClick={() => onProvideFeedback(session.id as string)}
-                  className="gap-1.5"
+                  className="gap-1.5 bg-green-600 hover:bg-green-700 text-white cursor-pointer"
                 >
                   <FileEdit className="h-3.5 w-3.5" />
-                  <span>Generate Feedback</span>
+                  <span>Generate AI Feedback</span>
                 </Button>
               </TableCell>
             </TableRow>
