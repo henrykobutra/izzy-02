@@ -10,18 +10,19 @@ import type { InterviewSession } from "@/types/interview-session"
  */
 export const getSessions = async (userId: string) => {
     const supabase = await createClient()
-    
+
     try {
         const { data, error } = await supabase
             .from('interview_sessions')
             .select('*')
             .eq('user_id', userId)
+            .eq('is_removed', false)
             .order('created_at', { ascending: false })
-        
+
         if (error) {
             throw error
         }
-        
+
         return data as InterviewSession[]
     } catch (error) {
         console.error('Error fetching interview sessions:', error)
@@ -36,7 +37,7 @@ export const getSessions = async (userId: string) => {
  */
 export const getSessionById = async (id: string) => {
     const supabase = await createClient()
-    
+
     try {
         // Fetch the session data
         const { data: sessionData, error: sessionError } = await supabase
@@ -44,11 +45,11 @@ export const getSessionById = async (id: string) => {
             .select('*')
             .eq('id', id)
             .single()
-            
+
         if (sessionError) {
             throw sessionError
         }
-        
+
         // Return just the session data
         return sessionData as InterviewSession
     } catch (error) {

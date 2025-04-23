@@ -10,17 +10,17 @@ import { createClient } from "@/utils/supabase/server"
 export const deleteSession = async (sessionId: string) => {
   try {
     const supabase = await createClient()
-    
+
     const { error } = await supabase
       .from('interview_sessions')
-      .delete()
+      .update({ is_removed: true })
       .eq('id', sessionId)
-    
+
     if (error) {
       console.error('Error deleting interview session:', error)
       throw error
     }
-    
+
     return {
       success: true
     }
