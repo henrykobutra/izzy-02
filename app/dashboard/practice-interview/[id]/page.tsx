@@ -17,6 +17,7 @@ import { useUser } from "@/hooks/users/useUser"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import type { ConversationMessage } from "@/hooks/interview-sessions/useInterviewTranscript";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
 // Updated type definition for Next.js 15.3.1 params
 interface PageProps {
@@ -43,6 +44,9 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
+
+  // Alert dialog state for restart confirmation
+  const [showRestartAlert, setShowRestartAlert] = useState(false)
 
   // Conversation messages (to store transcript)
   const [conversationMessages, setConversationMessages] = useState<ConversationMessage[]>([])
@@ -432,7 +436,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
           {/* Action buttons */}
           <CardFooter className="flex justify-center border-t pt-6">
-            {interviewState === "before_start" && (
+            {interviewState === "before_start" && session.status !== "completed" && (
               <Button
                 className="mt-6 gap-2"
                 onClick={handleStartInterview}
@@ -454,7 +458,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            {interviewState === "completed" && (
+            {interviewState === "completed" || session.status === "completed" && (
               <div className="mt-6 flex flex-wrap gap-3 justify-center">
                 <Button
                   variant="outline"
@@ -464,13 +468,34 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   <ArrowLeft className="h-4 w-4" />
                   Go back to interviews
                 </Button>
-                <Button
-                  className="gap-2"
-                  onClick={handleStartInterview}
-                >
-                  <RefreshCcw className="h-4 w-4" />
-                  Start Interview Again
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      className="gap-2"
+                      onClick={() => setShowRestartAlert(true)}
+                    >
+                      <RefreshCcw className="h-4 w-4" />
+                      Start Interview Again
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Restart</AlertDialogTitle>
+                    </AlertDialogHeader>
+                    <AlertDialogDescription>
+                      Are you sure you want to restart the interview? All progress will be lost.
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={() => setShowRestartAlert(false)}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => {
+                        setShowRestartAlert(false);
+                        handleStartInterview();
+                      }}>
+                        Restart Interview
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <Button
                   variant="secondary"
                   className="gap-2"
