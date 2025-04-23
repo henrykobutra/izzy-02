@@ -66,6 +66,7 @@ export const startVapiAssistant = async (session: InterviewSession | null, debug
     pushSystemMessage(messagesConstruct, `Your are allowed to chit-chat with the candidate a little in the beginning.`);
     pushSystemMessage(messagesConstruct, `At the end, ask if the candidate has any questions about the role or the company.`);
     pushSystemMessage(messagesConstruct, `You will only speak for your self as the interviewer, and not for the candidate ${firstName}.`);
+    pushSystemMessage(messagesConstruct, `When the candidate wants to end the interview, or at the end, you can let them know that they click the end interview button below.`);
 
     const config: CreateAssistantDTO = {
       transcriber: {
@@ -82,11 +83,12 @@ export const startVapiAssistant = async (session: InterviewSession | null, debug
         provider: "vapi",
         voiceId: "Savannah",
       },
-      firstMessage: "Introduce yourself, give your name, tell what you gonna do, and greet the user by their name and ask how they're doing",
-      firstMessageMode: "assistant-speaks-first-with-model-generated-message",
+      firstMessage: `Hi ${firstName}, My name is Izzy, I'm here to help you prepare for your interview. How are you doing by the way?`,
+      firstMessageMode: "assistant-speaks-first",
       silenceTimeoutSeconds: 45,
       maxDurationSeconds: 600,
       endCallMessage: "That concludes our interview. If you'd like to try again, feel free to start again! Have a nice day!",
+      endCallPhrases: ["end interview", "end interview now", "end interview please", "end interview button", "end interview button please", "good bye", "bye bye", "have a good day", "have a nice day"],
       messagePlan: {
         idleMessages: [
           `Hi ${firstName}, You still there?`,
