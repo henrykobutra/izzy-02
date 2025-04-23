@@ -1,29 +1,67 @@
 "use client"
 
+import { useState } from "react";
 import { FeedbackOverviewCards } from "@/components/feedback/overview-cards";
 import { FeedbackTable } from "@/components/feedback/feedback-table";
 import { ReadyForFeedbackTable } from "@/components/feedback/ready-for-feedback-table";
 import { FeedbackMetrics } from "@/components/feedback/metrics";
 import { useUser } from "@/hooks/users/useUser";
 import { useFeedback } from "@/hooks/feedback/useFeedback";
+import { generateAndSaveFeedback } from "@/services/feedback/generateAndSaveFeedback";
+import { useRouter } from "next/navigation";
 
 import { RefreshCw, FileText, CheckCircle, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export default function FeedbackPage() {
 
+  const router = useRouter();
   const { userId } = useUser();
+  const [generatingFeedback, setGeneratingFeedback] = useState<string | null>(null);
   const {
     feedbackData,
     isLoading,
     hasFeedback,
     improvementAreas,
     sessionsReadyForFeedback,
-    loadingReadySessions
+    loadingReadySessions,
+    fetchFeedback,
+    fetchReadyForFeedback
   } = useFeedback(userId);
 
-  const handleGenerateFeedback = (sessionId: string) => {
-    console.log("handleGenerateFeedback", sessionId);
+  const handleGenerateFeedback = async (sessionId: string) => {
+    if (!userId) return;
+    
+    try {
+      setGeneratingFeedback(sessionId);
+      toast.loading("Generating feedback...", {
+        description: "Please wait while AI analyzes your interview",
+        duration: 5000,
+      });
+      
+      // Generate feedback and save to database
+      const feedbackId = await generateAndSaveFeedback(sessionId, userId);
+      
+      // Refresh data
+      await fetchFeedback(userId);
+      await fetchReadyForFeedback(userId);
+      
+      toast.success("Feedback generated successfully!", {
+        description: "Your interview feedback is ready to view",
+      });
+      
+      // Navigate to the feedback detail page
+      router.push(`/dashboard/feedback/${feedbackId}`);
+      
+    } catch (error) {
+      console.error("Error generating feedback:", error);
+      toast.error("Error generating feedback", {
+        description: "There was a problem analyzing your interview. Please try again.",
+      });
+    } finally {
+      setGeneratingFeedback(null);
+    }
   };
 
   return (

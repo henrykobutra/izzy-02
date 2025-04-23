@@ -13,7 +13,7 @@ export const getInterviewTranscript = async (sessionId: string) => {
 
     const { data, error } = await supabase
       .from('interview_sessions')
-      .select('transcript, position_title, position_type')
+      .select('transcript, job_title')
       .eq('id', sessionId)
       .eq('status', 'completed')
       .single()
