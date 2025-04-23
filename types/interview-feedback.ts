@@ -33,5 +33,14 @@ export type FeedbackWithMetadata = InterviewFeedback & {
   interview_sessions?: {
     job_title: string | null
     interview_type: string
+    interview_strategy_id?: string | null
+    interview_question_amount?: number
   }
+}
+
+export interface FeedbackTableProps {
+  data: FeedbackWithMetadata[];
+  loading: boolean;
+  hasFeedback: boolean;
+  refetchFeedback: () => void;
 }

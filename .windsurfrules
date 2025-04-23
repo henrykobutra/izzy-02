@@ -3,3 +3,4 @@
 - use pnpm lint for linting
 - use pnpm exec tsc --noEmit for type checking
 - do not run a dev server, user runs by himself
+- to understand data relationships, visit types/supabase.ts
