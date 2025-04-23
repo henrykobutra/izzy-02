@@ -26,7 +26,7 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileText, Trash, Loader2 } from "lucide-react";
+import { FileText, Trash, Loader2, MessageSquare, Code, CompassIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import type { InterviewFeedback } from "@/types/interview-feedback";
@@ -41,6 +41,7 @@ type FeedbackTableData = InterviewFeedback & {
     job_title: string | null;
     interview_type: string;
     interview_strategy_id?: string | null;
+    interview_question_amount?: number;
   }
 };
 
@@ -205,8 +206,31 @@ export function FeedbackTable({
                         variant="outline"
                         className="px-1.5 py-0.5 text-xs flex items-center gap-1"
                       >
-                        {feedback.interview_sessions?.interview_type || "Interview"}
+                        {feedback.interview_sessions?.interview_type === 'behavioral' && (
+                          <>
+                            <MessageSquare className="h-3 w-3" />
+                            Behavioral
+                          </>
+                        )}
+                        {feedback.interview_sessions?.interview_type === 'technical' && (
+                          <>
+                            <Code className="h-3 w-3" />
+                            Technical
+                          </>
+                        )}
+                        {feedback.interview_sessions?.interview_type === 'comprehensive' && (
+                          <>
+                            <CompassIcon className="h-3 w-3" />
+                            Comprehensive
+                          </>
+                        )}
+                        {!feedback.interview_sessions?.interview_type && (
+                          <>Generic</>
+                        )}
                       </Badge>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {feedback.interview_sessions?.interview_question_amount || 0} questions
+                      </div>
                     </TableCell>
                     <TableCell className="py-3">
                       <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-medium" 
