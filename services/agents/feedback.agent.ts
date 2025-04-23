@@ -30,10 +30,21 @@ export const generateInterviewFeedback = async (
             schema: z.object({
                 overall_score: z.number().int().min(0).max(100),
                 skills_breakdown: z.array(z.object({
-                    skill: z.string(),
+                    skill: z.enum([
+                        "Technical Knowledge", 
+                        "Problem Solving", 
+                        "Communication", 
+                        "Critical Thinking",
+                        "Leadership",
+                        "Adaptability",
+                        "Teamwork",
+                        "Domain Expertise",
+                        "Time Management",
+                        "Attention to Detail"
+                    ]),
                     score: z.number().int().min(0).max(100),
                     feedback: z.string()
-                })),
+                })).min(4),
                 strengths: z.array(z.object({
                     trait: z.string(),
                     description: z.string()
@@ -62,8 +73,16 @@ Please analyze the following aspects:
 1. Technical/professional competency related to the position
 2. Communication skills and clarity
 3. Problem-solving approach
-4. Behavioral traits demonstrated
+4. Critical thinking abilities
 5. Overall interview performance
+
+For the skills breakdown, you MUST include assessments for these specific skills (with exact spelling and capitalization):
+- Technical Knowledge
+- Problem Solving
+- Communication
+- Critical Thinking
+
+You may include additional skills in your assessment as appropriate for the position.
 
 Provide a fair and balanced assessment with actionable feedback. Your analysis should be:
 - Specific and evidence-based (citing examples from the transcript)
