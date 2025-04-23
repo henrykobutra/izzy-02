@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   Loader2,
   AlertCircle,
   MessageSquare,
@@ -47,7 +47,7 @@ interface PageProps {
 export default function FeedbackDetailPage({ params }: PageProps) {
   // Unwrap params Promise with React.use()
   const { id } = React.use(params)
-  
+
   const [feedback, setFeedback] = useState<FeedbackWithMetadata | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -58,11 +58,11 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   // Function to fetch transcript
   const fetchTranscript = async (sessionId: string) => {
     if (!sessionId) return
-    
+
     try {
       setTranscriptLoading(true)
       const transcriptData = await getInterviewTranscript(sessionId)
-      
+
       if (transcriptData && transcriptData.transcript) {
         setTranscript(transcriptData.transcript)
       }
@@ -78,12 +78,12 @@ export default function FeedbackDetailPage({ params }: PageProps) {
       try {
         setLoading(true)
         const feedbackData = await getFeedback(id)
-        
+
         if (!feedbackData) {
           setError("Feedback not found")
         } else {
           setFeedback(feedbackData)
-          
+
           // Fetch transcript if session_id exists
           if (feedbackData.session_id) {
             fetchTranscript(feedbackData.session_id)
@@ -126,7 +126,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
             {error || "There was a problem loading your feedback. Please try again later."}
           </p>
           <Button asChild className="cursor-pointer">
-            <Link href="/dashboard">
+            <Link href="/dashboard/feedback">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Return to Feedback & Evaluation
             </Link>
@@ -164,7 +164,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
       <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 pb-20">
         {/* Back button */}
         <div className="mb-6 flex items-center">
-          <Link href="/dashboard">
+          <Link href="/dashboard/feedback">
             <Button variant="ghost" size="sm" className="gap-1 cursor-pointer" aria-label="Back to Feedback & Evaluation">
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Feedback & Evaluation</span>
@@ -189,7 +189,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                   {capitalizeInterviewType(feedback.interview_sessions?.interview_type)} Interview
                 </span>
               </div>
-              
+
               <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">Interview Performance</h1>
                 {feedback.interview_sessions?.job_title && (
@@ -203,40 +203,40 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex flex-col gap-4 w-full lg:w-auto lg:min-w-[250px]">
               <div className="bg-card rounded-lg p-4 sm:p-6 shadow-sm border border-border/50">
                 <div className="flex flex-col items-center mb-3">
                   <h3 className="text-xl font-bold mb-2 sm:mb-4">Performance Score</h3>
                   <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center mb-2">
                     <svg className="w-full h-full" viewBox="0 0 100 100">
-                      <circle 
-                        cx="50" 
-                        cy="50" 
-                        r="45" 
-                        fill="transparent" 
-                        stroke="currentColor" 
-                        strokeWidth="8" 
-                        className="text-muted/20" 
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        fill="transparent"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        className="text-muted/20"
                       />
-                      <circle 
-                        cx="50" 
-                        cy="50" 
-                        r="45" 
-                        fill="transparent" 
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        fill="transparent"
                         stroke={getScoreBarColor(feedback.overall_score)}
-                        strokeWidth="8" 
-                        strokeDasharray={`${feedback.overall_score * 2.83} 283`} 
-                        strokeDashoffset="0" 
-                        strokeLinecap="round" 
-                        transform="rotate(-90 50 50)" 
+                        strokeWidth="8"
+                        strokeDasharray={`${feedback.overall_score * 2.83} 283`}
+                        strokeDashoffset="0"
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
                       />
-                      <text 
-                        x="50" 
-                        y="50" 
-                        textAnchor="middle" 
-                        fontSize="22" 
-                        fontWeight="bold" 
+                      <text
+                        x="50"
+                        y="50"
+                        textAnchor="middle"
+                        fontSize="22"
+                        fontWeight="bold"
                         fill="currentColor"
                         dominantBaseline="middle"
                       >
@@ -255,7 +255,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
-        
+
         {/* Tabs for Feedback and Transcript */}
         <Tabs defaultValue="feedback" className="mt-8">
           <TabsList className="mb-4">
@@ -268,7 +268,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
               Transcript
             </TabsTrigger>
           </TabsList>
-          
+
           {/* Feedback Content */}
           <TabsContent value="feedback" className="space-y-8">
             {/* Skills Breakdown */}
@@ -296,14 +296,14 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                           <span className="font-medium">{skill.skill}</span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span 
+                          <span
                             className={cn(
-                              "font-mono font-medium text-sm px-1.5 py-0.5 rounded", 
+                              "font-mono font-medium text-sm px-1.5 py-0.5 rounded",
                               skill.score > 90 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400" :
-                              skill.score >= 80 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
-                              skill.score >= 60 ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
-                              skill.score >= 40 ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" :
-                              "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                skill.score >= 80 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
+                                  skill.score >= 60 ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                                    skill.score >= 40 ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" :
+                                      "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                             )}
                           >
                             {skill.score}%
@@ -324,10 +324,10 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                             className={cn(
                               "h-full rounded-full transition-all",
                               skill.score > 90 ? "bg-emerald-500 dark:bg-emerald-600" :
-                              skill.score >= 80 ? "bg-green-500 dark:bg-green-600" :
-                              skill.score >= 60 ? "bg-yellow-500 dark:bg-yellow-600" :
-                              skill.score >= 40 ? "bg-amber-500 dark:bg-amber-600" :
-                              "bg-red-500 dark:bg-red-600"
+                                skill.score >= 80 ? "bg-green-500 dark:bg-green-600" :
+                                  skill.score >= 60 ? "bg-yellow-500 dark:bg-yellow-600" :
+                                    skill.score >= 40 ? "bg-amber-500 dark:bg-amber-600" :
+                                      "bg-red-500 dark:bg-red-600"
                             )}
                             style={{
                               width: `${skill.score}%`,
@@ -427,7 +427,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           {/* Transcript Content */}
           <TabsContent value="transcript">
             <Card>
@@ -453,48 +453,48 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                         {transcript
                           .filter(entry => entry.role !== "system")
                           .map((entry, index) => (
-                          <div 
-                            key={index} 
-                            className={cn(
-                              "flex gap-3",
-                              entry.role === "assistant" ? "flex-row" : "flex-row-reverse"
-                            )}
-                          >
-                            {/* Avatar */}
-                            {entry.role === "assistant" ? (
-                              <Avatar className="h-9 w-9">
-                                <AvatarImage src="/faces/izzy-avatar.png" alt="Izzy" />
-                                <AvatarFallback className="bg-primary/20 text-primary">IZ</AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              <Avatar className="h-9 w-9">
-                                <AvatarFallback className="bg-muted-foreground/20 text-muted-foreground">
-                                  {firstName ? firstName.charAt(0).toUpperCase() : "U"}
-                                </AvatarFallback>
-                              </Avatar>
-                            )}
+                            <div
+                              key={index}
+                              className={cn(
+                                "flex gap-3",
+                                entry.role === "assistant" ? "flex-row" : "flex-row-reverse"
+                              )}
+                            >
+                              {/* Avatar */}
+                              {entry.role === "assistant" ? (
+                                <Avatar className="h-9 w-9">
+                                  <AvatarImage src="/faces/izzy-avatar.png" alt="Izzy" />
+                                  <AvatarFallback className="bg-primary/20 text-primary">IZ</AvatarFallback>
+                                </Avatar>
+                              ) : (
+                                <Avatar className="h-9 w-9">
+                                  <AvatarFallback className="bg-muted-foreground/20 text-muted-foreground">
+                                    {firstName ? firstName.charAt(0).toUpperCase() : "U"}
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
 
-                            {/* Message Content */}
-                            <div className={cn(
-                              "flex-1 max-w-[80%] px-4 py-3 rounded-lg",
-                              entry.role === "assistant" 
-                                ? "bg-primary/10 border border-primary/20 rounded-tl-none" 
-                                : "bg-muted/70 border border-muted/30 rounded-tr-none self-end"
-                            )}>
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="font-medium text-sm">
-                                  {entry.role === "assistant" ? "Izzy" : firstName || "You"}
-                                </div>
-                                {entry.timestamp && (
-                                  <div className="text-xs text-muted-foreground ml-2">
-                                    {new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                              {/* Message Content */}
+                              <div className={cn(
+                                "flex-1 max-w-[80%] px-4 py-3 rounded-lg",
+                                entry.role === "assistant"
+                                  ? "bg-primary/10 border border-primary/20 rounded-tl-none"
+                                  : "bg-muted/70 border border-muted/30 rounded-tr-none self-end"
+                              )}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="font-medium text-sm">
+                                    {entry.role === "assistant" ? "Izzy" : firstName || "You"}
                                   </div>
-                                )}
+                                  {entry.timestamp && (
+                                    <div className="text-xs text-muted-foreground ml-2">
+                                      {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="text-sm whitespace-pre-wrap">{entry.content}</div>
                               </div>
-                              <div className="text-sm whitespace-pre-wrap">{entry.content}</div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     ) : (
                       <div className="prose prose-sm max-w-none">

@@ -114,15 +114,19 @@ export default function FeedbackPage() {
         </Card>
       )}
 
-      <FeedbackOverviewCards feedbackMetrics={feedbackMetrics} />
+      {hasFeedback && (
+        <>
+          <FeedbackOverviewCards feedbackMetrics={feedbackMetrics} />
 
-      <div className="px-4 lg:px-6">
-        <div className="mb-3">
-          <h2 className="text-lg font-semibold">Performance Metrics</h2>
-          <p className="text-sm text-muted-foreground">Key interview skills assessment</p>
-        </div>
-        <FeedbackMetrics feedbackMetrics={feedbackMetrics} />
-      </div>
+          <div className="px-4 lg:px-6">
+            <div className="mb-3">
+              <h2 className="text-lg font-semibold">Performance Metrics</h2>
+              <p className="text-sm text-muted-foreground">Key interview skills assessment</p>
+            </div>
+            <FeedbackMetrics feedbackMetrics={feedbackMetrics} />
+          </div>
+        </>
+      )}
 
       <Card className="mx-4 lg:mx-6">
         <CardHeader className="pb-3">
@@ -146,11 +150,19 @@ export default function FeedbackPage() {
                 <div className="rounded-full bg-primary/10 p-6">
                   <FileText className="h-10 w-10 text-primary" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <h3 className="font-medium text-lg">No Feedback Yet</h3>
                   <p className="text-sm text-muted-foreground max-w-md">
                     Complete practice interviews to receive detailed feedback on your performance.
                   </p>
+                  <div className="pt-2">
+                    <a 
+                      href="/dashboard/practice-interview" 
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                    >
+                      Start Practice Interview
+                    </a>
+                  </div>
                 </div>
               </div>
             </CardContent>
