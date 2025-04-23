@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import type { FeedbackWithMetadata, FeedbackTableProps } from "@/types/interview-feedback";
 import type { StrategyAnalysis } from "@/types/strategy";
 import { getStrategyById } from "@/services/database/strategies/getStrategy";
+import { deleteFeedback } from "@/services/database/feedback/deleteFeedback";
 import { getScoreColor, getScoreBarColor, getScoreLabel } from "@/utils/score-utils";
 
 export function FeedbackTable({
@@ -100,11 +101,9 @@ export function FeedbackTable({
     
     setIsDeleting(true);
     try {
-      // This would be replaced with your actual delete function
-      // const result = await deleteFeedback(feedbackToDelete);
-      const result = { success: true }; // Placeholder, replace with actual API call
+      const success = await deleteFeedback(feedbackToDelete);
       
-      if (result.success) {
+      if (success) {
         toast.success("Feedback deleted successfully");
         refetchFeedback();
       } else {
