@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCalendar, IconBrain, IconMessageCircle, IconCode, IconPuzzle } from "@tabler/icons-react";
+import { IconCalendar, IconBrain, IconMessageCircle, IconCode, IconPuzzle, IconStar, IconClock, IconList } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,20 @@ export function FeedbackMetrics() {
     <Card className="p-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <Tabs defaultValue="all" className="w-full md:w-auto">
+          <Tabs defaultValue="best" className="w-full md:w-auto">
             <TabsList>
-              <TabsTrigger value="all">All Metrics</TabsTrigger>
-              <TabsTrigger value="technical">Technical</TabsTrigger>
-              <TabsTrigger value="behavioral">Behavioral</TabsTrigger>
+              <TabsTrigger value="best">
+                <IconStar className="h-4 w-4 mr-1" />
+                Best
+              </TabsTrigger>
+              <TabsTrigger value="latest">
+                <IconClock className="h-4 w-4 mr-1" />
+                Latest
+              </TabsTrigger>
+              <TabsTrigger value="all">
+                <IconList className="h-4 w-4 mr-1" />
+                All
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           
