@@ -445,7 +445,7 @@ export default function InterviewStrategyPage() {
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="h-8 px-2.5 border-amber-200 dark:border-amber-800 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                                  className="h-8 px-2.5 border-amber-200 dark:border-amber-800 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 cursor-pointer"
                                   onClick={() => strategy.id && handleSynchronizeStrategy(strategy.id)}
                                   disabled={synchronizingStrategy === strategy.id}
                                 >
@@ -459,7 +459,7 @@ export default function InterviewStrategyPage() {
                                 <Button 
                                   variant="outline" 
                                   size="sm"
-                                  className="h-8 px-2.5 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                  className="h-8 px-2.5 text-destructive border-destructive/20 hover:bg-destructive/10 cursor-pointer"
                                   onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
                                   disabled={deletingStrategy === strategy.id}
                                 >
@@ -474,14 +474,14 @@ export default function InterviewStrategyPage() {
                             ) : (
                               <>
                                 <Link href={`/dashboard/interview-strategy/${strategy.id}`}>
-                                  <Button variant="outline" size="sm" className="h-8 px-2.5">
+                                  <Button variant="outline" size="sm" className="h-8 px-2.5 cursor-pointer">
                                     <Eye className="h-3.5 w-3.5 mr-1" />
                                     <span className="text-xs">View</span>
                                   </Button>
                                 </Link>
                                 <div className="flex flex-col sm:flex-row gap-1.5">
                                   <Link href={`/dashboard/practice-interview?strategyId=${strategy.id}`}>
-                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 cursor-pointer">
                                       <Mic className="h-3.5 w-3.5" />
                                       <span className="sr-only">Practice</span>
                                     </Button>
@@ -489,7 +489,7 @@ export default function InterviewStrategyPage() {
                                   <Button 
                                     variant="outline" 
                                     size="sm"
-                                    className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
+                                    className="h-8 w-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10 cursor-pointer"
                                     onClick={() => strategy.id && setStrategyToDelete(strategy.id)}
                                     disabled={deletingStrategy === strategy.id}
                                   >
