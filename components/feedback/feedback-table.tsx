@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 import {
   Table,
@@ -124,10 +124,11 @@ export function FeedbackTable({
             <Table className="border-collapse w-full">
               <TableHeader>
                 <TableRow className="border-b bg-muted/30">
-                  <TableHead className="w-[25%] py-2 font-medium pl-6">Position</TableHead>
-                  <TableHead className="w-[15%] py-2 font-medium">Type</TableHead>
-                  <TableHead className="w-[15%] py-2 font-medium">Score</TableHead>
-                  <TableHead className="py-2 text-right font-medium pr-6">Actions</TableHead>
+                  <TableHead className="w-[25%] py-2 font-medium pl-6">Job Position</TableHead>
+                  <TableHead className="w-[15%] py-2 font-medium">Interview Type</TableHead>
+                  <TableHead className="w-[15%] py-2 font-medium">Performance</TableHead>
+                  <TableHead className="w-[20%] py-2 font-medium">Completed</TableHead>
+                  <TableHead className="py-2 text-right font-medium pr-6">Manage</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -140,9 +141,6 @@ export function FeedbackTable({
                       <div className="space-y-1">
                         <div className="font-medium">
                           {feedback.interview_sessions?.job_title || "Generic Interview"}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {feedback.created_at && format(new Date(feedback.created_at), 'MMM d, yyyy')}
                         </div>
                       </div>
                     </TableCell>
@@ -159,6 +157,18 @@ export function FeedbackTable({
                            style={{ backgroundColor: getScoreColor(feedback.overall_score) }}>
                         {Math.round(feedback.overall_score)}
                       </div>
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-sm text-muted-foreground">
+                            {formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>{format(new Date(feedback.created_at), 'MMMM d, yyyy, h:mm a')}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell className="py-3 text-right pr-6">
                       <div className="flex items-center justify-end space-x-2 transition-opacity">
