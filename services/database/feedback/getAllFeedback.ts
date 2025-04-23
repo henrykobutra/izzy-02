@@ -25,7 +25,8 @@ export const getAllFeedback = async (
                 *,
                 interview_sessions (
                     job_title,
-                    interview_type
+                    interview_type,
+                    interview_strategy_id
                 )
             `)
             .eq('user_id', userId)

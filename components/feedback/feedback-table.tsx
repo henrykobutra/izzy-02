@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
@@ -30,6 +30,8 @@ import { FileText, Trash, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { InterviewFeedback } from "@/types/interview-feedback";
+import type { StrategyAnalysis } from "@/types/strategy";
+import { getStrategyById } from "@/services/database/strategies/getStrategy";
 
 type FeedbackTableData = InterviewFeedback & { 
   id: string; 
@@ -38,6 +40,7 @@ type FeedbackTableData = InterviewFeedback & {
   interview_sessions?: {
     job_title: string | null;
     interview_type: string;
+    interview_strategy_id?: string | null;
   }
 };
 
@@ -64,12 +67,56 @@ export function FeedbackTable({
   const router = useRouter();
   const [feedbackToDelete, setFeedbackToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [strategies, setStrategies] = useState<Record<string, StrategyAnalysis>>({});
 
   // Sort data by created_at in descending order
   const sortedData = React.useMemo(() => {
     return [...data].sort((a, b) => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
+  }, [data]);
+
+  // Fetch strategy information for sessions that have a strategy ID
+  useEffect(() => {
+    const fetchStrategies = async () => {
+      const strategiesMap: Record<string, StrategyAnalysis> = {};
+
+      // Find unique strategy IDs from the feedback data
+      const uniqueStrategyIds = new Set<string>();
+      data.forEach(feedback => {
+        if (feedback.interview_sessions?.interview_strategy_id) {
+          uniqueStrategyIds.add(feedback.interview_sessions.interview_strategy_id);
+        }
+      });
+
+      if (uniqueStrategyIds.size === 0) {
+        return; // No strategy IDs to fetch
+      }
+
+      // Fetch all strategy data in parallel
+      const strategiesPromises = Array.from(uniqueStrategyIds).map(async (strategyId) => {
+        try {
+          const strategy = await getStrategyById(strategyId);
+          if (strategy) {
+            strategiesMap[strategyId] = strategy;
+          }
+        } catch (error) {
+          console.error("Error fetching strategy:", error);
+        }
+      });
+
+      await Promise.all(strategiesPromises);
+      setStrategies(strategiesMap);
+    };
+
+    if (data.length > 0) {
+      fetchStrategies();
+    }
+    
+    return () => {
+      // Clean up strategies state when component unmounts
+      setStrategies({});
+    };
   }, [data]);
 
   const handleDelete = async () => {
@@ -142,6 +189,15 @@ export function FeedbackTable({
                         <div className="font-medium">
                           {feedback.interview_sessions?.job_title || "Generic Interview"}
                         </div>
+                        {feedback.interview_sessions?.interview_strategy_id ? (
+                          <div className="text-xs text-muted-foreground">
+                            {strategies[feedback.interview_sessions.interview_strategy_id]?.job_company || "Loading company..."}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-muted-foreground">
+                            Generic Interview
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="py-3">
