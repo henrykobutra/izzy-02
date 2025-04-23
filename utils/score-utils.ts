@@ -35,3 +35,14 @@ export const getScoreLabel = (score: number): string => {
   if (score >= 60) return "Needs Improvement";
   return "Poor";
 };
+
+/**
+ * Returns the appropriate gradient class for background styling based on the score value
+ * @param score - A number between 0-100
+ */
+export const getScoreGradient = (score: number): string => {
+  if (score >= 90) return "from-green-500/20 to-green-600/30";
+  if (score >= 80) return "from-emerald-500/20 to-emerald-600/30";
+  if (score >= 70) return "from-amber-500/20 to-amber-600/30";
+  return "from-red-500/20 to-red-600/30";
+};

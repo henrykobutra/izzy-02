@@ -13,6 +13,7 @@ import { getFeedback } from "@/services/database/feedback/getFeedback"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
+import { getScoreColor, getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score-utils"
 
 /**
  * Formats a date into a readable string
@@ -25,20 +26,6 @@ const formatDate = (date: Date): string => {
     month: 'long',
     day: 'numeric'
   }).format(date)
-}
-
-// Helper function to get gradient based on score
-const getScoreGradient = (score: number): string => {
-  if (score >= 80) return "from-emerald-500/20 to-emerald-600/30"
-  if (score >= 60) return "from-amber-500/20 to-amber-600/30"
-  return "from-red-500/20 to-red-600/30"
-}
-
-// Helper function to get color based on score
-const getScoreColor = (score: number): string => {
-  if (score >= 80) return "text-emerald-500"
-  if (score >= 60) return "text-amber-500"
-  return "text-red-500"
 }
 
 // Updated type definition for Next.js params
@@ -184,21 +171,21 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                         cy="50" 
                         r="45" 
                         fill="transparent" 
-                        stroke="currentColor" 
+                        stroke={getScoreBarColor(feedback.overall_score)}
                         strokeWidth="8" 
                         strokeDasharray={`${feedback.overall_score * 2.83} 283`} 
                         strokeDashoffset="0" 
                         strokeLinecap="round" 
-                        className={getScoreColor(feedback.overall_score)} 
                         transform="rotate(-90 50 50)" 
                       />
                       <text 
                         x="50" 
-                        y="55" 
+                        y="50" 
                         textAnchor="middle" 
                         fontSize="22" 
                         fontWeight="bold" 
                         fill="currentColor"
+                        dominantBaseline="middle"
                       >
                         {feedback.overall_score}%
                       </text>
@@ -206,7 +193,9 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Target className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground font-medium">Overall Rating</span>
+                    <span className="text-sm text-muted-foreground font-medium">
+                      {getScoreLabel(feedback.overall_score)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -226,12 +215,20 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 <Collapsible key={index} className="w-full border rounded-lg p-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <BarChart className={cn("h-5 w-5", getScoreColor(skill.score))} />
+                      <BarChart className="h-5 w-5" style={{ color: getScoreBarColor(skill.score) }} />
                       <div>
                         <p className="font-medium">{skill.skill}</p>
                         <div className="flex items-center mt-1">
-                          <Progress value={skill.score} className="h-2 w-48" />
-                          <span className="ml-3 text-sm text-muted-foreground">{skill.score}/100</span>
+                          <Progress 
+                            value={skill.score} 
+                            className="h-2 w-48"
+                            style={{ 
+                              "--progress-background": getScoreBarColor(skill.score)
+                            } as React.CSSProperties}
+                          />
+                          <span className="ml-3 text-sm text-muted-foreground">
+                            {skill.score}/100 • {getScoreLabel(skill.score)}
+                          </span>
                         </div>
                       </div>
                     </div>
