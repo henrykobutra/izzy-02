@@ -6,7 +6,7 @@ import { useInterviewTranscript } from "@/hooks/interview-sessions/useInterviewT
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, FileText } from "lucide-react"
+import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, FileText, PhoneOff } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
@@ -56,20 +56,44 @@ export default function InterviewDetailPage({ params }: PageProps) {
   const cleanupEventListeners = useRef<(() => void) | null>(null)
   const speechEndTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cleanup Vapi event listeners when component unmounts
+  // Cleanup Vapi event listeners and resources when component unmounts
   useEffect(() => {
+    // This effect is only for cleanup when component unmounts
+    // No setup logic needed here
+
     return () => {
+      // Clean up any active speech end timers
+      if (speechEndTimerRef.current) {
+        clearTimeout(speechEndTimerRef.current);
+        speechEndTimerRef.current = null;
+      }
+
+      // Clean up event listeners
       if (cleanupEventListeners.current) {
         cleanupEventListeners.current();
       }
+
+      // Stop Vapi call if active
+      if (vapiCall) {
+        try {
+          vapi.stop();
+        } catch (e) {
+          // Silent catch - we're in cleanup, can't show toast
+          console.error("Error stopping Vapi call during unmount:", e);
+        }
+        // No need to setVapiCall(null) as component is unmounting
+      }
     };
-  }, []);
+  }, []); // Empty dependency array as this is only for unmount
 
   // Handle start interview with Vapi
   const handleStartInterview = async () => {
     try {
       // Start in processing state
       setInterviewState("processing");
+
+      //TODO:: Await Soft Delete feedback where is_removed is false if any
+
 
       // Start the Vapi assistant
       const call = await startVapiAssistant(session, true);
@@ -92,6 +116,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
         },
         onCallEnd: () => {
           setInterviewState("completed");
+          setVapiCall(null);
         },
         onSpeechStart: () => {
           setInterviewState("interviewer_speaking");
@@ -143,7 +168,21 @@ export default function InterviewDetailPage({ params }: PageProps) {
           toast.error("Error ending interview", {
             description: "The session has been marked as completed, but there was an error ending the call.",
           });
+        } finally {
+          setVapiCall(null);
         }
+      }
+
+      // Clean up any active speech end timers
+      if (speechEndTimerRef.current) {
+        clearTimeout(speechEndTimerRef.current);
+        speechEndTimerRef.current = null;
+      }
+
+      // Clean up event listeners
+      if (cleanupEventListeners.current) {
+        cleanupEventListeners.current();
+        cleanupEventListeners.current = null;
       }
 
       // Save transcript and mark session as completed
@@ -454,18 +493,15 @@ export default function InterviewDetailPage({ params }: PageProps) {
             )}
 
             {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
-              <div className="mt-6 flex gap-3">
-                <Button
-                  variant="destructive"
-                  className="gap-2 cursor-pointer"
-                  onClick={() => handleEndInterview()}
-                >
+              <div className="mt-6 flex gap-3 items-center flex-col">
+                <Button variant="destructive" className="gap-2 cursor-pointer" onClick={() => handleEndInterview()}>
+                  <PhoneOff className="h-4 w-4" />
                   End Interview
                 </Button>
               </div>
             )}
 
-            {interviewState === "completed" || session.status === "completed" && (
+            {(interviewState === "completed" || (interviewState === "before_start" && session.status === "completed")) && (
               <div className="mt-6 flex flex-wrap gap-3 justify-center">
                 <Button
                   variant="outline"
@@ -479,9 +515,6 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   <AlertDialogTrigger asChild>
                     <Button
                       className="gap-2 cursor-pointer"
-                      onClick={() => {
-                        handleStartInterview();
-                      }}
                     >
                       <RefreshCcw className="h-4 w-4" />
                       Start Interview Again
@@ -519,6 +552,9 @@ export default function InterviewDetailPage({ params }: PageProps) {
             )}
           </CardFooter>
         </Card>
+        <div className="mt-6">
+          <strong>Interview State: </strong>{interviewState}
+        </div>
       </div>
     </div>
   )
