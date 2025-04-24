@@ -25,7 +25,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator
@@ -115,7 +114,7 @@ export default function PracticeInterviewPage() {
   // Handle strategy URL params with Suspense boundary
   const StrategyParamsWithSuspense = () => (
     <Suspense fallback={null}>
-      <StrategyParamHandler 
+      <StrategyParamHandler
         specificPositions={specificPositions}
         strategiesLoading={strategiesLoading}
         strategies={strategies}
@@ -279,7 +278,6 @@ export default function PracticeInterviewPage() {
                     </PopoverTrigger>
                     <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start" side="bottom">
                       <Command className="w-full">
-                        <CommandInput placeholder="Search position..." className="w-full" />
                         <CommandEmpty>No position found.</CommandEmpty>
                         <CommandList className="w-full max-h-[300px] overflow-auto">
                           <CommandGroup heading="Most Popular">
@@ -451,11 +449,6 @@ export default function PracticeInterviewPage() {
                     </PopoverTrigger>
                     <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start" side="bottom">
                       <Command className="w-full">
-                        <CommandInput
-                          placeholder="Search target positions..."
-                          className="w-full"
-                          disabled={specificPositions.length === 0 || strategiesLoading}
-                        />
                         <CommandEmpty></CommandEmpty>
                         <CommandList className="w-full max-h-[300px] overflow-auto">
                           <CommandGroup>
@@ -484,7 +477,7 @@ export default function PracticeInterviewPage() {
                                     <div>
                                       <span className="font-medium">{position.title}</span>
                                       {position.company && (
-                                        <span className="text-muted-foreground text-xs ml-1">
+                                        <span className="text-xs ml-1">
                                           ({position.company})
                                         </span>
                                       )}
@@ -620,10 +613,10 @@ export default function PracticeInterviewPage() {
       </div>
 
       {/* Multi-step loader for interview session creation */}
-      <MultiStepLoader 
-        loadingStates={interviewSessionLoadingStates} 
-        loading={isCreatingSession} 
-        duration={1800} 
+      <MultiStepLoader
+        loadingStates={interviewSessionLoadingStates}
+        loading={isCreatingSession}
+        duration={1800}
         loop={false}
       />
       <StrategyParamsWithSuspense />
