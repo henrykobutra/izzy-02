@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/marketing/how-it-works/HowItWorks";
 import { FaqSection } from "@/components/marketing/faq";
 import CTASection from "@/components/marketing/CTA";
 import Link from "next/link";
+import { WaveSeparator } from "@/components/ui/wave-separator";
 
 export default function HomePage() {
   return (
@@ -23,14 +24,21 @@ export default function HomePage() {
           </p>
           <div className="mt-12">
             <Link href="/login">
-              <Button className="text-2xl p-8 cursor-pointer" variant="default" effect="expandIcon" icon={IconArrowRight} iconPlacement="right">
+              <Button className="text-2xl p-8 cursor-pointer" variant="ghost" effect="expandIcon" icon={IconArrowRight} iconPlacement="right">
                 Get Started
               </Button>
             </Link>
           </div>
+        </section>
 
+        {/* Wave Separator - Moved outside container for full width */}
+        <div className="w-full my-8">
+          <WaveSeparator height={80} />
+        </div>
+
+        <section className="container mx-auto text-center flex flex-col items-center">
           {/* Agent Visualizer Component */}
-          <div className="mt-16 w-full max-w-5xl mx-auto">
+          <div className="w-full max-w-5xl mx-auto">
             <AgentCard />
           </div>
         </section>
