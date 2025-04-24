@@ -27,6 +27,13 @@ import {
 import { useUser } from "@/hooks/use-user"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog"
 
 const data = {
   navMain: [
@@ -113,42 +120,75 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup className="mt-auto">
           <div className="px-3 py-2 text-xs">
             <Badge variant="outline" className="bg-yellow-800 text-yellow-100 border-yellow-600 mb-2 font-medium">Educational Review</Badge>
-            <p className="text-muted-foreground mb-2">
-              This is an educational review project. It may contain bugs and issues.
-              AI can get things wrong, always review the results.
+            <p className="text-muted-foreground mb-2 text-red-200">
+              <span className="font-medium">Note:</span> This is an educational project that may contain bugs. AI can get things wrong, always review the results.
             </p>
-            <p className="text-muted-foreground mb-2 text-[11px]">
-              Finals project for the Deep Learning class taught by Prof. Patricia McManus, Spring Term 2025, at HCC.
-            </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="link" className="text-xs h-auto p-0 mb-2 text-primary">
+                  Read more
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>About Izzy AI</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <p className="text-muted-foreground mb-2">
+                      Izzy AI is a demonstration project showcasing multiple AI agents working together to help interviewers improve their interview performance.
+                    </p>
+                    <p className="text-muted-foreground mb-1">
+                      <span className="font-medium">Technologies:</span> Google Gemini Pro 2.5 Preview, OpenAI's 4o, VAPI's voice agents and routing
+                    </p>
+                    <p className="text-muted-foreground mb-1">
+                      <span className="font-medium">Built with:</span> Next.js, Supabase, Vercel
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <p className="text-muted-foreground mb-2">
+                      Finals project for the Deep Learning class taught by Prof. Patricia McManus, Spring Term 2025, at HCC.
+                    </p>
+                    <p className="font-medium mb-1">Project by Henry Kobutra</p>
+                    <div className="flex flex-col gap-1">
+                      <a 
+                        href="https://www.linkedin.com/in/henrykobutra/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        LinkedIn
+                      </a>
+                      <a 
+                        href="https://github.com/henrykobutra" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        GitHub
+                      </a>
+                      <a 
+                        href="https://kobutra.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        kobutra.com
+                      </a>
+                    </div>
+                    <div className="mt-4">
+                      <Link href="/about">
+                        <Button variant="secondary" className="w-full cursor-pointer text-xs h-8">
+                          Visit About Page
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <div className="border-t pt-2 mt-1">
-              <p className="font-medium mb-1">Project by Henry Kobutra</p>
-              <div className="flex flex-col gap-1">
-                <a 
-                  href="https://www.linkedin.com/in/henrykobutra/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  LinkedIn
-                </a>
-                <a 
-                  href="https://github.com/henrykobutra" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  GitHub
-                </a>
-                <a 
-                  href="https://kobutra.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  kobutra.com
-                </a>
-              </div>
-              <div className="flex items-center mt-3 text-[10px] text-muted-foreground">
+              <div className="flex items-center mt-1 text-[10px] text-muted-foreground">
                 <IconSparkles size={12} className="mr-1" />
                 Built with Coffee in Houston, TX
               </div>
