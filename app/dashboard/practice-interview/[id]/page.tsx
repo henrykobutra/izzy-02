@@ -45,6 +45,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
+  const [isEndingInterview, setIsEndingInterview] = useState(false)
 
   // Conversation messages (to store transcript)
   const [conversationMessages, setConversationMessages] = useState<ConversationMessage[]>([])
@@ -54,8 +55,14 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Vapi interview management
   const [vapiCall, setVapiCall] = useState<unknown>(null)
+  const vapiCallRef = useRef<unknown>(null); // Add ref to track current vapiCall
   const cleanupEventListeners = useRef<(() => void) | null>(null)
   const speechEndTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Update ref when vapiCall changes
+  useEffect(() => {
+    vapiCallRef.current = vapiCall;
+  }, [vapiCall]);
 
   // Cleanup Vapi event listeners and resources when component unmounts
   useEffect(() => {
@@ -75,14 +82,14 @@ export default function InterviewDetailPage({ params }: PageProps) {
       }
 
       // Stop Vapi call if active
-      if (vapiCall) {
+      if (vapiCallRef.current) {
         try {
           vapi.stop();
         } catch (e) {
           // Silent catch - we're in cleanup, can't show toast
           console.error("Error stopping Vapi call during unmount:", e);
         }
-        // No need to setVapiCall(null) as component is unmounting
+        // No need to update state as component is unmounting
       }
     };
   }, []); // Empty dependency array as this is only for unmount
@@ -165,6 +172,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Handle ending the interview
   const handleEndInterview = async () => {
+    setIsEndingInterview(true);
     try {
       // End the Vapi call if active
       if (vapiCall) {
@@ -266,6 +274,8 @@ export default function InterviewDetailPage({ params }: PageProps) {
       });
       // Still set to cancelled state even if there's an error
       setInterviewState("cancelled");
+    } finally {
+      setIsEndingInterview(false);
     }
   };
 
@@ -540,9 +550,18 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
             {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
               <div className="mt-6 flex gap-3 items-center flex-col">
-                <Button variant="destructive" className="gap-2 cursor-pointer" onClick={() => handleEndInterview()} disabled={interviewState === "processing"}>
-                  <PhoneOff className="h-4 w-4" />
-                  End Interview
+                <Button 
+                  variant="destructive" 
+                  className="gap-2 cursor-pointer" 
+                  onClick={() => handleEndInterview()} 
+                  disabled={interviewState === "processing" || isEndingInterview}
+                >
+                  {isEndingInterview ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <PhoneOff className="h-4 w-4" />
+                  )}
+                  {isEndingInterview ? "Ending..." : "End Interview"}
                 </Button>
               </div>
             )}
