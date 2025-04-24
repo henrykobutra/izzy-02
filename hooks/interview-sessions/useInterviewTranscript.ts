@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { updateTranscript } from '@/services/database/interviews/updateTranscript'
+import { cancelInterview } from '@/services/database/interviews/cancelInterview'
 
 export interface ConversationMessage {
   type: string
@@ -143,12 +144,50 @@ export function useInterviewTranscript(sessionId: string) {
     [updateSessionTranscript]
   )
 
+  /**
+   * Cancels the interview session and clears the transcript
+   * @returns Object indicating success/failure and the updated data
+   */
+  const cancelInterviewSession = useCallback(
+    async () => {
+      if (!sessionId) {
+        setError(new Error('No session ID provided'))
+        setLastUpdateStatus('error')
+        return { success: false }
+      }
+
+      setIsUpdating(true)
+      setError(null)
+
+      try {
+        const result = await cancelInterview({
+          sessionId
+        })
+
+        if (!result.success) {
+          throw result.error
+        }
+
+        setLastUpdateStatus('success')
+        return result
+      } catch (err) {
+        setError(err)
+        setLastUpdateStatus('error')
+        return { success: false, error: err }
+      } finally {
+        setIsUpdating(false)
+      }
+    },
+    [sessionId]
+  )
+
   return {
     isUpdating,
     error,
     lastUpdateStatus,
     recordSessionStart,
     updateSessionTranscript,
-    endInterviewSession
+    endInterviewSession,
+    cancelInterviewSession
   }
 }

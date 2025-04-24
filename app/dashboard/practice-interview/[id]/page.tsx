@@ -40,7 +40,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Use custom hooks for data fetching and transcript management
   const { session, loading, error } = useInterviewSession(id)
-  const { endInterviewSession } = useInterviewTranscript(id)
+  const { endInterviewSession, cancelInterviewSession } = useInterviewTranscript(id)
 
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
@@ -185,38 +185,128 @@ export default function InterviewDetailPage({ params }: PageProps) {
         cleanupEventListeners.current = null;
       }
 
-      // Save transcript and mark session as completed
+      // Check if there are any user messages in the conversation
+      const hasUserMessages = conversationMessages.some(message =>
+        message.conversation &&
+        Array.isArray(message.conversation) &&
+        message.conversation.some(msg => msg.role === "user")
+      );
+
+      // Save transcript and mark session as completed or cancel if no user input
       if (conversationMessages.length > 0) {
         // Show loading toast
-        const loadingToast = toast.loading("Saving interview transcript...");
+        const loadingToast = toast.loading(hasUserMessages ? "Saving interview transcript..." : "Cancelling interview...");
 
         try {
-          const result = await endInterviewSession(conversationMessages);
 
-          if (result.success) {
-            toast.success("Interview completed", {
-              description: "Your interview transcript has been saved successfully.",
-              id: loadingToast,
-            });
+          if (hasUserMessages) {
+            // If there are user messages, save the transcript
+            const result = await endInterviewSession(conversationMessages);
+
+            if (result.success) {
+              toast.success("Interview completed", {
+                description: "Your interview transcript has been saved successfully.",
+                id: loadingToast,
+              });
+            } else {
+              throw new Error("Failed to save transcript");
+            }
           } else {
-            throw new Error("Failed to save transcript");
+            // If there are no user messages, cancel the interview
+            const result = await cancelInterviewSession();
+
+            if (result.success) {
+              toast.success("Interview cancelled", {
+                description: "The interview was cancelled due to no user responses.",
+                id: loadingToast,
+              });
+            } else {
+              throw new Error("Failed to cancel interview");
+            }
           }
         } catch {
-          toast.error("Error saving transcript", {
-            description: "There was a problem saving your interview transcript.",
+          toast.error("Error processing interview", {
+            description: "There was a problem saving your interview data.",
             id: loadingToast,
           });
         }
       } else {
-        toast.warning("No interview data", {
-          description: "No interview data was recorded to save.",
-        });
+        // If there are no conversation messages at all, cancel silently
+        try {
+          await cancelInterviewSession();
+          toast.warning("No interview data", {
+            description: "No interview data was recorded. The session has been cancelled.",
+          });
+        } catch {
+          toast.error("Error cancelling empty interview", {
+            description: "There was a problem cancelling the empty interview session.",
+          });
+        }
       }
 
       setInterviewState("completed");
     } catch {
       toast.error("Error ending interview", {
         description: "There was a problem ending the interview.",
+      });
+      // Still set to completed state even if there's an error
+      setInterviewState("completed");
+    }
+  };
+
+  // Handle cancelling the interview
+  const handleCancelInterview = async () => {
+    try {
+      // End the Vapi call if active
+      if (vapiCall) {
+        try {
+          vapi.stop();
+        } catch {
+          toast.error("Error ending interview", {
+            description: "The session has been marked as cancelled, but there was an error ending the call.",
+          });
+        } finally {
+          setVapiCall(null);
+        }
+      }
+
+      // Clean up any active speech end timers
+      if (speechEndTimerRef.current) {
+        clearTimeout(speechEndTimerRef.current);
+        speechEndTimerRef.current = null;
+      }
+
+      // Clean up event listeners
+      if (cleanupEventListeners.current) {
+        cleanupEventListeners.current();
+        cleanupEventListeners.current = null;
+      }
+
+      // Show loading toast
+      const loadingToast = toast.loading("Cancelling interview...");
+
+      try {
+        const result = await cancelInterviewSession();
+
+        if (result.success) {
+          toast.success("Interview cancelled", {
+            description: "Your interview has been cancelled successfully.",
+            id: loadingToast,
+          });
+        } else {
+          throw new Error("Failed to cancel interview");
+        }
+      } catch {
+        toast.error("Error cancelling interview", {
+          description: "There was a problem cancelling your interview.",
+          id: loadingToast,
+        });
+      }
+
+      setInterviewState("completed");
+    } catch {
+      toast.error("Error cancelling interview", {
+        description: "There was a problem cancelling the interview.",
       });
       // Still set to completed state even if there's an error
       setInterviewState("completed");
@@ -494,7 +584,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
             {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
               <div className="mt-6 flex gap-3 items-center flex-col">
-                <Button variant="destructive" className="gap-2 cursor-pointer" onClick={() => handleEndInterview()}>
+                <Button variant="destructive" className="gap-2 cursor-pointer" onClick={() => handleEndInterview()} disabled={interviewState === "processing"}>
                   <PhoneOff className="h-4 w-4" />
                   End Interview
                 </Button>
