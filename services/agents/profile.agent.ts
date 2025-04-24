@@ -5,6 +5,11 @@ import { generateObject } from "ai"
 import { z } from "zod"
 import { retry } from "@/utils/retry"
 
+/**
+ * Analyzes a resume text to extract structured profile information
+ * @param rawResumeText - The raw text content of a resume
+ * @returns Structured profile analysis with skills, experience, and other relevant information
+ */
 export const getProfileAnalysis = async (rawResumeText: string) => {
     return retry(async () => {
         const results = await generateObject({
@@ -43,36 +48,85 @@ export const getProfileAnalysis = async (rawResumeText: string) => {
                 is_resume: z.boolean(),
                 experience_level: z.enum(["junior", "mid", "senior", "principal"])
             }),
-            temperature: 0.9,
+            temperature: 0.7,
             maxTokens: 5000,
             messages: [
                 {
                     role: 'system',
-                    content: `You're an assistant that takes parsed text from a resume and turns them into an output that can be inserted into a row of a supabase table. Here are some instructions for the structured output:
-- achievements are an array of concise sentences
-- certifications are an array of concise sentences and do not need to include years
-- educations are an array of concise sentences and do not include years or months
-- ratings are integers between 1-100 (try to be precise with the rating as inferred from the whole doc, and do not end in 0 or 5)
-- years are nearest whole number
-- primary skills always need to be only 4 skills
-- secondary skills always need to be only 4 skills
-- other skills have no cap
-- professional summary: provide a very concise analysis
-- experience level summary should be very concise (e.g. Experienced professional with 4 years of experience in [industry or skill]
-- experience description should be a concise analysis
-- limit achievements to only top 10 notable achievements
-- limit skills to only top 20 notable skills
-- is_resume simply refers to if the provided raw text is or can be used as a resume or not
-- primary and secondary skills should be categorized and appropriate categories should be provided`
+                    content: `You're an expert resume analyzer that transforms resume text into structured profile data for database storage. Provide detailed and accurate analysis following these guidelines:
+
+VALIDATION RULES:
+- If the provided text is not a resume or CV, set is_resume to false and provide simple valid values:
+  * Use "Not a resume" for text fields
+  * Use "mid" for experience_level
+  * Use empty arrays [] for array fields or arrays with generic items
+  * For skills, provide exactly 4 generic skills in primary and secondary categories
+  * Include a note in professional_summary explaining this is not a valid resume
+
+CONTENT STRUCTURE:
+- PROFESSIONAL SUMMARY:
+  * Provide a concise, insightful analysis (3-5 sentences)
+  * Focus on career trajectory, core competencies, and professional identity
+
+- EXPERIENCE LEVEL SUMMARY:
+  * Very concise (1 sentence): "Experienced professional with X years in [industry/skill]"
+  * Be specific about years and primary domain
+
+- SKILLS ASSESSMENT:
+  * REQUIREMENTS:
+    - Primary skills: Exactly 4 most important skills (no more, no less)
+    - Secondary skills: Exactly 4 supporting skills (no more, no less)
+    - Other skills: Up to 12 additional relevant skills
+    - Select distinct skills with minimal overlap between categories
+    - Group related skills under meaningful category names
+
+  * SKILL SELECTION METHODOLOGY:
+    - Primary: Core technical/domain skills most critical to the candidate's profession
+    - Secondary: Supporting technical/domain skills that complement primary skills
+    - Other: Additional technical, domain, or transferable skills worth noting
+
+  * RATING SCALE (1-100):
+    - 1-20: Beginner/Rudimentary (mentioned but little evidence of practical application)
+    - 21-40: Basic/Foundational (some evidence of use with limited complexity)
+    - 41-60: Intermediate (clear evidence of practical application in professional context)
+    - 61-80: Advanced (strong evidence of significant expertise and complex applications)
+    - 81-100: Expert/Master (exceptional evidence of deep specialization and leadership)
+
+  * RATING METHODOLOGY:
+    - Base ratings on concrete evidence from the resume (projects, responsibilities, years of use)
+    - Consider depth of usage, complexity of applications, and recency
+    - Provide precise scores - avoid ratings ending in 0 or 5 (e.g., use 73 instead of 75)
+    - Ensure consistency across skills (relative scores should reflect relative expertise)
+    - For limited evidence, err on the side of moderation (41-60 range)
+
+  * CATEGORY NAMING:
+    - Use concise, industry-standard terminology for category names
+    - Primary category should reflect the core professional identity
+    - Secondary category should reflect a complementary skill domain
+
+- EXPERIENCE ENTRIES:
+  * Extract title, company, and years accurately
+  * Years should be the nearest whole number based on dates in resume
+  * Descriptions should be concise analyses of responsibilities and achievements
+
+- ADDITIONAL ELEMENTS:
+  * Achievements: Limited to top 10 notable accomplishments (concise sentences)
+  * Education: Concise entries without years/months
+  * Certifications: Concise without years
+  * Industries: Identify 1-5 relevant industries based on experience
+
+EXPERIENCE LEVEL CRITERIA:
+- Junior: 0-2 years experience, entry-level positions
+- Mid: 3-5 years experience, established professional
+- Senior: 6-10 years experience, leadership roles
+- Principal: 10+ years experience, strategic roles, executive positions`
                 },
                 {
-                    role: 'user',
+                    role: 'system',
                     content: rawResumeText
                 }
             ]
         })
-
-        console.log(results.object)
 
         return results.object
     }, 3, 2000);
