@@ -251,7 +251,15 @@ export default function PracticeInterviewPage() {
               >
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="generic">Generic Position</TabsTrigger>
-                  <TabsTrigger value="specific">Target Position</TabsTrigger>
+                  <TabsTrigger value="specific" className="relative">
+                    {hasStrategies && (
+                      <span className="inline-flex relative mr-1.5">
+                        <span className="h-2 w-2 rounded-full bg-green-500" />
+                        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75" />
+                      </span>
+                    )}
+                    Target Position
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="generic" className="pt-4">
                   <Label className="text-sm mb-2 block">Select a generic position type:</Label>
