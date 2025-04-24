@@ -36,15 +36,15 @@ export function ReadyForFeedbackTable({ data, onProvideFeedback }: ReadyForFeedb
                 </div>
               </TableCell>
               <TableCell>
-                {session.created_at ? (
+                {session.session_start ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="cursor-help">
-                        {formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(session.session_start), { addSuffix: true })}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="top">
-                      {format(new Date(session.created_at), "PPP 'at' p")}
+                      {format(new Date(session.session_start), "PPP 'at' p")}
                     </TooltipContent>
                   </Tooltip>
                 ) : (
@@ -55,15 +55,20 @@ export function ReadyForFeedbackTable({ data, onProvideFeedback }: ReadyForFeedb
                 {session.session_start && session.session_end ? (
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800">
                     <Clock className="h-3.5 w-3.5 mr-1" />
-                    {Math.round((new Date(session.session_end).getTime() - new Date(session.session_start).getTime()) / 60000)} minutes
+                    {(() => {
+                      const durationMinutes = Math.round((new Date(session.session_end).getTime() - new Date(session.session_start).getTime()) / 60000);
+                      if (durationMinutes === 0) return "< 1 minute";
+                      if (durationMinutes === 1) return "1 minute";
+                      return `${durationMinutes} minutes`;
+                    })()}
                   </Badge>
                 ) : (
                   '-'
                 )}
               </TableCell>
               <TableCell className="text-right pr-6">
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   onClick={() => onProvideFeedback(session.id as string)}
                   className="gap-1.5 bg-green-600 hover:bg-green-700 text-white cursor-pointer"
                 >
