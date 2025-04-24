@@ -313,7 +313,7 @@ export function InterviewSessionsTable({
                                 className="h-8 px-2.5 cursor-pointer"
                                 asChild
                               >
-                                <Link href={`/dashboard/practice-interview/${session.id}`}>
+                                <Link href={`/dashboard/feedback/${session.id}`}>
                                   <FileText className="h-3.5 w-3.5 mr-1" />
                                   <span className="text-xs">View</span>
                                 </Link>
