@@ -434,7 +434,7 @@ export default function PracticeInterviewPage() {
                   </Popover>
                 </TabsContent>
                 <TabsContent value="specific" className="pt-4">
-                  <Label className="text-sm mb-2 block">Select one of your target positions:</Label>
+                  <Label className="text-sm mb-2 block">Select from {specificPositions.length} available target positions:</Label>
                   <Popover open={openPositionCombobox} onOpenChange={setOpenPositionCombobox}>
                     <PopoverTrigger asChild>
                       <Button
