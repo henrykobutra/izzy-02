@@ -12,8 +12,10 @@ import {
   Code,
   Compass as CompassIcon,
   FileText,
+  User,
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { format } from "date-fns"
 import { getFeedbackBySessionId } from "@/services/database/feedback/getFeedback"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
@@ -472,12 +474,18 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                             >
                               {/* Avatar */}
                               {entry.role === "assistant" ? (
-                                <div className="h-9 w-9 bg-muted-foreground/20 text-muted-foreground flex items-center justify-center rounded-full">
-                                  IZ
+                                <div className="h-9 w-9 overflow-hidden rounded-full relative">
+                                  <Image 
+                                    src="/faces/izzy-avatar.png" 
+                                    alt="Izzy Avatar" 
+                                    fill
+                                    sizes="36px"
+                                    className="object-cover"
+                                  />
                                 </div>
                               ) : (
                                 <div className="h-9 w-9 bg-muted-foreground/20 text-muted-foreground flex items-center justify-center rounded-full">
-                                  {firstName ? firstName.charAt(0).toUpperCase() : "U"}
+                                  <User className="h-5 w-5" />
                                 </div>
                               )}
 
