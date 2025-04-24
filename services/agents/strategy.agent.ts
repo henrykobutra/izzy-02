@@ -88,11 +88,11 @@ CONTENT GUIDELINES:
 - All skills and experiences evaluations should be evidence-based, referring to specific aspects of the profile and job description`
                 },
                 {
-                    role: 'system',
+                    role: 'user',
                     content: `here is the candidate profile: ${JSON.stringify(candidateProfile)}`
                 },
                 {
-                    role: 'system',
+                    role: 'user',
                     content: `here is the job description: ${rawJobDescriptionText}`
                 }
             ]

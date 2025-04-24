@@ -59,7 +59,7 @@ TOPIC CATEGORIZATION:
 - Categorize topics accurately to ensure comprehensive coverage of essential skills`
             },
             {
-                role: 'system' as const,
+                role: 'user' as const,
                 content: `here is the candidate's profile: ${JSON.stringify(questionsRequest.candidateProfile)}`
             },
         ];
@@ -67,7 +67,7 @@ TOPIC CATEGORIZATION:
         // Conditionally add the strategy message
         if (questionsRequest.strategy) {
             messages.push({
-                role: 'system' as const,
+                role: 'user' as const,
                 content: `- here's the target job title: ${questionsRequest.strategy.job_title}
                 - here's the job company: ${questionsRequest.strategy.job_company}
                 - here's the job industry: ${questionsRequest.strategy.job_industry}
@@ -81,7 +81,7 @@ TOPIC CATEGORIZATION:
             });
         } else {
             messages.push({
-                role: 'system' as const,
+                role: 'user' as const,
                 content: `here's the target job title: ${questionsRequest.jobTitle}`
             })
         }

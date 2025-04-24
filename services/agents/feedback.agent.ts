@@ -121,7 +121,7 @@ CONFIDENCE SCORE:
   * Ability to infer position expectations from the title and context`
                 },
                 {
-                    role: 'system',
+                    role: 'user',
                     content: `Position: ${positionTitle}
 Position Type: ${positionType}
 

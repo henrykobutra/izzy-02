@@ -122,7 +122,7 @@ EXPERIENCE LEVEL CRITERIA:
 - Principal: 10+ years experience, strategic roles, executive positions`
                 },
                 {
-                    role: 'system',
+                    role: 'user',
                     content: rawResumeText
                 }
             ]
