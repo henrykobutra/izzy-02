@@ -11,8 +11,8 @@ interface WaveSeparatorProps {
 
 export function WaveSeparator({
   className = '',
-  height = 60,
-  colors = ['#673AB7', '#FF5722', '#FFEB3B'], // Default colors based on user preference
+  height = 100,
+  colors = [], // We'll generate colors dynamically if none provided
   lineWidth = 2,
 }: WaveSeparatorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -27,7 +27,8 @@ export function WaveSeparator({
     if (!ctx) return;
 
     const resizeCanvas = () => {
-      const width = Math.max(window.innerWidth, 1920);
+      // Use the actual window width without the minimum constraint
+      const width = window.innerWidth;
       canvas.width = width;
       canvas.height = height;
     };
@@ -35,9 +36,12 @@ export function WaveSeparator({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // Generate 20 colors if none provided
+    const waveColors = colors.length > 0 ? colors : generateWaveColors(14);
+
     // Initialize waves
     const nodes = 6;
-    waveNodesRef.current = colors.map(color => {
+    waveNodesRef.current = waveColors.map(color => {
       const waveNodes = [];
       for (let i = 0; i <= nodes + 2; i++) {
         waveNodes.push([(i - 1) * canvas.width / nodes, 0, Math.random() * 200, 0.3]);
@@ -46,8 +50,18 @@ export function WaveSeparator({
     });
 
     const bounce = (nodeArr: number[]) => {
-      nodeArr[1] = height / 2 * Math.sin(nodeArr[2] / 20) + canvas.height / 2;
-      nodeArr[2] = nodeArr[2] + nodeArr[3];
+      // Calculate a safe amplitude that uses more of the available height
+      // Use 45% of height to ensure waves stay within the canvas while having good motion
+      const safeAmplitude = height * 0.45;
+      
+      // Center the waves vertically in the canvas
+      const centerY = canvas.height / 2;
+      
+      // Apply sine wave motion with controlled amplitude
+      nodeArr[1] = centerY + safeAmplitude * Math.sin(nodeArr[2] / 15);
+      
+      // Keep animation speed consistent
+      nodeArr[2] = nodeArr[2] + nodeArr[3] * 1.2;
     };
 
     const drawWave = (obj: { nodes: number[][], color: string }) => {
@@ -108,4 +122,45 @@ export function WaveSeparator({
       />
     </div>
   );
+}
+
+// Helper function to generate an array of wave colors
+function generateWaveColors(count: number): string[] {
+  // Colors from the dark theme in globals.css (using actual values)
+  const colorPalette = [
+    '#673AB7',   // Deep purple (--primary)
+    '#FF5722',   // Vibrant orange (--secondary)
+    '#FFEB3B',   // Bright yellow (--accent)
+    '#8844DD',   // Purple variation (--chart-4 approximation)
+    '#FF6F39',   // Orange variation (--chart-5 approximation)
+    '#404040',   // Subtle background shade (--muted approximation)
+    '#4D4D4D'    // Border color (--border approximation)
+  ];
+
+  const colors: string[] = [];
+
+  // First, add our main colors directly
+  colors.push(colorPalette[0], colorPalette[1], colorPalette[2]);
+
+  // Then fill the rest with variations using opacity
+  for (let i = colors.length; i < count; i++) {
+    // Cycle through our palette and apply varying opacities
+    const baseColorIndex = i % colorPalette.length;
+    const baseColor = colorPalette[baseColorIndex];
+
+    // For the main colors, use higher opacity
+    // For secondary colors, use lower opacity to make them more subtle
+    const opacity = baseColorIndex < 3 ?
+      0.6 + (0.4 * ((i % 3) / 3)) :  // Main colors (60-100% opacity)
+      0.2 + (0.3 * ((i % 4) / 4));   // Secondary colors (20-50% opacity)
+
+    // Convert hex to rgba
+    const r = parseInt(baseColor.slice(1, 3), 16);
+    const g = parseInt(baseColor.slice(3, 5), 16);
+    const b = parseInt(baseColor.slice(5, 7), 16);
+
+    colors.push(`rgba(${r}, ${g}, ${b}, ${opacity.toFixed(2)})`);
+  }
+
+  return colors;
 }
