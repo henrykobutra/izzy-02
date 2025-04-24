@@ -32,7 +32,8 @@ type InterviewState =
   | "interviewer_speaking"
   | "candidate_speaking"
   | "processing"
-  | "completed";
+  | "completed"
+  | "cancelled"
 
 export default function InterviewDetailPage({ params }: PageProps) {
   // Unwrap params Promise with React.use()
@@ -40,7 +41,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Use custom hooks for data fetching and transcript management
   const { session, loading, error } = useInterviewSession(id)
-  const { endInterviewSession, cancelInterviewSession } = useInterviewTranscript(id)
+  const { endInterviewSession, cancelInterviewSession, recordSessionStart } = useInterviewTranscript(id)
 
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
@@ -88,6 +89,12 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
   // Handle start interview with Vapi
   const handleStartInterview = async () => {
+    // Reset conversation messages
+    setConversationMessages([]);
+
+    // Record session start
+    recordSessionStart(new Date().toISOString());
+
     try {
       // Start in processing state
       setInterviewState("processing");
@@ -198,6 +205,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
         const loadingToast = toast.loading(hasUserMessages ? "Saving interview transcript..." : "Cancelling interview...");
 
         try {
+          let isCancelled = false;
 
           if (hasUserMessages) {
             // If there are user messages, save the transcript
@@ -214,6 +222,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
           } else {
             // If there are no user messages, cancel the interview
             const result = await cancelInterviewSession();
+            isCancelled = true;
 
             if (result.success) {
               toast.success("Interview cancelled", {
@@ -224,11 +233,16 @@ export default function InterviewDetailPage({ params }: PageProps) {
               throw new Error("Failed to cancel interview");
             }
           }
+
+          // Set the interview state based on whether it was cancelled or completed
+          setInterviewState(isCancelled ? "cancelled" : "completed");
         } catch {
           toast.error("Error processing interview", {
             description: "There was a problem saving your interview data.",
             id: loadingToast,
           });
+          // Default to completed state on error, as we don't know what failed
+          setInterviewState("completed");
         }
       } else {
         // If there are no conversation messages at all, cancel silently
@@ -237,79 +251,21 @@ export default function InterviewDetailPage({ params }: PageProps) {
           toast.warning("No interview data", {
             description: "No interview data was recorded. The session has been cancelled.",
           });
+          setInterviewState("cancelled");
         } catch {
           toast.error("Error cancelling empty interview", {
             description: "There was a problem cancelling the empty interview session.",
           });
+          // Still set to cancelled state even if there's an error cancelling
+          setInterviewState("cancelled");
         }
       }
-
-      setInterviewState("completed");
     } catch {
       toast.error("Error ending interview", {
         description: "There was a problem ending the interview.",
       });
-      // Still set to completed state even if there's an error
-      setInterviewState("completed");
-    }
-  };
-
-  // Handle cancelling the interview
-  const handleCancelInterview = async () => {
-    try {
-      // End the Vapi call if active
-      if (vapiCall) {
-        try {
-          vapi.stop();
-        } catch {
-          toast.error("Error ending interview", {
-            description: "The session has been marked as cancelled, but there was an error ending the call.",
-          });
-        } finally {
-          setVapiCall(null);
-        }
-      }
-
-      // Clean up any active speech end timers
-      if (speechEndTimerRef.current) {
-        clearTimeout(speechEndTimerRef.current);
-        speechEndTimerRef.current = null;
-      }
-
-      // Clean up event listeners
-      if (cleanupEventListeners.current) {
-        cleanupEventListeners.current();
-        cleanupEventListeners.current = null;
-      }
-
-      // Show loading toast
-      const loadingToast = toast.loading("Cancelling interview...");
-
-      try {
-        const result = await cancelInterviewSession();
-
-        if (result.success) {
-          toast.success("Interview cancelled", {
-            description: "Your interview has been cancelled successfully.",
-            id: loadingToast,
-          });
-        } else {
-          throw new Error("Failed to cancel interview");
-        }
-      } catch {
-        toast.error("Error cancelling interview", {
-          description: "There was a problem cancelling your interview.",
-          id: loadingToast,
-        });
-      }
-
-      setInterviewState("completed");
-    } catch {
-      toast.error("Error cancelling interview", {
-        description: "There was a problem cancelling the interview.",
-      });
-      // Still set to completed state even if there's an error
-      setInterviewState("completed");
+      // Still set to cancelled state even if there's an error
+      setInterviewState("cancelled");
     }
   };
 
@@ -548,11 +504,11 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   </div>
                 )}
 
-                {interviewState === "completed" && (
+                {(interviewState === "completed" || interviewState === "cancelled") && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-medium">Interview Ended</h2>
+                    <h2 className="text-xl font-medium">Interview {interviewState === "completed" ? "Completed" : "Cancelled"}</h2>
                     <p className="text-muted-foreground">
-                      Your practice interview session has concluded. What would you like to do next?
+                      Your practice interview session has {interviewState === "completed" ? "concluded" : "been cancelled"}. What would you like to do next?
                     </p>
                   </div>
                 )}
@@ -591,7 +547,7 @@ export default function InterviewDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            {(interviewState === "completed" || (interviewState === "before_start" && session.status === "completed")) && (
+            {((interviewState === "completed" || interviewState === "cancelled") || (interviewState === "before_start" && session.status === "completed")) && (
               <div className="mt-6 flex flex-wrap gap-3 justify-center">
                 <Button
                   variant="outline"
@@ -629,21 +585,28 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Link href={`/dashboard/feedback/${id}`}>
-                  <Button
-                    variant="secondary"
-                    className="gap-2 cursor-pointer"
-                  >
-                    <FileText className="h-4 w-4" />
-                    Interview Feedback
-                  </Button>
-                </Link>
+                {interviewState === "completed" && (
+                  <Link href={`/dashboard/feedback/${id}`}>
+                    <Button
+                      variant="secondary"
+                      className="gap-2 cursor-pointer"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Interview Feedback
+                    </Button>
+                  </Link>
+                )}
               </div>
             )}
           </CardFooter>
         </Card>
-        <div className="mt-6">
-          <strong>Interview State: </strong>{interviewState}
+        <div className="mt-6 flex flex-col">
+          <div>
+            <strong>Interview State: </strong>{interviewState}
+          </div>
+          <div>
+            <strong>Session status: </strong>{session.status}
+          </div>
         </div>
       </div>
     </div>
