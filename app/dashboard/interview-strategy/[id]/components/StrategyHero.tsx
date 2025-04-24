@@ -75,7 +75,7 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
                 <Briefcase className="h-5 w-5" aria-hidden="true" />
                 {strategy.job_company}
               </p>
-              <p className="text-muted-foreground line-clamp-3">
+              <p className="text-muted-foreground">
                 {strategy.job_description_summary}
               </p>
             </div>
