@@ -151,25 +151,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </p>
                     <p className="font-medium mb-1">Project by Henry Kobutra</p>
                     <div className="flex flex-col gap-1">
-                      <a 
-                        href="https://www.linkedin.com/in/henrykobutra/" 
-                        target="_blank" 
+                      <a
+                        href="https://www.linkedin.com/in/henrykobutra/"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
                         LinkedIn
                       </a>
-                      <a 
-                        href="https://github.com/henrykobutra" 
-                        target="_blank" 
+                      <a
+                        href="https://github.com/henrykobutra"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
                         GitHub
                       </a>
-                      <a 
-                        href="https://kobutra.com" 
-                        target="_blank" 
+                      <a
+                        href="https://kobutra.com"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
@@ -187,14 +187,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
               </DialogContent>
             </Dialog>
-            <div className="flex flex-col px-4 py-2 font-medium">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium">Need help? We&apos;ve got you covered</span>
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                Contact us if you&apos;re experiencing any issues
-              </div>
-            </div>
             <div className="flex items-center mt-1 text-[10px] text-muted-foreground">
               <IconSparkles size={12} className="mr-1" />
               Built with Coffee in Houston, TX
