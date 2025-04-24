@@ -156,14 +156,13 @@ export default function ProfileAnalysisPage() {
                         Build your profile through conversation with our AI assistant
                       </p>
                     </div>
-                    <Button
-                      variant="default"
-                      className="gap-2 cursor-pointer"
-                      disabled={isAnalyzing}
-                    >
-                      <Mic className="h-4 w-4" />
-                      Start Conversation
-                    </Button>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed select-none opacity-60">
+                        <Mic className="h-4 w-4 text-muted-foreground" />
+                        <span>Start Conversation</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs px-1.5 py-0">Coming Soon</Badge>
+                    </div>
                   </div>
                 </div>
 
