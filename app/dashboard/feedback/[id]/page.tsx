@@ -13,6 +13,8 @@ import {
   Compass as CompassIcon,
   FileText,
   User,
+  FileEdit,
+  Sparkles,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -25,7 +27,13 @@ import { getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score
 import { getSkillIconComponent, getSkillColor, feedbackIcons, itemIndicatorIcons, metadataIcons } from "@/utils/icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUser } from "@/hooks/users/useUser"
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"
+import { getSessionById } from "@/services/database/interviews/getSessions"
+import { MultiStepLoader } from "@/components/ui/multi-step-loader"
+import { feedbackGenerationLoadingStates } from "@/constants/loadingStates"
+import { generateAndSaveFeedback } from "@/services/feedback/generateAndSaveFeedback"
+import { toast } from "sonner"
+import type { InterviewSession } from "@/types/interview-session"
 
 /**
  * Formats a date into a readable string
@@ -47,39 +55,49 @@ export default function FeedbackDetailPage({ params }: PageProps) {
 
   const [feedbackList, setFeedbackList] = useState<FeedbackWithMetadata[]>([])
   const [currentFeedback, setCurrentFeedback] = useState<FeedbackWithMetadata | null>(null)
+  const [sessionData, setSessionData] = useState<InterviewSession | null>(null)
   const [loading, setLoading] = useState(true)
+  const [generatingFeedback, setGeneratingFeedback] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [transcript, setTranscript] = useState<Record<string, unknown> | null>(null)
-  const { firstName } = useUser()
+  const { userId, firstName } = useUser()
+
+  const loadFeedback = async () => {
+    try {
+      setLoading(true)
+      // We're now using the session ID to fetch feedback
+      const feedbackData = await getFeedbackBySessionId(id)
+
+      if (!feedbackData || feedbackData.length === 0) {
+        // If no feedback found, try to get the session data
+        const session = await getSessionById(id)
+
+        if (!session) {
+          setError("No interview session found with this ID")
+        } else {
+          setSessionData(session)
+          setError(null) // Clear error since we found a session
+        }
+      } else {
+        setFeedbackList(feedbackData)
+        // Set the first feedback as the current one by default
+        setCurrentFeedback(feedbackData[0])
+
+        // We don't need to separately fetch the transcript anymore
+        // as it's included in the interview_sessions data
+        if (feedbackData[0].interview_sessions?.transcript) {
+          setTranscript(feedbackData[0].interview_sessions.transcript)
+        }
+      }
+    } catch (err) {
+      setError("Error loading feedback")
+      console.error("Error loading feedback:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadFeedback = async () => {
-      try {
-        setLoading(true)
-        // We're now using the session ID to fetch feedback
-        const feedbackData = await getFeedbackBySessionId(id)
-
-        if (!feedbackData || feedbackData.length === 0) {
-          setError("No feedback found for this session")
-        } else {
-          setFeedbackList(feedbackData)
-          // Set the first feedback as the current one by default
-          setCurrentFeedback(feedbackData[0])
-          
-          // We don't need to separately fetch the transcript anymore
-          // as it's included in the interview_sessions data
-          if (feedbackData[0].interview_sessions?.transcript) {
-            setTranscript(feedbackData[0].interview_sessions.transcript)
-          }
-        }
-      } catch (err) {
-        setError("Error loading feedback")
-        console.error("Error loading feedback:", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadFeedback()
   }, [id])
 
@@ -88,6 +106,33 @@ export default function FeedbackDetailPage({ params }: PageProps) {
     setCurrentFeedback(feedback)
     if (feedback.interview_sessions?.transcript) {
       setTranscript(feedback.interview_sessions.transcript)
+    }
+  }
+
+  // Function to handle feedback generation
+  const handleGenerateFeedback = async () => {
+    if (!userId || !sessionData) return
+
+    try {
+      setGeneratingFeedback(true)
+
+      // Generate feedback and save to database
+      const feedbackId = await generateAndSaveFeedback(id, userId)
+
+      toast.success("Feedback generated successfully!", {
+        description: "Your interview feedback is ready to view",
+      })
+
+      // Reload feedback data
+      await loadFeedback()
+
+    } catch (error) {
+      console.error("Error generating feedback:", error)
+      toast.error("Error generating feedback", {
+        description: "There was a problem analyzing your interview. Please try again.",
+      })
+    } finally {
+      setGeneratingFeedback(false)
     }
   }
 
@@ -101,6 +146,97 @@ export default function FeedbackDetailPage({ params }: PageProps) {
           <p className="text-muted-foreground text-sm max-w-md text-center">
             Please wait while we retrieve your interview feedback...
           </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle case where we have session data but no feedback yet
+  if (sessionData && !currentFeedback) {
+    return (
+      <div className="flex flex-col w-full overflow-x-hidden">
+        <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 pb-20">
+          {/* Multi-Step Loader for feedback generation */}
+          <MultiStepLoader
+            loadingStates={feedbackGenerationLoadingStates}
+            loading={generatingFeedback}
+            duration={1800}
+            loop={false}
+          />
+
+          {/* Back button */}
+          <div className="mb-6 flex items-center">
+            <Link href="/dashboard/feedback">
+              <Button variant="ghost" size="sm" className="gap-1 cursor-pointer" aria-label="Back to Feedback & Evaluation">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Feedback & Evaluation</span>
+              </Button>
+            </Link>
+          </div>
+
+          <Card className="mx-auto max-w-3xl border border-green-200 dark:border-green-800">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full">
+                    <span className="absolute inset-0 rounded-full animate-ping bg-green-400 opacity-75"></span>
+                  </div>
+                  <Sparkles className="h-5 w-5 text-green-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-medium">Generate AI Feedback</CardTitle>
+                  <CardDescription>Interview session ready for AI-generated feedback</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-6">
+              <div className="mb-6 border rounded-lg p-4 bg-muted/20">
+                <p className="text-sm font-medium mb-2">Interview Details:</p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2">
+                    <metadataIcons.jobTitle className="h-4 w-4 text-muted-foreground" />
+                    <span>Position: <span className="font-medium">{sessionData.job_title || 'Unnamed Position'}</span></span>
+                  </li>
+                  {sessionData.created_at && (
+                    <li className="flex items-center gap-2">
+                      <metadataIcons.date className="h-4 w-4 text-muted-foreground" />
+                      <span>Date: <span className="font-medium">{format(new Date(sessionData.created_at), 'MMMM d, yyyy')}</span></span>
+                    </li>
+                  )}
+                  {sessionData.interview_type && (
+                    <li className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                      <span>Type: <span className="font-medium">{sessionData.interview_type.charAt(0).toUpperCase() + sessionData.interview_type.slice(1)} Interview</span></span>
+                    </li>
+                  )}
+                </ul>
+              </div>
+
+              <div className="text-center space-y-4">
+                <div className="rounded-full bg-primary/10 p-5 mx-auto w-fit">
+                  <FileEdit className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Ready for AI Feedback</h3>
+                  <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
+                    Your interview session is ready for AI analysis. Generate detailed feedback on your performance including strengths, areas for improvement, and actionable recommendations.
+                  </p>
+                  <Button
+                    onClick={handleGenerateFeedback}
+                    disabled={generatingFeedback}
+                    className="gap-2 bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                  >
+                    {generatingFeedback ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-4 w-4" />
+                    )}
+                    <span>Generate AI Feedback</span>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
@@ -189,7 +325,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                     {currentFeedback.interview_sessions.job_title}
                   </p>
                 )}
-                
+
                 {/* Display feedback selector if multiple feedbacks exist */}
                 {feedbackList.length > 1 && (
                   <div className="mb-4">
@@ -208,8 +344,8 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                     </div>
                   </div>
                 )}
-                
-                <p className="text-muted-foreground line-clamp-3">
+
+                <p className="text-muted-foreground">
                   {currentFeedback.feedback_summary}
                 </p>
               </div>
@@ -469,9 +605,9 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                               {/* Avatar */}
                               {entry.role === "assistant" ? (
                                 <div className="h-9 w-9 overflow-hidden rounded-full relative">
-                                  <Image 
-                                    src="/faces/izzy-avatar.png" 
-                                    alt="Izzy Avatar" 
+                                  <Image
+                                    src="/faces/izzy-avatar.png"
+                                    alt="Izzy Avatar"
                                     fill
                                     sizes="36px"
                                     className="object-cover"
