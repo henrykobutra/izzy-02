@@ -38,18 +38,16 @@ export default function AgentCard() {
 
             {/* CTA Button */}
             <div className="mt-4 md:mt-0 flex-shrink-0">
-                <Link href="/#">
-                    <Button
-                        size="lg"
-                        className="text-lg px-8 py-6 font-semibold transition-all hover:scale-105 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg cursor-pointer"
-                        variant="default"
-                        effect="expandIcon"
-                        icon={PhoneCall}
-                        iconPlacement="right"
-                    >
-                        Talk to Izzy
-                    </Button>
-                </Link>
+                <Button
+                    size="lg"
+                    className="text-lg px-8 py-6 font-semibold transition-all hover:scale-105 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg cursor-pointer"
+                    variant="default"
+                    effect="expandIcon"
+                    icon={PhoneCall}
+                    iconPlacement="right"
+                >
+                    Talk to Izzy
+                </Button>
             </div>
         </div>
     );

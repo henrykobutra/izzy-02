@@ -6,6 +6,7 @@ import { FaqSection } from "@/components/marketing/faq";
 import CTASection from "@/components/marketing/CTA";
 import Link from "next/link";
 import { WaveSeparator } from "@/components/ui/wave-separator";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 export default function HomePage() {
   return (
@@ -22,11 +23,26 @@ export default function HomePage() {
             requirements, strategize, conduct mock interviews, and provide
             detailed evaluations.
           </p>
-          <div className="mt-12">
-            <Link href="/login">
-              <Button className="text-2xl p-8 cursor-pointer" variant="ghost" effect="expandIcon" icon={IconArrowRight} iconPlacement="right">
-                Get Started
-              </Button>
+          <div className="mt-12 flex gap-6 justify-center">
+            <Link href="/about">
+              <InteractiveHoverButton
+                className="border-accent text-accent font-medium bg-transparent"
+                dotColorClass="bg-accent"
+                expandedTextColorClass="text-accent-foreground"
+                size="xl"
+              >
+                Learn More
+              </InteractiveHoverButton>
+            </Link>
+            <Link href="/signup">
+              <InteractiveHoverButton
+                className="border-primary bg-primary text-primary-foreground font-medium"
+                dotColorClass="bg-accent"
+                expandedTextColorClass="text-background"
+                size="xl"
+              >
+                Sign Up
+              </InteractiveHoverButton>
             </Link>
           </div>
         </section>
