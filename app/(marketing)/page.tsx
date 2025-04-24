@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@tabler/icons-react";
-import AgentVisualizer from "@/components/animations/soundbar";
+import AgentCard from "@/components/marketing/agent-card";
 import { HowItWorks } from "@/components/marketing/how-it-works/HowItWorks";
 import { FaqSection } from "@/components/marketing/faq";
 import CTASection from "@/components/marketing/CTA";
@@ -31,7 +31,7 @@ export default function HomePage() {
 
           {/* Agent Visualizer Component */}
           <div className="mt-16 w-full max-w-5xl mx-auto">
-            <AgentVisualizer />
+            <AgentCard />
           </div>
         </section>
 
