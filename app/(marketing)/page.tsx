@@ -33,10 +33,10 @@ export default function HomePage() {
 
         {/* Wave Separator - Moved outside container for full width */}
         <div className="w-full my-8">
-          <WaveSeparator height={80} />
+          <WaveSeparator height={123} />
         </div>
 
-        <section className="container mx-auto text-center flex flex-col items-center">
+        <section className="-mt-20 container mx-auto text-center flex flex-col items-center">
           {/* Agent Visualizer Component */}
           <div className="w-full max-w-5xl mx-auto">
             <AgentCard />
