@@ -50,7 +50,6 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [transcript, setTranscript] = useState<Record<string, unknown> | null>(null)
-  const [transcriptLoading, setTranscriptLoading] = useState(false)
   const { firstName } = useUser()
 
   useEffect(() => {
@@ -453,12 +452,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {transcriptLoading ? (
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                    <p className="text-muted-foreground text-sm">Loading transcript...</p>
-                  </div>
-                ) : transcript ? (
+                {transcript ? (
                   <div className="space-y-4">
                     {Array.isArray(transcript) ? (
                       <div className="space-y-6">
