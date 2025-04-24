@@ -9,7 +9,6 @@ import { InterviewTipCard } from "@/components/interview-tip-card"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, CheckCircle2, ListChecks, Target } from "lucide-react"
-import Link from "next/link"
 import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useRouter } from "next/navigation"
 import confetti from "canvas-confetti"
@@ -54,7 +53,7 @@ export default function DashboardPage() {
         <p className="text-muted-foreground mb-6">
           {profileExists
             ? "Track your progress and prepare for your next interview"
-            : "Let's get you started on your interview preparation journey"}
+            : "Let&apos;s get you started on your interview preparation journey"}
         </p>
       </div>
 
@@ -76,7 +75,7 @@ export default function DashboardPage() {
                   <div>
                     <h3 className="font-medium text-sm">Create your profile</h3>
                     <p className="text-sm text-muted-foreground">
-                      Tell us about your experience and what roles you're targeting to receive personalized guidance
+                      Tell us about your experience and what roles you&apos;re targeting to receive personalized guidance
                     </p>
                   </div>
                 </div>

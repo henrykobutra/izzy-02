@@ -45,9 +45,6 @@ export default function InterviewDetailPage({ params }: PageProps) {
   // Interview state management
   const [interviewState, setInterviewState] = useState<InterviewState>("before_start")
 
-  // Alert dialog state for restart confirmation
-  const [showRestartAlert, setShowRestartAlert] = useState(false)
-
   // Conversation messages (to store transcript)
   const [conversationMessages, setConversationMessages] = useState<ConversationMessage[]>([])
 
@@ -482,7 +479,9 @@ export default function InterviewDetailPage({ params }: PageProps) {
                   <AlertDialogTrigger asChild>
                     <Button
                       className="gap-2 cursor-pointer"
-                      onClick={() => setShowRestartAlert(true)}
+                      onClick={() => {
+                        handleStartInterview();
+                      }}
                     >
                       <RefreshCcw className="h-4 w-4" />
                       Start Interview Again
@@ -496,9 +495,10 @@ export default function InterviewDetailPage({ params }: PageProps) {
                       Are you sure you want to restart the interview? All progress will be lost.
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="cursor-pointer" onClick={() => setShowRestartAlert(false)}>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel className="cursor-pointer">
+                        Cancel
+                      </AlertDialogCancel>
                       <AlertDialogAction className="cursor-pointer" onClick={() => {
-                        setShowRestartAlert(false);
                         handleStartInterview();
                       }}>
                         Restart Interview

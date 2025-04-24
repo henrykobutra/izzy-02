@@ -11,12 +11,11 @@ import { FileText, ChevronRight, BarChart3, Lightbulb, TrendingUp, LineChart, Ch
 export function FeedbackCard() {
   const { userId } = useUser()
   const { 
-    hasFeedback, 
     feedbackData, 
-    isLoading, 
+    hasFeedback, 
+    isLoading,
     sessionsReadyForFeedback,
-    loadingReadySessions,
-    improvementAreas
+    loadingReadySessions
   } = useFeedback(userId)
   
   // Count total feedback items and sessions ready for feedback
@@ -28,11 +27,6 @@ export function FeedbackCard() {
     ? Math.round(feedbackData.reduce((sum, fb) => sum + fb.overall_score, 0) / feedbackData.length)
     : 0
   
-  // Get the latest feedback date
-  const latestFeedback = feedbackData.length > 0
-    ? [...feedbackData].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
-    : null
-    
   // Count total strengths and areas for improvement across all feedback
   const totalStrengths = feedbackData.reduce((sum, fb) => sum + (fb.strengths?.length || 0), 0)
   const totalImprovements = feedbackData.reduce((sum, fb) => sum + (fb.areas_for_improvement?.length || 0), 0)

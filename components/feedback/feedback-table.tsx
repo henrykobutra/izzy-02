@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -29,11 +28,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { FileText, Trash, Loader2, MessageSquare, Code, CompassIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import type { FeedbackWithMetadata, FeedbackTableProps } from "@/types/interview-feedback";
+import type { FeedbackTableProps } from "@/types/interview-feedback";
 import type { StrategyAnalysis } from "@/types/strategy";
 import { getStrategyById } from "@/services/database/strategies/getStrategy";
 import { deleteFeedback } from "@/services/database/feedback/deleteFeedback";
-import { getScoreColor, getScoreBarColor, getScoreLabel } from "@/utils/score-utils";
+import { getScoreBarColor, getScoreLabel } from "@/utils/score-utils";
 
 export function FeedbackTable({
   data,
@@ -41,7 +40,6 @@ export function FeedbackTable({
   hasFeedback,
   refetchFeedback
 }: FeedbackTableProps) {
-  const router = useRouter();
   const [feedbackToDelete, setFeedbackToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [strategies, setStrategies] = useState<Record<string, StrategyAnalysis>>({});
@@ -54,7 +52,7 @@ export function FeedbackTable({
   }, [data]);
 
   // Fetch strategy information for sessions that have a strategy ID
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchStrategies = async () => {
       const strategiesMap: Record<string, StrategyAnalysis> = {};
 

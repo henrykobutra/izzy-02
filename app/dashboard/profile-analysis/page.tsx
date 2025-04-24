@@ -8,7 +8,24 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic, UserSquare2, ChevronUp, RefreshCw, Check, ChevronsUpDown } from "lucide-react"
+import { 
+  Linkedin, 
+  Upload, 
+  FileText, 
+  CheckCircle, 
+  Calendar, 
+  Brain, 
+  BarChart3, 
+  Award, 
+  Briefcase, 
+  GraduationCap, 
+  Mic, 
+  UserSquare2, 
+  ChevronUp, 
+  RefreshCw, 
+  Check, 
+  ChevronsUpDown 
+} from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -21,7 +38,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+}
+from "@/components/ui/popover"
 import {
   Command,
   CommandEmpty,

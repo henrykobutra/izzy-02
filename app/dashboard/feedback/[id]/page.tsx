@@ -3,8 +3,6 @@
 import React from "react"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   ArrowLeft,
@@ -14,8 +12,6 @@ import {
   Code,
   Compass as CompassIcon,
   FileText,
-  Bot,
-  User2
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -23,12 +19,12 @@ import { getFeedback } from "@/services/database/feedback/getFeedback"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
-import { getScoreColor, getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score-utils"
+import { getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score-utils"
 import { getSkillIconComponent, getSkillColor, feedbackIcons, itemIndicatorIcons, metadataIcons } from "@/utils/icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getInterviewTranscript } from "@/services/database/interviews/getTranscript"
 import { useUser } from "@/hooks/users/useUser"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge";
 
 /**
  * Formats a date into a readable string
@@ -51,7 +47,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   const [feedback, setFeedback] = useState<FeedbackWithMetadata | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [transcript, setTranscript] = useState<any>(null)
+  const [transcript, setTranscript] = useState<Record<string, unknown> | null>(null)
   const [transcriptLoading, setTranscriptLoading] = useState(false)
   const { firstName } = useUser()
 
@@ -462,16 +458,13 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                             >
                               {/* Avatar */}
                               {entry.role === "assistant" ? (
-                                <Avatar className="h-9 w-9">
-                                  <AvatarImage src="/faces/izzy-avatar.png" alt="Izzy" />
-                                  <AvatarFallback className="bg-primary/20 text-primary">IZ</AvatarFallback>
-                                </Avatar>
+                                <div className="h-9 w-9 bg-muted-foreground/20 text-muted-foreground flex items-center justify-center rounded-full">
+                                  IZ
+                                </div>
                               ) : (
-                                <Avatar className="h-9 w-9">
-                                  <AvatarFallback className="bg-muted-foreground/20 text-muted-foreground">
-                                    {firstName ? firstName.charAt(0).toUpperCase() : "U"}
-                                  </AvatarFallback>
-                                </Avatar>
+                                <div className="h-9 w-9 bg-muted-foreground/20 text-muted-foreground flex items-center justify-center rounded-full">
+                                  {firstName ? firstName.charAt(0).toUpperCase() : "U"}
+                                </div>
                               )}
 
                               {/* Message Content */}

@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useRef } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { FileText, Plus, Briefcase, Eye, Mic, Trash2, RefreshCw, AlertTriangle, Database, ChevronDown, ChevronsUpDown } from "lucide-react"
+import { FileText, Plus, Briefcase, Eye, Mic, Trash2, RefreshCw, AlertTriangle, ChevronsUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
@@ -29,7 +30,6 @@ import { useProfiles } from "@/hooks/profile/useProfiles"
 import { useStrategies } from "@/hooks/strategies/useStrategies"
 import { sampleJobs } from "@/constants/sampleJobs"
 import type { SampleJobEntry } from "@/types/jobs"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   AlertDialog,
@@ -50,7 +50,6 @@ import type { StrategyAnalysis } from "@/types/strategy"
 import { MultiStepLoader } from "@/components/ui/multi-step-loader"
 import { jobAnalysisLoadingStates, synchronizationLoadingStates } from "@/constants/loadingStates"
 import { ProfileSummaryCard } from "@/components/profile/ProfileSummaryCard"
-import { Label } from "@/components/ui/label"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 

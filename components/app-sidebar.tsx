@@ -139,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       Izzy AI is a demonstration project showcasing multiple AI agents working together to help interviewers improve their interview performance.
                     </p>
                     <p className="text-muted-foreground mb-1">
-                      <span className="font-medium">Technologies:</span> Google Gemini Pro 2.5 Preview, OpenAI's 4o, VAPI's voice agents and routing
+                      <span className="font-medium">Technologies:</span> Google Gemini Pro 2.5 Preview, OpenAI&apos;s 4o, VAPI&apos;s voice agents and routing
                     </p>
                     <p className="text-muted-foreground mb-1">
                       <span className="font-medium">Built with:</span> Next.js, Supabase, Vercel
@@ -187,11 +187,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
               </DialogContent>
             </Dialog>
-            <div className="border-t pt-2 mt-1">
-              <div className="flex items-center mt-1 text-[10px] text-muted-foreground">
-                <IconSparkles size={12} className="mr-1" />
-                Built with Coffee in Houston, TX
+            <div className="flex flex-col px-4 py-2 font-medium">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium">Need help? We&apos;ve got you covered</span>
               </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Contact us if you&apos;re experiencing any issues
+              </div>
+            </div>
+            <div className="flex items-center mt-1 text-[10px] text-muted-foreground">
+              <IconSparkles size={12} className="mr-1" />
+              Built with Coffee in Houston, TX
             </div>
           </div>
         </SidebarGroup>

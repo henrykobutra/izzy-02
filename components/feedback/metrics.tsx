@@ -3,7 +3,6 @@
 import { IconCalendar, IconBrain, IconMessageCircle, IconCode, IconPuzzle, IconStar, IconClock, IconList } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { ProcessedFeedback } from "@/utils/processFeedback";
 import { useUser } from "@/hooks/users/useUser";
 import { formatDistanceToNow } from "date-fns";
@@ -21,7 +20,7 @@ interface FeedbackMetricsProps {
 }
 
 export function FeedbackMetrics({ feedbackMetrics }: FeedbackMetricsProps) {
-  const { averages, best, latest } = feedbackMetrics;
+  const { averages } = feedbackMetrics;
   const { createdAt, isLoading } = useUser();
   
   // Create metrics array from the averages

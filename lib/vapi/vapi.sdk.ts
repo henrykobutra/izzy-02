@@ -2,7 +2,7 @@ import Vapi from '@vapi-ai/web'
 
 // Create a global variable to store the vapi instance
 declare global {
-  var vapiInstance: typeof Vapi.prototype | undefined
+  let vapiInstance: typeof Vapi.prototype | undefined
 }
 
 // This ensures vapi is only instantiated once even in development

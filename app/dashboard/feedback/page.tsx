@@ -12,8 +12,9 @@ import { useRouter } from "next/navigation";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { feedbackGenerationLoadingStates } from "@/constants/loadingStates";
 import { processFeedback } from "@/utils/processFeedback";
+import Link from "next/link";
 
-import { RefreshCw, FileText, CheckCircle, Sparkles } from "lucide-react";
+import { FileText, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
@@ -26,7 +27,6 @@ export default function FeedbackPage() {
     feedbackData,
     isLoading,
     hasFeedback,
-    improvementAreas,
     sessionsReadyForFeedback,
     loadingReadySessions,
     fetchFeedback,
@@ -156,12 +156,12 @@ export default function FeedbackPage() {
                     Complete practice interviews to receive detailed feedback on your performance.
                   </p>
                   <div className="pt-2">
-                    <a 
+                    <Link 
                       href="/dashboard/practice-interview" 
                       className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
                     >
                       Start Practice Interview
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
