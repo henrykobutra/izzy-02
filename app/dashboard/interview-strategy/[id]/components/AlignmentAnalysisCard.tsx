@@ -120,17 +120,17 @@ export function AlignmentAnalysisCard({ strategy }: AlignmentAnalysisCardProps) 
             </div>
           </div>
           <div className="p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Skills */}
               <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">Skills</h4>
-                <div className="flex flex-wrap gap-2">
+                <h4 className="text-sm font-medium text-muted-foreground mb-3">Skills</h4>
+                <div className="flex flex-wrap gap-2 max-w-full">
                   {strategy.key_alignments.skills.map((skill, i) => (
                     <Badge 
                       key={i} 
-                      className="px-2 py-1 bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-500/20 border-green-200"
+                      className="px-2 py-1 bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-500/20 border-green-200 break-words"
                     >
-                      {skill.length > 80 ? `${skill.substring(0, 80)}...` : skill}
+                      {skill.length > 50 ? `${skill.substring(0, 50)}...` : skill}
                     </Badge>
                   ))}
                 </div>
@@ -139,7 +139,7 @@ export function AlignmentAnalysisCard({ strategy }: AlignmentAnalysisCardProps) 
               {/* Experience */}
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground mb-3">Experience</h4>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {strategy.key_alignments.experience.map((exp, i) => (
                     <div key={i} className="flex items-start gap-2.5 text-sm">
                       <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" aria-hidden="true" />
