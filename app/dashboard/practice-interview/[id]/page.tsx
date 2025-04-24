@@ -6,7 +6,7 @@ import { useInterviewTranscript } from "@/hooks/interview-sessions/useInterviewT
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, FileText, PhoneOff } from "lucide-react"
+import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, FileText, PhoneOff, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
@@ -16,8 +16,8 @@ import { startVapiAssistant, setupVapiEventListeners } from "@/lib/vapi/vapi.uti
 import { useUser } from "@/hooks/users/useUser"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
-import type { ConversationMessage } from "@/hooks/interview-sessions/useInterviewTranscript";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import type { ConversationMessage } from "@/hooks/interview-sessions/useInterviewTranscript";
 import { deleteFeedbackBySessionId } from "@/services/database/feedback/deleteFeedback"
 
 // Updated type definition for Next.js 15.3.1 params
@@ -609,14 +609,18 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                {interviewState === "completed" && (
+                {(interviewState === "completed" || session.status === "completed") && (
                   <Link href={`/dashboard/feedback/${id}`}>
                     <Button
-                      variant="secondary"
-                      className="gap-2 cursor-pointer"
+                      variant="outline"
+                      className="gap-2 cursor-pointer relative"
                     >
-                      <FileText className="h-4 w-4" />
-                      Interview Feedback
+                      <Sparkles className="h-4 w-4" />
+                      <span>Interview Feedback</span>
+                      <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                        <span className="absolute h-3 w-3 rounded-full bg-green-500"></span>
+                        <span className="h-3 w-3 rounded-full bg-green-400 animate-ping opacity-75"></span>
+                      </div>
                     </Button>
                   </Link>
                 )}
