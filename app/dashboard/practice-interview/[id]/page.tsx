@@ -6,7 +6,7 @@ import { useInterviewTranscript } from "@/hooks/interview-sessions/useInterviewT
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, FileText, PhoneOff, Sparkles } from "lucide-react"
+import { AlertCircle, ArrowLeft, MessageSquare, Code, CompassIcon, Loader2, UserRound, Play, RefreshCcw, PhoneOff, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"

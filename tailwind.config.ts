@@ -98,6 +98,10 @@ const config: Config = {
           '50%': { 'background-position': '100% 50%' },
           '100%': { 'background-position': '0% 50%' },
         },
+        blink: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -105,10 +109,10 @@ const config: Config = {
         rainbow: "rainbow var(--speed,2s) infinite linear",
         shine: 'shine 3s ease-out infinite',
         'gradient-flow': 'gradientFlow 10s ease 0s infinite normal none running',
+        blink: "blink 1s step-end infinite",
       },
     },
   },
   plugins: [require("tw-animate-css")],
-}
-
+} satisfies Config
 export default config
