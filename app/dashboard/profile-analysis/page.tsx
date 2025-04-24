@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic, UserSquare2, ChevronUp, RefreshCw } from "lucide-react"
+import { Linkedin, Upload, FileText, CheckCircle, Calendar, Brain, BarChart3, Award, Briefcase, GraduationCap, MessageSquare, Mic, UserSquare2, ChevronUp, RefreshCw, Check, ChevronsUpDown } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -16,6 +16,19 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { toast } from "sonner"
 import { MultiStepLoader } from "@/components/ui/multi-step-loader"
 import { profileAnalysisLoadingStates } from "@/constants/loadingStates"
+import { SampleProfile, sampleProfiles } from "@/constants/sampleProfiles"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command"
+import { cn } from "@/lib/utils"
 
 export default function ProfileAnalysisPage() {
   const [resumeContent, setResumeContent] = useState("")
@@ -23,6 +36,8 @@ export default function ProfileAnalysisPage() {
   const [highlightProfileCard, setHighlightProfileCard] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<ProfileAnalysis | null>(null)
+  const [openSampleProfilesCombobox, setOpenSampleProfilesCombobox] = useState(false)
+  const [selectedSampleProfile, setSelectedSampleProfile] = useState<SampleProfile | null>(null)
   const { generateProfile, error: generateProfileError } = useGenerateProfile();
   const { profile, loading: profileLoading, exists: profileExists } = useProfiles();
 
@@ -60,6 +75,12 @@ export default function ProfileAnalysisPage() {
       setIsAnalyzing(false)
       window.scrollTo({ top: document.getElementById("analysis-results")?.offsetTop || 0, behavior: "smooth" })
     }
+  }
+
+  const handleSelectSampleProfile = (profile: SampleProfile) => {
+    setSelectedSampleProfile(profile)
+    setResumeContent(profile.content)
+    setOpenSampleProfilesCombobox(false)
   }
 
   return (
@@ -108,7 +129,7 @@ export default function ProfileAnalysisPage() {
                   <div className="lg:col-span-7 space-y-4 border rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <FileText className="h-5 w-5 text-primary" />
-                      <h3 className="font-medium">Option 1: Paste Your Resume</h3>
+                      <h3 className="font-medium">Paste Your Resume</h3>
                     </div>
                     <Textarea
                       placeholder="Paste your resume text here..."
@@ -117,7 +138,18 @@ export default function ProfileAnalysisPage() {
                       onChange={(e) => setResumeContent(e.target.value)}
                       disabled={isAnalyzing}
                     />
-                    <div className="flex justify-end">
+                    <div className="flex justify-between">
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setResumeContent('');
+                          setSelectedSampleProfile(null);
+                        }}
+                        disabled={!resumeContent.trim() || isAnalyzing}
+                        className={(!resumeContent.trim() || isAnalyzing) ? '' : 'cursor-pointer'}
+                      >
+                        Clear
+                      </Button>
                       <Button
                         onClick={handleAnalyzeProfile}
                         disabled={!resumeContent.trim() || isAnalyzing}
@@ -145,23 +177,71 @@ export default function ProfileAnalysisPage() {
                     </div>
                   </div>
 
-                  {/* Talk to Izzy - Takes 1/3 width */}
-                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 flex flex-col items-center justify-center text-center">
-                    <div className="mb-2">
-                      <div className="flex items-center gap-2 mb-3 justify-center">
-                        <MessageSquare className="h-5 w-5 text-primary" />
-                        <h3 className="font-medium">Option 2: Talk to Izzy</h3>
+                  {/* Insert Sample Profile - Takes 1/3 width */}
+                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-sm">
+                    <div className="mb-4 w-full">
+                      <div className="flex items-center justify-center">
+                        <div className="inline-flex h-8 items-center text-primary font-medium text-sm">
+                          <FileText className="h-4 w-4 mr-1.5 flex-shrink-0" />
+                          <span className="truncate">Sample Profiles</span>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1 mb-6">
-                        Build your profile through conversation with our AI assistant
+                      <p className="text-xs sm:text-sm text-muted-foreground px-1 mt-2">
+                        Try with a sample profile to see how the analysis works
                       </p>
                     </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="inline-flex items-center text-sm bg-white dark:bg-slate-800 border rounded-lg px-3 py-1.5 gap-2 cursor-not-allowed select-none opacity-60">
-                        <Mic className="h-4 w-4 text-muted-foreground" />
-                        <span>Start Conversation</span>
+
+                    <div className="w-full space-y-3 sm:space-y-4 mt-1 sm:mt-2">
+                      <div className="relative">
+                        <div className="absolute -top-2 left-4 px-1 bg-slate-50 dark:bg-slate-900/40 text-xs text-muted-foreground">
+                          Select a sample profile
+                        </div>
+                        <Popover open={openSampleProfilesCombobox} onOpenChange={setOpenSampleProfilesCombobox}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={openSampleProfilesCombobox}
+                              className="w-full justify-between border-dashed h-9 sm:h-11 text-xs sm:text-sm"
+                              disabled={isAnalyzing}
+                            >
+                              {selectedSampleProfile ? (
+                                <span className="font-medium truncate max-w-[200px]">{selectedSampleProfile.label}</span>
+                              ) : (
+                                <span className="text-muted-foreground">Choose from the list...</span>
+                              )}
+                              <ChevronsUpDown className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50 flex-shrink-0" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[250px] sm:w-[300px] p-0" align="center">
+                            <Command>
+                              <CommandEmpty>No sample profile found.</CommandEmpty>
+                              <CommandGroup>
+                                {sampleProfiles.map((profile) => (
+                                  <CommandItem
+                                    key={profile.value}
+                                    value={profile.value}
+                                    onSelect={() => handleSelectSampleProfile(profile)}
+                                    className="flex items-center gap-2 text-xs sm:text-sm"
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-1 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0",
+                                        selectedSampleProfile?.value === profile.value
+                                          ? "opacity-100 text-primary"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    <span className="truncate">{profile.label}</span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <Badge variant="outline" className="text-xs px-1.5 py-0">Coming Soon</Badge>
+
+
                     </div>
                   </div>
                 </div>
@@ -192,7 +272,7 @@ export default function ProfileAnalysisPage() {
           </Collapsible>
         </Card>
 
-        <MultiStepLoader 
+        <MultiStepLoader
           loadingStates={profileAnalysisLoadingStates}
           loading={isAnalyzing}
           duration={1800}
