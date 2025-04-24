@@ -1,8 +1,92 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { PhoneCall } from "lucide-react";
+import { PhoneCall, PhoneOff, UserRound } from "lucide-react";
+import { useState } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+
+// Simple speech visualizer for the call interface
+function SpeechVisualizer() {
+    return (
+        <div className="flex justify-center gap-1 h-6">
+            {[...Array(5)].map((_, i) => (
+                <div
+                    key={i}
+                    className="w-1 bg-primary rounded-full"
+                    style={{
+                        height: `${Math.max(15, Math.random() * 24)}px`,
+                        animationDuration: `${0.2 + Math.random() * 0.3}s`,
+                        animationDelay: `${i * 0.1}s`
+                    }}
+                >
+                    <style jsx>{`
+                        div {
+                            animation: pulse infinite alternate ease-in-out;
+                        }
+                        @keyframes pulse {
+                            0% { height: 15px; }
+                            100% { height: 24px; }
+                        }
+                    `}</style>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+// VisuallyHidden component for accessibility
+function VisuallyHidden({ children }: { children: React.ReactNode }) {
+    return (
+        <span className="absolute w-[1px] h-[1px] p-0 -m-[1px] overflow-hidden clip-[rect(0,0,0,0)] whitespace-nowrap border-0">
+            {children}
+        </span>
+    );
+}
 
 export default function AgentCard() {
+    const [open, setOpen] = useState(false);
+    const [callState, setCallState] = useState<"not_started" | "connecting" | "izzy_speaking" | "user_speaking" | "ended">("not_started");
+    
+    // Start the call
+    const handleStartCall = () => {
+        setCallState("connecting");
+        // Simulate connection delay
+        setTimeout(() => {
+            setCallState("izzy_speaking");
+        }, 1500);
+    };
+    
+    // End the call
+    const handleEndCall = () => {
+        setCallState("ended");
+        // Reset after a delay
+        setTimeout(() => {
+            setCallState("not_started");
+            setOpen(false);
+        }, 2000);
+    };
+    
+    // Toggle between who is speaking
+    const toggleSpeaking = () => {
+        if (callState === "izzy_speaking") {
+            setCallState("user_speaking");
+        } else if (callState === "user_speaking") {
+            setCallState("izzy_speaking");
+        }
+    };
+
+    // Helper to determine if participant is active
+    const isIzzyActive = callState === "izzy_speaking";
+    const isUserActive = callState === "user_speaking";
+
     return (
         <div className="bg-accent shadow-lg flex flex-col md:flex-row items-center gap-8 max-w-5xl mx-auto p-8 rounded-3xl">
             {/* Avatar with online indicator */}
@@ -35,18 +119,174 @@ export default function AgentCard() {
                 </p>
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Button with Dialog */}
             <div className="mt-4 md:mt-0 flex-shrink-0">
-                <Button
-                    size="lg"
-                    className="text-lg px-8 py-6 font-semibold transition-all hover:scale-105 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg cursor-pointer"
-                    variant="default"
-                    effect="expandIcon"
-                    icon={PhoneCall}
-                    iconPlacement="right"
-                >
-                    Talk to Izzy
-                </Button>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            size="lg"
+                            className="text-lg px-8 py-6 font-semibold transition-all hover:scale-105 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg cursor-pointer"
+                            variant="default"
+                            effect="expandIcon"
+                            icon={PhoneCall}
+                            iconPlacement="right"
+                        >
+                            Talk to Izzy
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md md:max-w-xl lg:max-w-2xl">
+                        {/* Visually hidden title for accessibility */}
+                        <VisuallyHidden>
+                            <DialogTitle>Chat with Izzy</DialogTitle>
+                        </VisuallyHidden>
+
+                        <div className="flex flex-col items-center p-4">
+                            {/* Call status indicator */}
+                            <div className="text-center mb-6 text-muted-foreground">
+                                {callState === "not_started" && <span>Ready to start call with Izzy</span>}
+                                {callState === "connecting" && <span>Connecting to Izzy...</span>}
+                                {callState === "izzy_speaking" && <span>Izzy is speaking</span>}
+                                {callState === "user_speaking" && <span>Your turn to speak</span>}
+                                {callState === "ended" && <span>Call ended</span>}
+                            </div>
+                            
+                            {/* Video call participants */}
+                            <div className="flex flex-col md:flex-row w-full gap-6 mb-8">
+                                {/* Interviewer */}
+                                <div
+                                    className={cn(
+                                        "flex-1 flex flex-col items-center p-6 rounded-xl border transition-all duration-500 ease-in-out h-[240px]",
+                                        isIzzyActive ? "border-primary bg-primary/5" : "border-muted-foreground/20"
+                                    )}
+                                >
+                                    <div className="relative mb-3">
+                                        <Avatar className="h-24 w-24">
+                                            <AvatarImage src="/faces/izzy-avatar.png" alt="Izzy" />
+                                            <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                                                IZ
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        {isIzzyActive && (
+                                            <span className="absolute bottom-0 right-0 h-5 w-5 rounded-full bg-green-500 border-2 border-white dark:border-gray-800">
+                                                <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></span>
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-center">
+                                        <h3 className="font-medium">Izzy</h3>
+                                        <p className="text-xs text-muted-foreground">Interview Assistant</p>
+                                    </div>
+                                    <div className="mt-auto pt-3">
+                                        {isIzzyActive && (
+                                            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                                <span className="mr-1 relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                </span>
+                                                Speaking
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* User */}
+                                <div
+                                    className={cn(
+                                        "flex-1 flex flex-col items-center p-6 rounded-xl border transition-all duration-500 ease-in-out h-[240px]",
+                                        isUserActive ? "border-primary bg-primary/5" : "border-muted-foreground/20"
+                                    )}
+                                >
+                                    <div className="relative mb-3">
+                                        <Avatar className="h-24 w-24">
+                                            <AvatarFallback className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-lg">
+                                                <UserRound className="h-12 w-12" />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        {isUserActive && (
+                                            <span className="absolute bottom-0 right-0 h-5 w-5 rounded-full bg-green-500 border-2 border-white dark:border-gray-800">
+                                                <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></span>
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-center">
+                                        <h3 className="font-medium">You</h3>
+                                        <p className="text-xs text-muted-foreground">Candidate</p>
+                                    </div>
+                                    <div className="mt-auto pt-3">
+                                        {isUserActive && (
+                                            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                                <span className="mr-1 relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                </span>
+                                                Speaking
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Speech visualizer - only show when conversation is active */}
+                            {(callState === "izzy_speaking" || callState === "user_speaking") && (
+                                <div className="w-full flex justify-center my-4">
+                                    <div className="bg-muted/30 rounded-md h-12 w-full max-w-md flex items-center justify-center">
+                                        <SpeechVisualizer />
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Call controls */}
+                            <div className="flex gap-3 mt-6">
+                                {callState === "not_started" && (
+                                    <Button 
+                                        onClick={handleStartCall} 
+                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                        size="lg"
+                                    >
+                                        <PhoneCall className="mr-2 h-4 w-4" />
+                                        Start Call
+                                    </Button>
+                                )}
+                                
+                                {(callState === "izzy_speaking" || callState === "user_speaking") && (
+                                    <Button
+                                        onClick={toggleSpeaking}
+                                        variant="outline"
+                                        className="rounded-full px-4"
+                                    >
+                                        Switch Speaker
+                                    </Button>
+                                )}
+                                
+                                {(callState !== "not_started" && callState !== "ended") && (
+                                    <Button 
+                                        onClick={handleEndCall} 
+                                        variant="destructive"
+                                        size="icon"
+                                        className="rounded-full h-12 w-12"
+                                    >
+                                        <PhoneOff className="h-5 w-5" />
+                                    </Button>
+                                )}
+                                
+                                {callState === "connecting" && (
+                                    <div className="text-sm text-muted-foreground animate-pulse">
+                                        Connecting to Izzy...
+                                    </div>
+                                )}
+                                
+                                {callState === "ended" && (
+                                    <Button 
+                                        onClick={() => setCallState("not_started")}
+                                        variant="outline"
+                                    >
+                                        Call again
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );
