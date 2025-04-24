@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Card, CardHeader, CardDescription, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Play, ChevronRight, CalendarClock, CheckSquare, Tag, ListChecks } from "lucide-react"
+import { ChevronRight, CalendarClock, CheckSquare, Tag, ListChecks } from "lucide-react"
 
 export function PracticeInterviewCard() {
   const { hasSessions, sessions, loading } = useInterviewSessions()
@@ -111,7 +111,6 @@ export function PracticeInterviewCard() {
             href="/dashboard/practice-interview" 
             className="flex items-center justify-center gap-1"
           >
-            <Play className="h-3 w-3" />
             <span>{hasSessions ? "Practice More" : "Start Practice"}</span>
             <ChevronRight className="h-3 w-3 ml-1" />
           </Link>
