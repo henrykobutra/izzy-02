@@ -84,16 +84,16 @@ export default function ProfileAnalysisPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-screen-xl px-4 py-8 lg:px-6">
+    <div className="container mx-auto max-w-screen-xl flex flex-col gap-6">
       <div className="flex flex-col gap-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile Analysis</h1>
-          <p className="text-muted-foreground mt-2">
+        <div className="px-4 lg:px-6">
+          <h1 className="text-2xl font-bold tracking-tight mb-4">Profile Analysis</h1>
+          <p className="text-muted-foreground mb-6">
             Update your profile to get fresh analysis or view your current profile details
           </p>
         </div>
 
-        <Card className={`transition-all ${highlightProfileCard ? 'ring-2 ring-primary ring-offset-2 animate-pulse' : ''}`}>
+        <Card className={`mx-4 lg:mx-6 transition-all ${highlightProfileCard ? 'ring-2 ring-primary ring-offset-2 animate-pulse' : ''}`}>
           <Collapsible open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
@@ -178,7 +178,7 @@ export default function ProfileAnalysisPage() {
                   </div>
 
                   {/* Insert Sample Profile - Takes 1/3 width */}
-                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-sm">
+                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4">
                     <div className="mb-4 w-full">
                       <div className="flex items-center justify-center">
                         <div className="inline-flex h-8 items-center text-primary font-medium text-sm">
@@ -284,7 +284,7 @@ export default function ProfileAnalysisPage() {
           {isAnalyzing ? (
             <></>
           ) : analysisResult ? (
-            <Card>
+            <Card className="mx-4 lg:mx-6">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -423,7 +423,7 @@ export default function ProfileAnalysisPage() {
           ) : profileLoading ? (
             <></>
           ) : !profileExists ? (
-            <Card>
+            <Card className="mx-4 lg:mx-6">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <UserSquare2 className="h-5 w-5 text-primary" />
@@ -458,7 +458,7 @@ export default function ProfileAnalysisPage() {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="mx-4 lg:mx-6">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
