@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import type { ConversationMessage } from "@/hooks/interview-sessions/useInterviewTranscript";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { deleteFeedbackBySessionId } from "@/services/database/feedback/deleteFeedback"
 
 // Updated type definition for Next.js 15.3.1 params
 interface PageProps {
@@ -102,6 +103,10 @@ export default function InterviewDetailPage({ params }: PageProps) {
     // Record session start
     recordSessionStart(new Date().toISOString());
 
+    // TODO: Optimistically soft delete interview_feedback where row has session_id = id
+    if (session?.status === "completed") {
+      await deleteFeedbackBySessionId(id);
+    }
     try {
       // Start in processing state
       setInterviewState("processing");
@@ -550,10 +555,10 @@ export default function InterviewDetailPage({ params }: PageProps) {
 
             {(interviewState === "interviewer_speaking" || interviewState === "candidate_speaking" || interviewState === "processing") && (
               <div className="mt-6 flex gap-3 items-center flex-col">
-                <Button 
-                  variant="destructive" 
-                  className="gap-2 cursor-pointer" 
-                  onClick={() => handleEndInterview()} 
+                <Button
+                  variant="destructive"
+                  className="gap-2 cursor-pointer"
+                  onClick={() => handleEndInterview()}
                   disabled={interviewState === "processing" || isEndingInterview}
                 >
                   {isEndingInterview ? (
