@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -62,7 +62,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   const [transcript, setTranscript] = useState<Record<string, unknown> | null>(null)
   const { userId, firstName } = useUser()
 
-  const loadFeedback = async () => {
+  const loadFeedback = useCallback(async () => {
     try {
       setLoading(true)
       // We're now using the session ID to fetch feedback
@@ -95,11 +95,11 @@ export default function FeedbackDetailPage({ params }: PageProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     loadFeedback()
-  }, [id])
+  }, [id, loadFeedback])
 
   // Function to select a specific feedback
   const selectFeedback = (feedback: FeedbackWithMetadata) => {
@@ -117,7 +117,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
       setGeneratingFeedback(true)
 
       // Generate feedback and save to database
-      const feedbackId = await generateAndSaveFeedback(id, userId)
+      await generateAndSaveFeedback(id, userId)
 
       toast.success("Feedback generated successfully!", {
         description: "Your interview feedback is ready to view",
