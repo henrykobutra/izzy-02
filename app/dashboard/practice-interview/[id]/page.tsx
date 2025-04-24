@@ -506,17 +506,15 @@ export default function InterviewDetailPage({ params }: PageProps) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button
-                  variant="secondary"
-                  className="gap-2 cursor-pointer"
-                  onClick={() => {
-                    // Replace with actual feedback generation logic
-                    alert("Generating interview feedback...");
-                  }}
-                >
-                  <FileText className="h-4 w-4" />
-                  Generate Interview Feedback
-                </Button>
+                <Link href={`/dashboard/feedback/${id}`}>
+                  <Button
+                    variant="secondary"
+                    className="gap-2 cursor-pointer"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Interview Feedback
+                  </Button>
+                </Link>
               </div>
             )}
           </CardFooter>
