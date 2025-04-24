@@ -1,8 +1,15 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb"
 
 export function SiteHeader() {
   const pathname = usePathname()
@@ -91,45 +98,40 @@ export function SiteHeader() {
     <header className="flex h-[var(--header-height)] shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-[var(--header-height)] capitalize">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <div className="flex items-center">
-          {/* Always use breadcrumb style for consistent text styling */}
-          <nav aria-label="Breadcrumb" className="flex">
-            <ol className="flex items-center gap-1">
+          <Breadcrumb className="flex">
+            <BreadcrumbList>
               {/* For Dashboard root, show just one item */}
               {isDashboardRoot ? (
-                <li>
-                  <span className="text-gray-500">Dashboard</span>
-                </li>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                </BreadcrumbItem>
               ) : (
                 <>
-                  <li>
-                    <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard">
                       Dashboard
-                    </Link>
-                  </li>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
 
                   {breadcrumbs.map((breadcrumb) => (
                     <React.Fragment key={breadcrumb.path}>
-                      <li>
-                        <span className="text-gray-500">/</span>
-                      </li>
-                      <li>
-                        <Link href={breadcrumb.path} className="text-gray-500 hover:text-gray-700">
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <BreadcrumbLink href={breadcrumb.path}>
                           {breadcrumb.label}
-                        </Link>
-                      </li>
+                        </BreadcrumbLink>
+                      </BreadcrumbItem>
                     </React.Fragment>
                   ))}
 
-                  <li>
-                    <span className="text-gray-500">/</span>
-                  </li>
-                  <li>
-                    <span className="text-gray-500">{title}</span>
-                  </li>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{title}</BreadcrumbPage>
+                  </BreadcrumbItem>
                 </>
               )}
-            </ol>
-          </nav>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
