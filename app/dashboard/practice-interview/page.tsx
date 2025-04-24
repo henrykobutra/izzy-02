@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect, useMemo, Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MultiStepLoader } from "@/components/ui/multi-step-loader"
@@ -40,7 +40,7 @@ import { useCreateSession } from "@/hooks/agents/useCreateSession"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Database } from "@/types/supabase"
-import { useSearchParams } from "next/navigation"
+import { StrategyParamHandler } from "@/components/interview/StrategyParamHandler"
 
 import { genericPositions } from "@/constants/positions"
 import { interviewSessionLoadingStates } from "@/constants/loadingStates"
@@ -75,7 +75,11 @@ export default function PracticeInterviewPage() {
   const { sessions, loading: sessionsLoading, hasSessions, refetch: refetchSessions } = useInterviewSessions();
   const { strategies, loading: strategiesLoading, hasStrategies } = useStrategies()
   const { createInterviewSession, isLoading: isCreatingSession, error: createSessionError } = useCreateSession();
-  const searchParams = useSearchParams();
+
+  const handleStrategySelection = (tab: string, position: Position | null) => {
+    setSelectedTab(tab);
+    setSelectedPosition(position);
+  };
 
   const interviewTypes: InterviewType[] = [
     { id: "technical", label: "Technical", icon: <Code className="h-4 w-4 mr-2" /> },
@@ -108,24 +112,17 @@ export default function PracticeInterviewPage() {
     }
   }, [selectedTab])
 
-  // Handle strategy ID from URL query parameter
-  useEffect(() => {
-    const strategyId = searchParams.get('strategyId');
-
-    if (strategyId && !strategiesLoading && strategies && strategies.length > 0) {
-      // Switch to the specific tab
-      setSelectedTab('specific');
-
-      // Find the matching strategy in specificPositions
-      const matchingPosition = specificPositions.find(position => position.id === strategyId);
-
-      if (matchingPosition) {
-        setSelectedPosition(matchingPosition);
-      } else {
-        console.warn(`Strategy with ID ${strategyId} not found`);
-      }
-    }
-  }, [searchParams, strategies, strategiesLoading, specificPositions]);
+  // Handle strategy URL params with Suspense boundary
+  const StrategyParamsWithSuspense = () => (
+    <Suspense fallback={null}>
+      <StrategyParamHandler 
+        specificPositions={specificPositions}
+        strategiesLoading={strategiesLoading}
+        strategies={strategies}
+        onSelectStrategy={handleStrategySelection}
+      />
+    </Suspense>
+  );
 
   useEffect(() => {
     if (createSessionError) {
@@ -621,6 +618,7 @@ export default function PracticeInterviewPage() {
         duration={1800} 
         loop={false}
       />
+      <StrategyParamsWithSuspense />
     </div>
   )
 }

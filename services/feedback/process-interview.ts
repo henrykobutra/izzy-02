@@ -18,16 +18,20 @@ export const processInterviewFeedback = async (
     // Get the interview transcript
     const interviewData = await getInterviewTranscript(sessionId)
     
-    if (!interviewData || !interviewData.transcript) {
+    // interviewData should include position_title and position_type for type safety
+    type InterviewData = { transcript: any; job_title: any; position_title?: string; position_type?: string };
+    const safeInterviewData = interviewData as InterviewData;
+    
+    if (!safeInterviewData || !safeInterviewData.transcript) {
       throw new Error('No transcript available for this session')
     }
     
     // Generate feedback from the transcript
     const feedback = await generateInterviewFeedback(
       sessionId,
-      interviewData.position_title || 'Unknown Position',
-      interviewData.position_type || 'general',
-      interviewData.transcript
+      safeInterviewData.position_title || 'Unknown Position',
+      safeInterviewData.position_type || 'general',
+      safeInterviewData.transcript
     )
     
     // Store the feedback in the database
