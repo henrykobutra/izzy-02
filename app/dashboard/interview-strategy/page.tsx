@@ -333,7 +333,7 @@ export default function InterviewStrategyPage() {
                 <div className="flex items-center justify-center">
                   <div className="inline-flex h-8 items-center text-primary font-medium text-sm">
                     <Briefcase className="h-4 w-4 mr-1.5 flex-shrink-0" />
-                    <span className="truncate">Sample Job Descriptions</span>
+                    <span className="text-white">Sample Job Descriptions</span>
                   </div>
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground px-1 mt-2">
@@ -343,9 +343,6 @@ export default function InterviewStrategyPage() {
 
               <div className="w-full space-y-3 sm:space-y-4 mt-1 sm:mt-2">
                 <div className="relative">
-                  <div className="absolute -top-2 left-4 px-1 bg-slate-50 dark:bg-slate-900/40 text-xs text-muted-foreground">
-                    Select a sample job
-                  </div>
                   <Popover open={openSampleJobCombobox} onOpenChange={setOpenSampleJobCombobox}>
                     <PopoverTrigger asChild>
                       <Button
@@ -357,7 +354,7 @@ export default function InterviewStrategyPage() {
                         {selectedSampleJob ? (
                           <span className="font-medium truncate max-w-[200px]">{selectedSampleJob.label}</span>
                         ) : (
-                          <span className="text-muted-foreground">Choose from the list...</span>
+                          <span>Choose from the list...</span>
                         )}
                         <ChevronsUpDown className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>

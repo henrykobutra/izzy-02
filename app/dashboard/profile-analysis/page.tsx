@@ -8,23 +8,23 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { 
-  Linkedin, 
-  Upload, 
-  FileText, 
-  CheckCircle, 
-  Calendar, 
-  Brain, 
-  BarChart3, 
-  Award, 
-  Briefcase, 
-  GraduationCap, 
-  Mic, 
-  UserSquare2, 
-  ChevronUp, 
-  RefreshCw, 
-  Check, 
-  ChevronsUpDown 
+import {
+  Linkedin,
+  Upload,
+  FileText,
+  CheckCircle,
+  Calendar,
+  Brain,
+  BarChart3,
+  Award,
+  Briefcase,
+  GraduationCap,
+  Mic,
+  UserSquare2,
+  ChevronUp,
+  RefreshCw,
+  Check,
+  ChevronsUpDown
 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
@@ -39,7 +39,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 }
-from "@/components/ui/popover"
+  from "@/components/ui/popover"
 import {
   Command,
   CommandEmpty,
@@ -196,12 +196,12 @@ export default function ProfileAnalysisPage() {
                   </div>
 
                   {/* Insert Sample Profile - Takes 1/3 width */}
-                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4">
+                  <div className="lg:col-span-4 border bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center text-center shadow-sm">
                     <div className="mb-4 w-full">
                       <div className="flex items-center justify-center">
                         <div className="inline-flex h-8 items-center text-primary font-medium text-sm">
                           <FileText className="h-4 w-4 mr-1.5 flex-shrink-0" />
-                          <span className="truncate">Sample Profiles</span>
+                          <span className="text-white">Sample Profiles</span>
                         </div>
                       </div>
                       <p className="text-xs sm:text-sm text-muted-foreground px-1 mt-2">
@@ -211,9 +211,6 @@ export default function ProfileAnalysisPage() {
 
                     <div className="w-full space-y-3 sm:space-y-4 mt-1 sm:mt-2">
                       <div className="relative">
-                        <div className="absolute -top-2 left-4 px-1 bg-slate-50 dark:bg-slate-900/40 text-xs text-muted-foreground">
-                          Select a sample profile
-                        </div>
                         <Popover open={openSampleProfilesCombobox} onOpenChange={setOpenSampleProfilesCombobox}>
                           <PopoverTrigger asChild>
                             <Button
@@ -226,7 +223,7 @@ export default function ProfileAnalysisPage() {
                               {selectedSampleProfile ? (
                                 <span className="font-medium truncate max-w-[200px]">{selectedSampleProfile.label}</span>
                               ) : (
-                                <span className="text-muted-foreground">Choose from the list...</span>
+                                <span>Choose from the list...</span>
                               )}
                               <ChevronsUpDown className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50 flex-shrink-0" />
                             </Button>
