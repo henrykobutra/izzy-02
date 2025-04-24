@@ -69,7 +69,7 @@ const LoaderCore = ({
                   className={cn(
                     "text-black dark:text-white",
                     value === index &&
-                      "text-black dark:text-primary opacity-100"
+                      "text-black dark:text-[#39FF14] opacity-100"
                   )}
                 />
               )}
@@ -77,7 +77,7 @@ const LoaderCore = ({
             <span
               className={cn(
                 "text-black dark:text-white",
-                value === index && "text-black dark:text-primary opacity-100"
+                value === index && "text-black dark:text-[#39FF14] opacity-100"
               )}
             >
               {loadingState.text}
