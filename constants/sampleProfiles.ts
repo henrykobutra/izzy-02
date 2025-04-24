@@ -8,11 +8,7 @@ export const sampleProfiles: SampleProfile[] = [
   {
     label: "Fresh AI Graduate from HCC",
     value: "ai-graduate",
-    content: `John Doe
-Email: johndoe@email.com | Phone: (555) 123-4567 | Houston, TX
-
-EDUCATION
-Houston Community College (HCC), Houston, TX
+    content: `EDUCATION
 Bachelor of Science in Artificial Intelligence and Machine Learning
 Graduated: May 2024 | GPA: 3.8/4.0
 
@@ -39,7 +35,7 @@ Chatbot Assistant
 - Built web interface for real-time interaction and feedback collection
 
 INTERNSHIP EXPERIENCE
-AI Research Intern, Tech Solutions Inc., Houston, TX (Summer 2023)
+AI Research Intern, Tech Solutions Inc. (Summer 2023)
 - Assisted senior data scientists in developing predictive maintenance algorithms
 - Processed and cleaned large datasets of sensor information
 - Contributed to model evaluation and validation processes
@@ -58,11 +54,7 @@ CERTIFICATIONS
   {
     label: "Junior Web Developer",
     value: "junior-web-dev",
-    content: `Sarah Johnson
-sjohnson@email.com | (123) 456-7890 | Austin, TX
-https://github.com/sarahjohnson | www.sarahjohnson-portfolio.com
-
-SUMMARY
+    content: `SUMMARY
 Junior Web Developer with 1.5 years of experience building responsive web applications using modern JavaScript frameworks. Passionate about creating clean, efficient code and continuously learning new technologies. Seeking opportunities to grow in a collaborative team environment.
 
 SKILLS
@@ -74,7 +66,7 @@ Databases: MongoDB, PostgreSQL
 
 EXPERIENCE
 Junior Web Developer
-TechStart Solutions, Austin, TX
+TechStart Solutions
 June 2023 - Present
 
 - Develop and maintain responsive web applications using React, achieving 98% cross-browser compatibility
@@ -84,7 +76,7 @@ June 2023 - Present
 - Assist in fixing bugs and resolving customer issues, with an average resolution time of 2 days
 
 Web Development Intern
-Digital Craft Agency, Austin, TX
+Digital Craft Agency
 January 2023 - May 2023
 
 - Assisted in building client websites using HTML, CSS, and JavaScript
@@ -93,7 +85,6 @@ January 2023 - May 2023
 - Supported senior developers in testing and debugging applications
 
 EDUCATION
-Austin Community College
 Associate of Applied Science in Web Development
 Graduated: December 2022 | GPA: 3.7/4.0
 
@@ -115,16 +106,12 @@ CERTIFICATIONS
   {
     label: "Experienced Military Mechanic",
     value: "military-mechanic",
-    content: `MICHAEL RODRIGUEZ
-mrodriguez@email.com | (555) 789-1234 | San Antonio, TX
-LinkedIn: linkedin.com/in/michaelrodriguez
-
-SUMMARY
+    content: `SUMMARY
 Highly skilled Military Vehicle Mechanic with 12 years of experience in the United States Army. Expert in diagnosing, repairing, and maintaining a wide range of military vehicles and equipment. Strong leadership abilities with experience supervising teams of up to 15 mechanics. Seeking to transition skills to civilian sector.
 
 PROFESSIONAL EXPERIENCE
 SENIOR VEHICLE MAINTENANCE SUPERVISOR
-United States Army, Fort Hood, TX
+United States Army
 January 2019 - February 2024
 
 - Supervised a team of 15 mechanics responsible for maintaining a fleet of 70+ tactical vehicles
@@ -135,7 +122,7 @@ January 2019 - February 2024
 - Ensured compliance with all safety regulations and maintenance procedures
 
 TACTICAL VEHICLE MECHANIC
-United States Army, Fort Bliss, TX
+United States Army
 March 2015 - December 2018
 
 - Performed maintenance and repairs on tactical vehicles including HMMWVs, 5-ton trucks, and MRAPs
@@ -145,7 +132,7 @@ March 2015 - December 2018
 - Participated in field exercises, providing mobile repair services in deployed conditions
 
 COMBAT VEHICLE MECHANIC
-United States Army, Afghanistan and Iraq
+United States Army
 June 2012 - February 2015
 
 - Performed emergency repairs on combat vehicles in deployed environments
@@ -168,7 +155,7 @@ EDUCATION AND TRAINING
 - Advanced Vehicle Maintenance, U.S. Army, 2019
 - Combat Vehicle Maintenance School, U.S. Army, 2015
 - Wheeled Vehicle Mechanic Course, U.S. Army, 2012
-- High School Diploma, Thomas Edison High School, San Antonio, TX, 2011
+- High School Diploma, Thomas Edison High School, 2011
 
 CERTIFICATIONS
 - ASE Certified Medium/Heavy Truck Technician (T2, T4, T6, T8)
@@ -189,12 +176,7 @@ ADDITIONAL SKILLS
   {
     label: "AI Professor",
     value: "ai-professor",
-    content: `Dr. Elizabeth Chen
-elizabeth.chen@university.edu | (555) 234-5678
-Department of Computer Science
-National University of Technology, Boston, MA
-
-ACADEMIC PROFILE
+    content: `ACADEMIC PROFILE
 Professor of Artificial Intelligence and Computer Science with 15+ years of experience in research, teaching, and academic leadership. Specializing in machine learning, natural language processing, and AI ethics. Recognized for groundbreaking research in explainable AI systems and leadership in developing interdisciplinary AI education programs.
 
 EDUCATION
@@ -212,7 +194,7 @@ Minor: Mathematics
 
 ACADEMIC APPOINTMENTS
 Professor, Department of Computer Science
-National University of Technology, Boston, MA
+National University of Technology
 2018-Present
 - Lead the Artificial Intelligence and Machine Learning research group
 - Developed and teach graduate and undergraduate courses in AI, deep learning, and NLP
@@ -220,14 +202,14 @@ National University of Technology, Boston, MA
 - Chair of the AI Ethics Committee
 
 Associate Professor, Department of Computer Science
-University of Washington, Seattle, WA
+University of Washington
 2013-2018
 - Established the Explainable AI Lab
 - Secured $3.5M in research funding from NSF, NIH, and industry partners
 - Designed new curriculum for Master's in AI program
 
 Assistant Professor, Department of Computer Science
-Carnegie Mellon University, Pittsburgh, PA
+Carnegie Mellon University
 2009-2013
 - Taught undergraduate and graduate courses in machine learning and AI
 - Mentored 6 Ph.D. students to successful completion of their dissertations
@@ -242,11 +224,11 @@ RESEARCH INTERESTS
 - Reinforcement learning
 
 SELECTED PUBLICATIONS (out of 87 total)
-1. Chen, E., et al. (2023). "Towards Transparent Medical Decision Systems: A Framework for Explainable Clinical AI." Nature Machine Intelligence, 5(4), 298-311.
-2. Chen, E., & Johnson, R. (2022). "LLMExplain: A Framework for Interpreting Large Language Models." Proceedings of the 39th International Conference on Machine Learning (ICML), 1876-1885.
-3. Chen, E., Smith, J., & Patel, K. (2021). "Mitigating Bias in AI Systems: A Comprehensive Approach." Journal of Artificial Intelligence Research, 72, 789-831.
-4. Chen, E., & Williams, T. (2020). "Neural Architectures for Cross-domain Knowledge Transfer." Advances in Neural Information Processing Systems (NeurIPS), 33, 4512-4523.
-5. Chen, E., et al. (2019). "Healthcare.AI: A Platform for Developing and Deploying Clinical AI Models." Journal of Biomedical Informatics, 96, 103256.
+1. "Towards Transparent Medical Decision Systems: A Framework for Explainable Clinical AI." Nature Machine Intelligence, 5(4), 298-311.
+2. "LLMExplain: A Framework for Interpreting Large Language Models." Proceedings of the 39th International Conference on Machine Learning (ICML), 1876-1885.
+3. "Mitigating Bias in AI Systems: A Comprehensive Approach." Journal of Artificial Intelligence Research, 72, 789-831.
+4. "Neural Architectures for Cross-domain Knowledge Transfer." Advances in Neural Information Processing Systems (NeurIPS), 33, 4512-4523.
+5. "Healthcare.AI: A Platform for Developing and Deploying Clinical AI Models." Journal of Biomedical Informatics, 96, 103256.
 
 GRANTS AND FUNDING
 - National Science Foundation, "Explainable AI for Critical Systems," Principal Investigator, $2.1M, 2021-2025
@@ -285,10 +267,7 @@ INDUSTRY COLLABORATION
   {
     label: "Customer Service Agent",
     value: "customer-service",
-    content: `LISA MARTINEZ
-lisamartinez@email.com | (555) 987-6543 | Denver, CO
-
-PROFESSIONAL SUMMARY
+    content: `PROFESSIONAL SUMMARY
 Dedicated Customer Service Agent with 2.5 years of experience in retail and call center environments. Recognized for resolving complex customer issues with patience and empathy. Skilled in providing product information, processing returns, and maintaining high customer satisfaction ratings. Seeking to leverage my communication skills and problem-solving abilities in a growing company.
 
 SKILLS
@@ -300,7 +279,7 @@ SKILLS
 
 WORK EXPERIENCE
 CUSTOMER SERVICE REPRESENTATIVE
-TechSupport Solutions, Denver, CO
+TechSupport Solutions
 June 2022 - Present
 
 • Handle an average of 50 customer inquiries daily through phone, email, and chat with 95% first-contact resolution rate
@@ -312,7 +291,7 @@ June 2022 - Present
 • Train and mentor new hires on customer service protocols and system navigation
 
 RETAIL CUSTOMER ASSOCIATE
-BestBuy, Colorado Springs, CO
+BestBuy
 March 2021 - May 2022
 
 • Assisted customers with product selection, demonstrations, and purchasing
@@ -345,16 +324,12 @@ ACCOMPLISHMENTS
   {
     label: "IT Project Manager Midlevel",
     value: "it-project-manager",
-    content: `DAVID WILLIAMS
-david.williams@email.com | (555) 456-7890 | Seattle, WA
-linkedin.com/in/davidwilliams | projectportfolio.davidwilliams.com
-
-PROFESSIONAL SUMMARY
+    content: `PROFESSIONAL SUMMARY
 Results-driven IT Project Manager with 6 years of experience leading cross-functional teams to deliver complex technology projects on time and within budget. Certified PMP and Scrum Master with proven track record of successful software implementations, infrastructure upgrades, and digital transformation initiatives. Known for strong stakeholder management, risk mitigation, and team leadership abilities.
 
 PROFESSIONAL EXPERIENCE
 SENIOR IT PROJECT MANAGER
-Global Financial Services Inc., Seattle, WA
+Global Financial Services Inc.
 June 2021 - Present
 
 • Lead 5-7 concurrent IT projects with budgets ranging from $250K to $1.5M, consistently meeting all delivery timelines
@@ -366,7 +341,7 @@ June 2021 - Present
 • Create and present monthly executive summaries to C-level stakeholders, highlighting project status, risks, and key metrics
 
 IT PROJECT MANAGER
-TechSolutions Corp., Portland, OR
+TechSolutions Corp.
 March 2018 - May 2021
 
 • Managed 12+ IT infrastructure and software development projects with combined budget of $3M
@@ -378,7 +353,7 @@ March 2018 - May 2021
 • Developed project schedules, resource allocation plans, and budget tracking mechanisms
 
 TECHNICAL ANALYST
-Innovative Systems Inc., Portland, OR
+Innovative Systems Inc.
 January 2016 - February 2018
 
 • Assisted project managers in coordinating IT infrastructure projects
@@ -396,12 +371,12 @@ SKILLS
 
 EDUCATION
 Master of Business Administration (MBA)
-University of Washington, Seattle, WA
+University of Washington
 Focus: Technology Management
 Graduated: 2019
 
 Bachelor of Science in Information Technology
-Oregon State University, Corvallis, OR
+Oregon State University
 Graduated: 2015
 
 CERTIFICATIONS
