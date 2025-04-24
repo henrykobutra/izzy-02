@@ -87,7 +87,7 @@ export function FeedbackTable({
     if (data.length > 0) {
       fetchStrategies();
     }
-    
+
     return () => {
       // Clean up strategies state when component unmounts
       setStrategies({});
@@ -96,11 +96,11 @@ export function FeedbackTable({
 
   const handleDelete = async () => {
     if (!feedbackToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const success = await deleteFeedback(feedbackToDelete);
-      
+
       if (success) {
         toast.success("Feedback deleted successfully");
         refetchFeedback();
@@ -243,7 +243,7 @@ export function FeedbackTable({
                           className="h-8 px-2.5 cursor-pointer"
                           asChild
                         >
-                          <Link href={`/dashboard/feedback/${feedback.id}`}>
+                          <Link href={`/dashboard/feedback/${feedback.session_id}`}>
                             <FileText className="h-3.5 w-3.5 mr-1" />
                             <span className="text-xs">View</span>
                           </Link>

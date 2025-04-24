@@ -15,14 +15,13 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
-import { getFeedback } from "@/services/database/feedback/getFeedback"
+import { getFeedbackBySessionId } from "@/services/database/feedback/getFeedback"
 import type { FeedbackWithMetadata } from "@/types/interview-feedback"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 import { getScoreBarColor, getScoreLabel, getScoreGradient } from "@/utils/score-utils"
 import { getSkillIconComponent, getSkillColor, feedbackIcons, itemIndicatorIcons, metadataIcons } from "@/utils/icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getInterviewTranscript } from "@/services/database/interviews/getTranscript"
 import { useUser } from "@/hooks/users/useUser"
 import { Badge } from "@/components/ui/badge";
 
@@ -44,45 +43,32 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   // Unwrap params Promise with React.use()
   const { id } = React.use(params)
 
-  const [feedback, setFeedback] = useState<FeedbackWithMetadata | null>(null)
+  const [feedbackList, setFeedbackList] = useState<FeedbackWithMetadata[]>([])
+  const [currentFeedback, setCurrentFeedback] = useState<FeedbackWithMetadata | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [transcript, setTranscript] = useState<Record<string, unknown> | null>(null)
   const [transcriptLoading, setTranscriptLoading] = useState(false)
   const { firstName } = useUser()
 
-  // Function to fetch transcript
-  const fetchTranscript = async (sessionId: string) => {
-    if (!sessionId) return
-
-    try {
-      setTranscriptLoading(true)
-      const transcriptData = await getInterviewTranscript(sessionId)
-
-      if (transcriptData && transcriptData.transcript) {
-        setTranscript(transcriptData.transcript)
-      }
-    } catch (err) {
-      console.error("Error loading transcript:", err)
-    } finally {
-      setTranscriptLoading(false)
-    }
-  }
-
   useEffect(() => {
     const loadFeedback = async () => {
       try {
         setLoading(true)
-        const feedbackData = await getFeedback(id)
+        // We're now using the session ID to fetch feedback
+        const feedbackData = await getFeedbackBySessionId(id)
 
-        if (!feedbackData) {
-          setError("Feedback not found")
+        if (!feedbackData || feedbackData.length === 0) {
+          setError("No feedback found for this session")
         } else {
-          setFeedback(feedbackData)
-
-          // Fetch transcript if session_id exists
-          if (feedbackData.session_id) {
-            fetchTranscript(feedbackData.session_id)
+          setFeedbackList(feedbackData)
+          // Set the first feedback as the current one by default
+          setCurrentFeedback(feedbackData[0])
+          
+          // We don't need to separately fetch the transcript anymore
+          // as it's included in the interview_sessions data
+          if (feedbackData[0].interview_sessions?.transcript) {
+            setTranscript(feedbackData[0].interview_sessions.transcript)
           }
         }
       } catch (err) {
@@ -95,6 +81,14 @@ export default function FeedbackDetailPage({ params }: PageProps) {
 
     loadFeedback()
   }, [id])
+
+  // Function to select a specific feedback
+  const selectFeedback = (feedback: FeedbackWithMetadata) => {
+    setCurrentFeedback(feedback)
+    if (feedback.interview_sessions?.transcript) {
+      setTranscript(feedback.interview_sessions.transcript)
+    }
+  }
 
   // Handle loading state
   if (loading) {
@@ -112,7 +106,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   }
 
   // Handle error state
-  if (error || !feedback) {
+  if (error || !currentFeedback) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] w-full">
         <div className="flex flex-col items-center gap-4 max-w-md text-center">
@@ -133,11 +127,11 @@ export default function FeedbackDetailPage({ params }: PageProps) {
   }
 
   // Format date for display
-  const formattedDate = feedback.created_at ? format(new Date(feedback.created_at), 'MMMM d, yyyy') : "Unknown"
+  const formattedDate = currentFeedback.created_at ? format(new Date(currentFeedback.created_at), 'MMMM d, yyyy') : "Unknown"
 
   // Get the appropriate icon for the interview type
   const getInterviewTypeIcon = () => {
-    switch (feedback.interview_sessions?.interview_type) {
+    switch (currentFeedback.interview_sessions?.interview_type) {
       case 'behavioral':
         return <MessageSquare className="h-5 w-5" aria-hidden="true" />;
       case 'technical':
@@ -169,7 +163,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
         </div>
 
         {/* Hero section with interview details and score */}
-        <div className={`rounded-xl bg-gradient-to-br ${getScoreGradient(feedback.overall_score)} p-4 sm:p-6 md:p-8 mb-8 shadow-sm overflow-hidden`}>
+        <div className={`rounded-xl bg-gradient-to-br ${getScoreGradient(currentFeedback.overall_score)} p-4 sm:p-6 md:p-8 mb-8 shadow-sm overflow-hidden`}>
           <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8 justify-between">
             <div className="space-y-3 md:space-y-4 w-full">
               <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -182,20 +176,40 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 </span>
                 <span className="text-muted-foreground flex items-center gap-1.5">
                   {getInterviewTypeIcon()}
-                  {capitalizeInterviewType(feedback.interview_sessions?.interview_type)} Interview
+                  {capitalizeInterviewType(currentFeedback.interview_sessions?.interview_type)} Interview
                 </span>
               </div>
 
               <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">Interview Performance</h1>
-                {feedback.interview_sessions?.job_title && (
+                {currentFeedback.interview_sessions?.job_title && (
                   <p className="text-lg font-medium flex items-center gap-2 mb-4">
                     <metadataIcons.jobTitle className="h-5 w-5" aria-hidden="true" />
-                    {feedback.interview_sessions.job_title}
+                    {currentFeedback.interview_sessions.job_title}
                   </p>
                 )}
+                
+                {/* Display feedback selector if multiple feedbacks exist */}
+                {feedbackList.length > 1 && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium mb-2">Multiple feedback entries available:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {feedbackList.map((feedback, index) => (
+                        <Button
+                          key={feedback.id}
+                          size="sm"
+                          variant={currentFeedback.id === feedback.id ? "default" : "outline"}
+                          onClick={() => selectFeedback(feedback)}
+                        >
+                          Feedback {index + 1}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <p className="text-muted-foreground line-clamp-3">
-                  {feedback.feedback_summary}
+                  {currentFeedback.feedback_summary}
                 </p>
               </div>
             </div>
@@ -220,9 +234,9 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                         cy="50"
                         r="45"
                         fill="transparent"
-                        stroke={getScoreBarColor(feedback.overall_score)}
+                        stroke={getScoreBarColor(currentFeedback.overall_score)}
                         strokeWidth="8"
-                        strokeDasharray={`${feedback.overall_score * 2.83} 283`}
+                        strokeDasharray={`${currentFeedback.overall_score * 2.83} 283`}
                         strokeDashoffset="0"
                         strokeLinecap="round"
                         transform="rotate(-90 50 50)"
@@ -236,14 +250,14 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                         fill="currentColor"
                         dominantBaseline="middle"
                       >
-                        {feedback.overall_score}%
+                        {currentFeedback.overall_score}%
                       </text>
                     </svg>
                   </div>
                   <div className="flex items-center gap-2">
                     <metadataIcons.performance className="h-5 w-5 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground font-medium">
-                      {getScoreLabel(feedback.overall_score)}
+                      {getScoreLabel(currentFeedback.overall_score)}
                     </span>
                   </div>
                 </div>
@@ -280,7 +294,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-5">
-                  {feedback.skills_breakdown?.map((skill) => (
+                  {currentFeedback.skills_breakdown?.map((skill) => (
                     <Collapsible key={skill.skill} className="border rounded-md px-4 py-3.5 hover:bg-muted/20 transition-colors">
                       <CollapsibleTrigger className="flex justify-between items-center w-full group">
                         <div className="flex items-center gap-2.5">
@@ -355,7 +369,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 </CardHeader>
                 <CardContent className="pt-2">
                   <div className="space-y-4">
-                    {feedback.strengths?.map((strength, index) => (
+                    {currentFeedback.strengths?.map((strength, index) => (
                       <div key={index} className="pb-3 space-y-1">
                         <div className="flex items-center gap-2">
                           <itemIndicatorIcons.strength className="h-4 w-4 text-primary" />
@@ -381,7 +395,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                 </CardHeader>
                 <CardContent className="pt-2">
                   <div className="space-y-4">
-                    {feedback.weaknesses?.map((weakness, index) => (
+                    {currentFeedback.weaknesses?.map((weakness, index) => (
                       <div key={index} className="pb-3 space-y-1">
                         <div className="flex items-center gap-2">
                           <itemIndicatorIcons.weakness className="h-4 w-4 text-amber-500" />
@@ -408,7 +422,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {feedback.areas_for_improvement?.map((area, index) => (
+                  {currentFeedback.areas_for_improvement?.map((area, index) => (
                     <div key={index} className="flex gap-4 pb-4 last:pb-0 last:border-0">
                       <div className="flex items-center justify-center rounded-full bg-primary/10 h-8 w-8 flex-shrink-0 mt-0.5">
                         <itemIndicatorIcons.actionItem className="h-4 w-4 text-primary" />

@@ -35,6 +35,7 @@ export type FeedbackWithMetadata = InterviewFeedback & {
     interview_type: string
     interview_strategy_id?: string | null
     interview_question_amount?: number
+    transcript?: Record<string, unknown>
   }
 }
 
