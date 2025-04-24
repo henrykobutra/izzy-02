@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@tabler/icons-react";
 import AgentCard from "@/components/marketing/agent-card";
 import { HowItWorks } from "@/components/marketing/how-it-works/HowItWorks";
 import { FaqSection } from "@/components/marketing/faq";
