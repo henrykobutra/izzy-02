@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -12,12 +12,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { 
-  Building, 
-  Calendar, 
-  Briefcase, 
-  Trash2, 
-  Mic, 
+import {
+  Building,
+  Calendar,
+  Briefcase,
+  Trash2,
+  Mic,
   ArrowLeft,
   Target
 } from "lucide-react"
@@ -32,11 +32,11 @@ interface StrategyHeroProps {
 }
 
 export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroProps) {
-  const { 
-    getMatchRateGradient, 
-    getMatchRateColor, 
-    getExperienceLevelDisplay, 
-    formatDate 
+  const {
+    getMatchRateGradient,
+    getMatchRateColor,
+    getExperienceLevelDisplay,
+    formatDate
   } = useStrategyUtils()
 
   return (
@@ -50,7 +50,7 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
           </Button>
         </Link>
       </div>
-      
+
       {/* Hero section with job details */}
       <div className={`rounded-xl bg-gradient-to-br ${getMatchRateGradient(strategy.match_rate)} p-4 sm:p-6 md:p-8 mb-8 shadow-sm overflow-hidden`}>
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8 justify-between">
@@ -68,7 +68,7 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
                 {strategy.job_industry}
               </span>
             </div>
-            
+
             <div>
               <h1 className="text-3xl font-bold tracking-tight mb-2">{strategy.job_title}</h1>
               <p className="text-lg font-medium flex items-center gap-2 mb-4">
@@ -79,7 +79,7 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
                 {strategy.job_description_summary}
               </p>
             </div>
-            
+
             <div className="flex flex-wrap gap-2 pt-2">
               {strategy.job_description_key_points.required_skills.slice(0, 5).map((skill, i) => (
                 <Badge key={i} variant="secondary" className="px-2 py-1">
@@ -93,41 +93,41 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
               )}
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-4 w-full lg:w-auto lg:min-w-[250px]">
             <div className="bg-card rounded-lg p-4 sm:p-6 shadow-sm border border-border/50">
               <div className="flex flex-col items-center mb-3">
                 <h3 className="text-xl font-bold mb-2 sm:mb-4">Match Score</h3>
                 <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center mb-2">
                   <svg className="w-full h-full" viewBox="0 0 100 100">
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="45" 
-                      fill="transparent" 
-                      stroke="currentColor" 
-                      strokeWidth="8" 
-                      className="text-muted/20" 
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="transparent"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      className="text-muted/20"
                     />
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="45" 
-                      fill="transparent" 
-                      stroke="currentColor" 
-                      strokeWidth="8" 
-                      strokeDasharray={`${strategy.match_rate * 2.83} 283`} 
-                      strokeDashoffset="0" 
-                      strokeLinecap="round" 
-                      className={getMatchRateColor(strategy.match_rate)} 
-                      transform="rotate(-90 50 50)" 
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="transparent"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      strokeDasharray={`${strategy.match_rate * 2.83} 283`}
+                      strokeDashoffset="0"
+                      strokeLinecap="round"
+                      className={getMatchRateColor(strategy.match_rate)}
+                      transform="rotate(-90 50 50)"
                     />
-                    <text 
-                      x="50" 
-                      y="55" 
-                      textAnchor="middle" 
-                      fontSize="22" 
-                      fontWeight="bold" 
+                    <text
+                      x="50"
+                      y="55"
+                      textAnchor="middle"
+                      fontSize="22"
+                      fontWeight="bold"
                       fill="currentColor"
                     >
                       {strategy.match_rate}%
@@ -139,17 +139,17 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
                   <span className="text-sm text-muted-foreground font-medium">Profile Alignment</span>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2 mt-4 sm:mt-6">
                 <Link href={`/dashboard/practice-interview?strategyId=${id}`}>
-                  <Button className="w-full gap-1.5">
+                  <Button className="w-full gap-1.5 cursor-pointer">
                     <Mic className="h-4 w-4" />
                     Practice
                   </Button>
                 </Link>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" className="w-full gap-1.5" disabled={deleting}>
+                    <Button variant="outline" className="w-full gap-1.5 cursor-pointer" disabled={deleting}>
                       <Trash2 className="h-4 w-4" />
                       Delete
                     </Button>
@@ -164,8 +164,8 @@ export function StrategyHero({ strategy, id, deleting, onDelete }: StrategyHeroP
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction 
-                        onClick={onDelete} 
+                      <AlertDialogAction
+                        onClick={onDelete}
                         disabled={deleting}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
