@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { PhoneCall, PhoneOff, UserRound } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -12,35 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-
-// Simple speech visualizer for the call interface
-function SpeechVisualizer() {
-    return (
-        <div className="flex justify-center gap-1 h-6">
-            {[...Array(5)].map((_, i) => (
-                <div
-                    key={i}
-                    className="w-1 bg-primary rounded-full"
-                    style={{
-                        height: `${Math.max(15, Math.random() * 24)}px`,
-                        animationDuration: `${0.2 + Math.random() * 0.3}s`,
-                        animationDelay: `${i * 0.1}s`
-                    }}
-                >
-                    <style jsx>{`
-                        div {
-                            animation: pulse infinite alternate ease-in-out;
-                        }
-                        @keyframes pulse {
-                            0% { height: 15px; }
-                            100% { height: 24px; }
-                        }
-                    `}</style>
-                </div>
-            ))}
-        </div>
-    );
-}
+import { startDemoVapiAssistant, setupVapiEventListeners } from "@/lib/vapi/vapi.demo.utils";
+import { vapi } from "@/lib/vapi/vapi.sdk";
+import { toast } from "sonner";
 
 // VisuallyHidden component for accessibility
 function VisuallyHidden({ children }: { children: React.ReactNode }) {
@@ -54,33 +28,135 @@ function VisuallyHidden({ children }: { children: React.ReactNode }) {
 export default function AgentCard() {
     const [open, setOpen] = useState(false);
     const [callState, setCallState] = useState<"not_started" | "connecting" | "izzy_speaking" | "user_speaking" | "ended">("not_started");
-    
-    // Start the call
-    const handleStartCall = () => {
-        setCallState("connecting");
-        // Simulate connection delay
-        setTimeout(() => {
-            setCallState("izzy_speaking");
-        }, 1500);
+
+    // Vapi call management
+    const [vapiCall, setVapiCall] = useState<unknown>(null);
+    const vapiCallRef = useRef<unknown>(null);
+    const cleanupEventListeners = useRef<(() => void) | null>(null);
+    const speechEndTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Update ref when vapiCall changes
+    useEffect(() => {
+        vapiCallRef.current = vapiCall;
+    }, [vapiCall]);
+
+    // Cleanup function that handles all Vapi resources
+    const cleanupVapiResources = () => {
+        // Clean up any active speech end timers
+        if (speechEndTimerRef.current) {
+            clearTimeout(speechEndTimerRef.current);
+            speechEndTimerRef.current = null;
+        }
+
+        // Clean up event listeners
+        if (cleanupEventListeners.current) {
+            cleanupEventListeners.current();
+            cleanupEventListeners.current = null;
+        }
+
+        // Stop Vapi call if active
+        if (vapiCallRef.current) {
+            try {
+                vapi.stop();
+            } catch (e) {
+                console.error("Error stopping Vapi call:", e);
+            }
+            setVapiCall(null);
+        }
+
+        // Reset call state
+        setCallState("not_started");
     };
-    
+
+    // Watch for dialog close and clean up resources
+    useEffect(() => {
+        if (!open && (callState !== "not_started" || vapiCall)) {
+            cleanupVapiResources();
+        }
+    }, [open, callState, vapiCall]);
+
+    // Cleanup Vapi event listeners and resources when component unmounts
+    useEffect(() => {
+        return () => {
+            cleanupVapiResources();
+        };
+    }, []);
+
+    // Start the call using Vapi
+    const handleStartCall = async () => {
+        setCallState("connecting");
+
+        try {
+            // Start the Vapi demo assistant
+            const call = await startDemoVapiAssistant();
+            setVapiCall(call);
+
+            // Setup event listeners to control UI
+            const cleanup = setupVapiEventListeners({
+                onCallStart: () => {
+                    setCallState("izzy_speaking");
+                },
+                onCallEnd: () => {
+                    setCallState("ended");
+                    setVapiCall(null);
+
+                    // Reset after a delay
+                    setTimeout(() => {
+                        setCallState("not_started");
+                        setOpen(false);
+                    }, 2000);
+                },
+                onSpeechStart: () => {
+                    setCallState("izzy_speaking");
+
+                    // Clear any pending debounced state changes when interviewer starts speaking
+                    if (speechEndTimerRef.current) {
+                        clearTimeout(speechEndTimerRef.current);
+                        speechEndTimerRef.current = null;
+                    }
+                },
+                onSpeechEnd: () => {
+                    // Clear any existing timeout first
+                    if (speechEndTimerRef.current) {
+                        clearTimeout(speechEndTimerRef.current);
+                    }
+
+                    // Set a new timeout with a short delay
+                    speechEndTimerRef.current = setTimeout(() => {
+                        setCallState("user_speaking");
+                        speechEndTimerRef.current = null;
+                    }, 500);
+                },
+                onError: () => {
+                    toast.error("Call ended", {
+                        description: "Feel free to try again later!",
+                    });
+                    handleEndCall();
+                }
+            });
+
+            // Save cleanup function
+            cleanupEventListeners.current = cleanup;
+        } catch (error) {
+            console.error("Failed to start Vapi call:", error);
+            toast.error("Failed to start call", {
+                description: "There was a problem starting the call. Please try again.",
+            });
+            setCallState("not_started");
+        }
+    };
+
     // End the call
     const handleEndCall = () => {
+        cleanupVapiResources();
+
         setCallState("ended");
+
         // Reset after a delay
         setTimeout(() => {
             setCallState("not_started");
             setOpen(false);
         }, 2000);
-    };
-    
-    // Toggle between who is speaking
-    const toggleSpeaking = () => {
-        if (callState === "izzy_speaking") {
-            setCallState("user_speaking");
-        } else if (callState === "user_speaking") {
-            setCallState("izzy_speaking");
-        }
     };
 
     // Helper to determine if participant is active
@@ -149,7 +225,7 @@ export default function AgentCard() {
                                 {callState === "user_speaking" && <span>Your turn to speak</span>}
                                 {callState === "ended" && <span>Call ended</span>}
                             </div>
-                            
+
                             {/* Video call participants */}
                             <div className="flex flex-col md:flex-row w-full gap-6 mb-8">
                                 {/* Interviewer */}
@@ -210,7 +286,7 @@ export default function AgentCard() {
                                     </div>
                                     <div className="text-center">
                                         <h3 className="font-medium">You</h3>
-                                        <p className="text-xs text-muted-foreground">Candidate</p>
+                                        <p className="text-xs text-muted-foreground">Job Seeker</p>
                                     </div>
                                     <div className="mt-auto pt-3">
                                         {isUserActive && (
@@ -219,68 +295,34 @@ export default function AgentCard() {
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                                 </span>
-                                                Speaking
+                                                Your Turn
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             </div>
-                            
-                            {/* Speech visualizer - only show when conversation is active */}
-                            {(callState === "izzy_speaking" || callState === "user_speaking") && (
-                                <div className="w-full flex justify-center my-4">
-                                    <div className="bg-muted/30 rounded-md h-12 w-full max-w-md flex items-center justify-center">
-                                        <SpeechVisualizer />
-                                    </div>
-                                </div>
-                            )}
-                            
+
                             {/* Call controls */}
-                            <div className="flex gap-3 mt-6">
-                                {callState === "not_started" && (
-                                    <Button 
-                                        onClick={handleStartCall} 
-                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                            <div className="flex gap-3 mt-2">
+                                {callState === "not_started" ? (
+                                    <Button
+                                        onClick={handleStartCall}
                                         size="lg"
+                                        className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                                     >
-                                        <PhoneCall className="mr-2 h-4 w-4" />
+                                        <PhoneCall className="h-5 w-5" />
                                         Start Call
                                     </Button>
-                                )}
-                                
-                                {(callState === "izzy_speaking" || callState === "user_speaking") && (
+                                ) : (
                                     <Button
-                                        onClick={toggleSpeaking}
-                                        variant="outline"
-                                        className="rounded-full px-4"
-                                    >
-                                        Switch Speaker
-                                    </Button>
-                                )}
-                                
-                                {(callState !== "not_started" && callState !== "ended") && (
-                                    <Button 
-                                        onClick={handleEndCall} 
+                                        onClick={handleEndCall}
+                                        size="lg"
                                         variant="destructive"
-                                        size="icon"
-                                        className="rounded-full h-12 w-12"
+                                        className="cursor-pointer gap-2"
+                                        disabled={callState === "ended"}
                                     >
                                         <PhoneOff className="h-5 w-5" />
-                                    </Button>
-                                )}
-                                
-                                {callState === "connecting" && (
-                                    <div className="text-sm text-muted-foreground animate-pulse">
-                                        Connecting to Izzy...
-                                    </div>
-                                )}
-                                
-                                {callState === "ended" && (
-                                    <Button 
-                                        onClick={() => setCallState("not_started")}
-                                        variant="outline"
-                                    >
-                                        Call again
+                                        End Call
                                     </Button>
                                 )}
                             </div>
