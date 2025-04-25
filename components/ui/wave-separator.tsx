@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WaveSeparatorProps {
   className?: string;
@@ -18,6 +18,7 @@ export function WaveSeparator({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number | undefined>(undefined);
   const waveNodesRef = useRef<Array<{ nodes: number[][], color: string }>>([]);
+  const [windowWidth, setWindowWidth] = useState<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -27,19 +28,23 @@ export function WaveSeparator({
     if (!ctx) return;
 
     const resizeCanvas = () => {
-      // Use the actual window width without the minimum constraint
       const width = window.innerWidth;
       canvas.width = width;
       canvas.height = height;
+      setWindowWidth(width); // Store the window width to trigger re-initialization
     };
 
-    resizeCanvas();
+    // Initialize on first render
+    if (windowWidth === 0) {
+      resizeCanvas();
+    }
+    
     window.addEventListener('resize', resizeCanvas);
 
-    // Generate 20 colors if none provided
+    // Generate colors if none provided
     const waveColors = colors.length > 0 ? colors : generateWaveColors(14);
 
-    // Initialize waves
+    // Initialize waves - this will now happen on every width change
     const nodes = 6;
     waveNodesRef.current = waveColors.map(color => {
       const waveNodes = [];
@@ -111,7 +116,7 @@ export function WaveSeparator({
       }
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [colors, height, lineWidth]);
+  }, [colors, height, lineWidth, windowWidth]); // Added windowWidth as dependency
 
   return (
     <div className={`wave-separator w-full overflow-hidden ${className}`}>
