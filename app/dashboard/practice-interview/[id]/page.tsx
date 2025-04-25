@@ -482,6 +482,12 @@ export default function InterviewDetailPage({ params }: PageProps) {
                       You&apos;ll have a real-time conversation with Izzy, your AI interviewer.
                       Speak clearly into your microphone when it&apos;s your turn.
                     </p>
+                    <div className="mt-2 inline-block mx-auto py-2 px-4 rounded-lg bg-amber-100/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 shadow-sm">
+                      <div className="flex items-center justify-center gap-2">
+                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                        <p className="text-sm font-medium">Allow microphone access when prompted for voice interaction</p>
+                      </div>
+                    </div>
                   </div>
                 )}
 

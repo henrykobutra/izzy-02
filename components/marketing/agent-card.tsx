@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { PhoneCall, PhoneOff, UserRound } from "lucide-react";
+import { PhoneCall, PhoneOff, UserRound, AlertCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import {
     Dialog,
@@ -125,7 +125,7 @@ export default function AgentCard() {
                     speechEndTimerRef.current = setTimeout(() => {
                         setCallState("user_speaking");
                         speechEndTimerRef.current = null;
-                    }, 500);
+                    }, 300);
                 },
                 onError: () => {
                     toast.error("Call ended", {
@@ -303,7 +303,15 @@ export default function AgentCard() {
                             </div>
 
                             {/* Call controls */}
-                            <div className="flex gap-3 mt-2">
+                            <div className="flex flex-col items-center gap-3 mt-2">
+                                {callState === "not_started" && (
+                                    <div className="inline-block mx-auto py-2 px-4 rounded-lg bg-amber-100/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 shadow-sm mb-3">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                                            <p className="text-sm font-medium">Allow microphone access when prompted for voice interaction</p>
+                                        </div>
+                                    </div>
+                                )}
                                 {callState === "not_started" ? (
                                     <Button
                                         onClick={handleStartCall}

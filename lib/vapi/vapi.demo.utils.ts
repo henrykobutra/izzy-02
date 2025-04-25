@@ -74,7 +74,7 @@ You are a demo agent for an AI interview app designed to simulate interview expe
       firstMessage: "Hi there! I'm Izzy, your AI interview assistant. This is a brief demo to showcase my interview simulation capabilities. How are you doing today?",
       firstMessageMode: "assistant-speaks-first",
       silenceTimeoutSeconds: 45,
-      maxDurationSeconds: 300, // 5 minutes for demo
+      maxDurationSeconds: 600, // 10 minutes for demo
       endCallMessage: "Thank you for trying our demo! Feel free to explore our website for more information or sign up for personalized interview practice. Have a great day!",
       endCallPhrases: [
         "end interview",
