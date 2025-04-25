@@ -48,7 +48,7 @@ export function NavUser({
   const { isSigningOut } = useAuth()
   const [displayName, setDisplayName] = useState<string>("User")
   const [initials, setInitials] = useState<string>("UN")
-  
+
   // Set display name and initials when user changes
   useEffect(() => {
     if (user?.name) {
@@ -102,7 +102,7 @@ export function NavUser({
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight ml-2">
                     <span className="truncate font-medium">{displayName}</span>
-                    <span className="text-muted-foreground truncate text-xs">
+                    <span className="truncate text-xs">
                       {user?.email}
                     </span>
                   </div>
