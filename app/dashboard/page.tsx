@@ -53,7 +53,7 @@ export default function DashboardPage() {
         <p className="text-muted-foreground mb-6">
           {profileExists
             ? "Track your progress and prepare for your next interview"
-            : "Let&apos;s get you started on your interview preparation journey"}
+            : "Let's get you started on your interview preparation journey"}
         </p>
       </div>
 

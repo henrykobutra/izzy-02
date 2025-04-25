@@ -466,7 +466,7 @@ export default function FeedbackDetailPage({ params }: PageProps) {
                         </div>
                       </CollapsibleTrigger>
                       <div className="pt-3 pb-1">
-                        <div className="overflow-hidden rounded-full bg-secondary h-2.5">
+                        <div className="overflow-hidden rounded-full bg-muted/30 h-2.5">
                           <div
                             className={cn(
                               "h-full rounded-full transition-all",
