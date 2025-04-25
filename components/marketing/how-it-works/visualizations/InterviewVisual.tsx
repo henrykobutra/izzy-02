@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { IconMessageUser, IconMicrophone } from "@tabler/icons-react";
+import { IconMicrophone } from "@tabler/icons-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function InterviewVisual() {
   return (
@@ -52,22 +53,28 @@ export function InterviewVisual() {
             >
               {bubble.from === "ai" && (
                 <motion.div
-                  className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: bubble.delay, duration: 0.3 }}
                 >
-                  <IconMessageUser className="w-5 h-5 text-white" />
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/faces/izzy-avatar.png" alt="Izzy" />
+                    <AvatarFallback className="bg-emerald-600">IZ</AvatarFallback>
+                  </Avatar>
                 </motion.div>
               )}
               {bubble.from === "user" && (
                 <motion.div
-                  className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: bubble.delay, duration: 0.3 }}
                 >
-                  <IconMicrophone className="w-5 h-5 text-white" />
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/faces/henry.png" alt="Henry" />
+                    <AvatarFallback className="bg-indigo-600">
+                      <IconMicrophone className="w-5 h-5 text-white" />
+                    </AvatarFallback>
+                  </Avatar>
                 </motion.div>
               )}
               <div
