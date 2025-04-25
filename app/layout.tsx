@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import MobileWarning from "@/components/mobile-warning";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark", geistSans.variable, geistMono.variable)}>
       <body className={cn("min-h-screen bg-background font-sans antialiased")}>
-        <main>
+        <MobileWarning />
+        <main className="sm:block">
           {children}
         </main>
         <Toaster />

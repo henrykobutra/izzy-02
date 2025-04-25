@@ -163,6 +163,16 @@
   }
 }
 
+/* Phone shake animation for mobile warning */
+@keyframes phone-shake {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+.animate-phone-shake {
+  animation: phone-shake 0.5s ease-in-out infinite;
+}
+
 /* Sound wave animations for interview page */
 @keyframes sound-wave-1 {
   0%, 100% { height: 0.75rem; }
