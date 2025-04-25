@@ -15,8 +15,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Default metadata for the application
 export const metadata: Metadata = {
-  title: "Izzy",
+  title: {
+    template: "%s | Izzy AI",
+    default: "Izzy AI", // Used when no template is provided
+  },
   description: "Izzy is an AI-powered platform that helps job seekers practice and ace their interviews with realistic mock interviews, instant feedback, and personalized preparation tools.",
 };
 
