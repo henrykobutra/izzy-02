@@ -9,7 +9,17 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AI Interview Agents for Job Seekers",
-  description: "Prepare for job interviews with AI agents that analyze your profile, create interview strategies, conduct mock interviews, and provide detailed feedback."
+  description: "Prepare for job interviews with AI agents that analyze your profile, create interview strategies, conduct mock interviews, and provide detailed feedback.",
+  openGraph: {
+    title: "AI Interview Agents for Job Seekers | Izzy AI",
+    description: "Practice with AI agents that analyze your profile, create personalized interview strategies, conduct realistic mock interviews, and provide detailed performance feedback.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Interview Agents for Job Seekers | Izzy AI",
+    description: "Practice with AI agents that analyze your profile, create personalized interview strategies, conduct realistic mock interviews, and provide detailed performance feedback.",
+  }
 };
 
 export default function HomePage() {

@@ -22,6 +22,17 @@ export const metadata: Metadata = {
     default: "Izzy AI", // Used when no template is provided
   },
   description: "Izzy is an AI-powered platform that helps job seekers practice and ace their interviews with realistic mock interviews, instant feedback, and personalized preparation tools.",
+  openGraph: {
+    title: "Izzy AI - Ace Your Interviews with AI-Powered Practice",
+    description: "Prepare for job interviews with Izzy's AI-powered mock interviews, real-time feedback, and personalized coaching. Level up your interview skills and land your dream job.",
+    type: "website",
+    siteName: "Izzy AI",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Izzy AI - Ace Your Interviews with AI-Powered Practice",
+    description: "Prepare for job interviews with Izzy's AI-powered mock interviews, real-time feedback, and personalized coaching.",
+  },
 };
 
 export default function RootLayout({

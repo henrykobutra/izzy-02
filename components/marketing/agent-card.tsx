@@ -304,7 +304,7 @@ export default function AgentCard() {
 
                             {/* Call controls */}
                             <div className="flex flex-col items-center gap-3 mt-2">
-                                {callState === "not_started" && (
+                                {(callState === "not_started" || callState === "connecting") && (
                                     <div className="inline-block mx-auto py-2 px-4 rounded-lg bg-amber-100/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 shadow-sm mb-3">
                                         <div className="flex items-center justify-center gap-2">
                                             <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -327,10 +327,10 @@ export default function AgentCard() {
                                         size="lg"
                                         variant="destructive"
                                         className="cursor-pointer gap-2"
-                                        disabled={callState === "ended"}
+                                        disabled={callState === "ended" || callState === "connecting"}
                                     >
                                         <PhoneOff className="h-5 w-5" />
-                                        End Call
+                                        {callState === "connecting" ? "Connecting..." : "End Call"}
                                     </Button>
                                 )}
                             </div>
