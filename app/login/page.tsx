@@ -1,4 +1,10 @@
 import { LoginForm } from "@/components/login-form"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Log In",
+  description: "Sign in to your Izzy AI account to access your interview preparation tools and mock interview sessions."
+}
 
 export default function LoginPage() {
   return (

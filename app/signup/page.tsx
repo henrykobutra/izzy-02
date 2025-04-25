@@ -1,4 +1,10 @@
 import { SignupForm } from "@/components/signup-form"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Sign Up",
+  description: "Create your free Izzy AI account to start preparing for job interviews with AI-powered mock interviews and personalized feedback."
+}
 
 export default function SignupPage() {
   return (

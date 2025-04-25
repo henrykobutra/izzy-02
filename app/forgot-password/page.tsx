@@ -1,4 +1,10 @@
 import { ForgotPasswordForm } from "@/components/forgot-password-form"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Reset Password",
+  description: "Reset your Izzy AI account password to regain access to your interview preparation tools and saved progress."
+}
 
 export default function ForgotPasswordPage() {
   return (

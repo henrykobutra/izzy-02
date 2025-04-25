@@ -5,6 +5,12 @@ import CTASection from "@/components/marketing/CTA";
 import Link from "next/link";
 import { WaveSeparator } from "@/components/ui/wave-separator";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI Interview Agents for Job Seekers",
+  description: "Prepare for job interviews with AI agents that analyze your profile, create interview strategies, conduct mock interviews, and provide detailed feedback."
+};
 
 export default function HomePage() {
   return (

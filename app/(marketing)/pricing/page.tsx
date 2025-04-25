@@ -9,6 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Check, Sparkles, Heart, Rocket } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description: "Free AI interview preparation during our educational preview. No credit card required. Prepare for job interviews with AI agents today."
+};
 
 export default function PricingPage() {
   return (

@@ -1,4 +1,10 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Learn how Izzy AI collects, uses, and protects your information during our educational preview. Read our privacy policy and data practices."
+};
 
 export default function PrivacyPage() {
   return (

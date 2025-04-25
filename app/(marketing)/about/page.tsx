@@ -1,6 +1,12 @@
 import Image from "next/image";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Our Mission and Story",
+  description: "Learn about Izzy AI's mission to make interview preparation accessible through intelligent AI agents and the story behind this educational project."
+};
 
 export default function AboutPage() {
 

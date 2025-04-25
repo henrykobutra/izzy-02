@@ -1,4 +1,10 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Review Izzy AI's terms of service, including user eligibility, account responsibilities, and terms for using our AI interview preparation platform."
+};
 
 export default function TermsPage() {
   return (
