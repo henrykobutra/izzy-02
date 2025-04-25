@@ -1,14 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { IconAlertTriangle, IconRefresh, IconHome } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 
-// Next.js App Router error boundary signature
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
+type ErrorUIProps = {
+  messageIndex: number;
+  year: number;
+};
+
+export function ErrorUI({ messageIndex, year }: ErrorUIProps) {
   // Fun error messages (primary)
   const errorMessages = [
     "Oops! Our servers are having an existential crisis.",
@@ -45,50 +45,33 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
     "In the meantime, have you tried hitting the keyboard harder?",
   ];
   
-  const randomIndex = Math.floor(Math.random() * errorMessages.length);
-  const randomMessage = errorMessages[randomIndex];
-  const randomSecondary = secondaryMessages[randomIndex];
-  const randomDescription = descriptions[randomIndex];
+  const randomMessage = errorMessages[messageIndex];
+  const randomSecondary = secondaryMessages[messageIndex];
+  const randomDescription = descriptions[messageIndex];
   
   return (
-    <div className="flex min-h-svh flex-col justify-between">
-      <main className="flex flex-1 flex-col items-center justify-center p-6 md:p-10">
-        <div className="w-full max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="rounded-full bg-red-100 p-3 text-red-600 dark:bg-red-900/30 animate-pulse">
-              <IconAlertTriangle size={32} />
-            </div>
-          </div>
-          
-          <h1 className="mb-2 text-2xl font-bold">{randomMessage}</h1>
-          
-          <Badge variant="outline" className="mb-4 bg-primary/10 dark:bg-primary/20 text-primary-foreground px-3 py-1 text-sm">
-            {randomSecondary}
-          </Badge>
-          
-          <p className="mb-8 text-sm text-muted-foreground">
-            {randomDescription}
-          </p>
-          
-          <div className="flex flex-col gap-4">
-            <Button onClick={() => window.location.reload()} className="flex items-center justify-center">
-              <IconRefresh className="mr-2" size={18} />
-              Try Again
-            </Button>
-            
-            <Button variant="outline" onClick={reset} className="flex items-center justify-center">
-              <IconHome className="mr-2" size={18} />
-              Go Home
-            </Button>
-          </div>
+    <>
+      <div className="mb-6 flex justify-center">
+        <div className="rounded-full bg-red-100 p-3 text-red-600 dark:bg-red-900/30 animate-pulse">
+          <IconAlertTriangle size={32} />
         </div>
-      </main>
+      </div>
       
-      <footer className="border-t border-border/20 py-3 px-6">
+      <h1 className="mb-2 text-2xl font-bold">{randomMessage}</h1>
+      
+      <Badge variant="outline" className="mb-4 bg-primary/10 dark:bg-primary/20 text-primary-foreground px-3 py-1 text-sm">
+        {randomSecondary}
+      </Badge>
+      
+      <p className="mb-8 text-sm text-muted-foreground">
+        {randomDescription}
+      </p>
+      
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-border/20 py-3 px-6">
         <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground/40">
           <div className="flex items-center">
             <Image src="/logo.png" alt="Izzy Logo" width={24} height={24} className="mr-2" />
-            <span>&copy; Izzy AI {new Date().getFullYear()}</span>
+            <span>&copy; Izzy AI {year}</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/terms" className="hover:text-muted-foreground transition-colors">Terms</Link>
@@ -99,6 +82,6 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 }

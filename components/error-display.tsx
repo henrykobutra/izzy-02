@@ -1,14 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { IconAlertTriangle, IconRefresh, IconHome } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// Next.js App Router error boundary signature
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
+type ErrorDisplayProps = {
+  onReset: () => void;
+};
+
+export function ErrorDisplay({ onReset }: ErrorDisplayProps) {
   // Fun error messages (primary)
   const errorMessages = [
     "Oops! Our servers are having an existential crisis.",
@@ -45,7 +45,11 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
     "In the meantime, have you tried hitting the keyboard harder?",
   ];
   
-  const randomIndex = Math.floor(Math.random() * errorMessages.length);
+  // Using a fixed seed for server-side rendering to maintain consistency
+  const date = new Date();
+  const seed = date.getDate() + date.getMonth() + date.getFullYear();
+  const randomIndex = seed % errorMessages.length;
+  
   const randomMessage = errorMessages[randomIndex];
   const randomSecondary = secondaryMessages[randomIndex];
   const randomDescription = descriptions[randomIndex];
@@ -76,7 +80,7 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
               Try Again
             </Button>
             
-            <Button variant="outline" onClick={reset} className="flex items-center justify-center">
+            <Button variant="outline" onClick={onReset} className="flex items-center justify-center">
               <IconHome className="mr-2" size={18} />
               Go Home
             </Button>
