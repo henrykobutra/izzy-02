@@ -333,7 +333,7 @@ export default function ProfileAnalysisPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-1.5 bg-white dark:bg-gray-950 cursor-pointer"
+                        className="gap-1.5 cursor-pointer"
                         onClick={() => window.location.reload()}
                       >
                         <RefreshCw className="h-3.5 w-3.5" />
