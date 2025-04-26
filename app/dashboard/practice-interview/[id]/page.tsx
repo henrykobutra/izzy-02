@@ -634,14 +634,6 @@ export default function InterviewDetailPage({ params }: PageProps) {
             )}
           </CardFooter>
         </Card>
-        <div className="mt-6 flex flex-col">
-          <div>
-            <strong>Interview State: </strong>{interviewState}
-          </div>
-          <div>
-            <strong>Session status: </strong>{session.status}
-          </div>
-        </div>
       </div>
     </div>
   )
